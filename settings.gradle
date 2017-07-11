@@ -1,0 +1,19 @@
+/**
+ * Africa's Talking SDK
+ */
+
+/* Libs */
+Set<String> libs = new HashSet<String>()
+//libs << 'server'
+libs << 'client'
+
+libs.each { lib ->
+    include lib
+    project(":${lib}").projectDir = file("libs/${lib}")
+}
+
+/* Examples */
+Set<String> examples = new HashSet<String>()
+//examples << 'example:web'
+examples << 'example:android'
+examples.each { eg -> include eg }

@@ -1,0 +1,80 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newInputStream())
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+
+group properties.getProperty("bintray.groupId")
+version properties.getProperty("bintray.version")
+
+apply plugin: 'java'
+apply plugin: "maven-publish"
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+targetCompatibility = 1.7
+sourceCompatibility = 1.7
+
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Africa\'s Talking SDK',
+                'Implementation-Version': version
+    }
+}
+
+shadowJar {
+    classifier = null // Avoid classifiers for now...
+}
+
+publishing {
+    publications {
+        SDK(MavenPublication) {
+            artifact shadowJar
+            groupId properties.getProperty("bintray.groupId")
+            artifactId project.name
+            version project.version
+        }
+    }
+}
+
+bintray {
+    dryRun = false
+    publish = true
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.key")
+    publications = ['SDK']
+    pkg {
+        repo = properties.getProperty("bintray.repo")
+        name = properties.getProperty("bintray.package")
+        userOrg = properties.getProperty("bintray.organization")
+        vcsUrl = properties.getProperty("bintray.vcsUrl")
+        licenses = ['Apache-2.0']
+        version {
+            name = project.version
+            desc = 'Africa\'s Talking SDK'
+            released  = new Date()
+            attributes = ['maturity': 'Development']
+        }
+    }
+}
