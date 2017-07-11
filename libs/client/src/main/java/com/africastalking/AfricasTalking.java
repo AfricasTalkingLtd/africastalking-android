@@ -36,7 +36,7 @@ public final class AfricasTalking{
     tokenString = getToken();
   }
 
-  protected static ManagedChannel getChannel(){
+  public static ManagedChannel getChannel(){
     if(HOST == null || PORT == -1) throw  new RuntimeException("call AfricasTalking.initialize(host, port, token) first");
     if(CHANNEL == null){
 
@@ -73,14 +73,13 @@ public final class AfricasTalking{
   protected static String getToken() {
     if(token == null) {
       token = new Token();
-      try {
-        tokenString = token.getToken();
-      } catch (IOException e) {
-        LOGGER.log(e.getMessage());
-      }
+      tokenString = token.getTokenString();
     }
     else{
       //TODO check if token not expired
+      if(token.getExpiration() != 0){
+
+      }
     }
     return tokenString;
   }
@@ -91,7 +90,7 @@ public final class AfricasTalking{
     ENV = env;
   }
 
-  public static void enableLogging(boolean enable) {
+  private static void enableLogging(boolean enable) {
     LOGGING = enable;
   }
 

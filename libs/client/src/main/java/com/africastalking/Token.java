@@ -1,5 +1,7 @@
 package com.africastalking;
 
+import android.util.Log;
+
 import com.africastalking.proto.RemoteToken.ClientTokenRequest;
 import com.africastalking.proto.RemoteToken.ClientTokenResponse;
 import com.africastalking.proto.SdkServerServiceGrpc;
@@ -13,22 +15,44 @@ import io.grpc.stub.StreamObserver;
 
 public class Token {
 
-    private SdkServerServiceStub asyncStub;
-    private SdkServerServiceBlockingStub blockingStub;
+    private static SdkServerServiceStub asyncStub;
+    private static SdkServerServiceBlockingStub blockingStub;
+    private static ClientTokenResponse resp;
+    private static String token;
+    private static long expiration;
 
     Token() {
         ManagedChannel channel = AfricasTalking.getChannel();
         blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
         asyncStub = SdkServerServiceGrpc.newStub(channel);
+        try {
+            resp = getToken();
+        } catch (IOException e) {
+            Log.d("ClientTokenResponse",e.getMessage());
+        }
     }
 
-    public String getToken() throws IOException {
+    public String getTokenString(){
+        if(token != null){
+            token = resp.getToken();
+        }
+        return token;
+    }
+
+    public long getExpiration(){
+        if(expiration != 0){
+            expiration = resp.getExpiration();
+        }
+        return expiration;
+    }
+
+    private static ClientTokenResponse getToken() throws IOException {
         ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
-        ClientTokenResponse resp = blockingStub.getToken(req);
-        return resp.getToken();
+        resp = blockingStub.getToken(req);
+        return resp;
     }
 
-    public void getToken(final Callback<String> callback) {
+    private void getToken(final Callback<String> callback) {
         ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
         asyncStub.getToken(req, new StreamObserver<ClientTokenResponse>() {
             @Override

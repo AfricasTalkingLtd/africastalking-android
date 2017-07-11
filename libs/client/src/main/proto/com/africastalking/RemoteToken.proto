@@ -5,6 +5,7 @@ message ClientTokenRequest { }
 
 message ClientTokenResponse {
   string token = 1;
+  int64 expiration = 2;
 }
 
 message SipCredentialsRequest { }
