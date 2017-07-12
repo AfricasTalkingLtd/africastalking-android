@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * A given service offered by AT API
  */
-public abstract class Service {
+abstract class Service {
 
     Retrofit.Builder retrofitBuilder;
 

@@ -13,7 +13,7 @@ import java.io.IOException;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 
-public class Token {
+class Token {
 
     private static SdkServerServiceStub asyncStub;
     private static SdkServerServiceBlockingStub blockingStub;
@@ -32,14 +32,14 @@ public class Token {
         }
     }
 
-    public String getTokenString(){
+    String getTokenString(){
         if(token != null){
             token = resp.getToken();
         }
         return token;
     }
 
-    public long getExpiration(){
+    long getExpiration(){
         if(expiration != 0){
             expiration = resp.getExpiration();
         }
