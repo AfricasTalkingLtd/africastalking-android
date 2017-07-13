@@ -99,7 +99,12 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    androidTestCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.powermock:powermock-module-junit4:1.6.2"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
+    testCompile "org.powermock:powermock-api-mockito:1.6.2"
+    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
 }
 
 task sourcesJar(type: Jar) {
@@ -121,8 +126,10 @@ artifacts {
     archives sourcesJar
 }
 
-task findConventions << {
-    println project.getConvention()
+task findConventions {
+    doLast{
+        println project.getConvention()
+    }
 }
 
 

@@ -39,7 +39,7 @@ public final class AfricasTalking{
   public static ManagedChannel getChannel(){
     if(HOST == null || PORT == -1) throw  new RuntimeException("call AfricasTalking.initialize(host, port, token) first");
     if(CHANNEL == null){
-
+      // TODO
     }
     return CHANNEL;
   }

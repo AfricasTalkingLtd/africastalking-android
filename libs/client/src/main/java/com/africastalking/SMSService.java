@@ -11,6 +11,7 @@ import com.africastalking.models.SubscriptionResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+//import java.util.StringJoiner;
 
 import retrofit2.Response;
 
@@ -56,7 +57,7 @@ public final class SMSService extends Service {
         }
     }
 
-    private String formatRecipients(String[] recipients) {
+    public String formatRecipients(String[] recipients) {
 
         if (recipients == null){
             return null;
@@ -67,6 +68,7 @@ public final class SMSService extends Service {
         }
 
         return TextUtils.join(",", Arrays.asList(recipients));
+
     }
 
     // -> Normal
