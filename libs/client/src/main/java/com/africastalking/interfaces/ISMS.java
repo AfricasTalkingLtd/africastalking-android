@@ -2,6 +2,7 @@ package com.africastalking.interfaces;
 
 import com.africastalking.models.Message;
 import com.africastalking.models.Recipient;
+import com.africastalking.models.SendMessageResponse;
 import com.africastalking.models.Subscription;
 import com.africastalking.models.SubscriptionResponse;
 
@@ -18,14 +19,17 @@ public interface ISMS {
 
     @FormUrlEncoded
     @POST("messaging")
-    Call<List<Recipient>> send(@Field("username") String username, @Field("to") String to,
-                               @Field("from") String from, @Field("message") String message);
+    Call<SendMessageResponse> send(@Field("username") String username, @Field("to") String to,
+                                   @Field("from") String from, @Field("message") String message);
 
-    Call<List<Recipient>> sendBulk(@Field("username") String username, @Field("to") String to,
+    @FormUrlEncoded
+    @POST("messaging")
+    Call<SendMessageResponse> sendBulk(@Field("username") String username, @Field("to") String to,
                                    @Field("from") String from, @Field("message") String message,
                                    @Field("bulkSMSMode") int bulkMode, @Field("enqueue") String enqueue);
-
-    Call<List<Recipient>> sendPremium(@Field("username") String username, @Field("to") String to,
+    @FormUrlEncoded
+    @POST("messaging")
+    Call<SendMessageResponse> sendPremium(@Field("username") String username, @Field("to") String to,
                                       @Field("from") String from, @Field("message") String message,
                                       @Field("keyword") String keyword, @Field("linkId") String linkId,
                                       @Field("retryDurationInHours") String retryDurationInHours);

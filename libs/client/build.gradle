@@ -105,6 +105,11 @@ dependencies {
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
     testCompile "org.powermock:powermock-api-mockito:1.6.2"
     testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+    androidTestCompile 'com.squareup.retrofit2:retrofit-mock:2.0.0'
+    androidTestCompile ('com.squareup.okhttp:mockwebserver:2.7.0')
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 }
 
 task sourcesJar(type: Jar) {

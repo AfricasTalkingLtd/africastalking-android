@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.africastalking.interfaces.ISMS;
 import com.africastalking.models.Message;
 import com.africastalking.models.Recipient;
+import com.africastalking.models.SendMessageResponse;
 import com.africastalking.models.Subscription;
 import com.africastalking.models.SubscriptionResponse;
 
@@ -20,6 +21,7 @@ public final class SMSService extends Service {
 
     private static SMSService smsService;
     private ISMS sms;
+    private String callType = "server";
 
     SMSService(String username, Format format, Currency currency) {
         super(username, format, currency);
@@ -47,7 +49,7 @@ public final class SMSService extends Service {
     @Override
     protected void initService() {
         String baseUrl = "https://api."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN) + "/version1/";
-        sms = retrofitBuilder.baseUrl(baseUrl).build().create(ISMS.class);
+        sms =  retrofitBuilder.baseUrl(baseUrl).build().create(ISMS.class) ;
     }
 
     @Override
@@ -71,6 +73,10 @@ public final class SMSService extends Service {
 
     }
 
+    public void setCallType(String callType){
+        this.callType = callType;
+    }
+
     // -> Normal
 
     /**
@@ -79,8 +85,8 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> send(String message, String from, String[] recipients) throws IOException {
-        Response<List<Recipient>> resp = sms.send(username, formatRecipients(recipients), from, message).execute();
+    public SendMessageResponse send(String message, String from, String[] recipients) throws IOException {
+        Response<SendMessageResponse> resp = sms.send(username, formatRecipients(recipients), from, message).execute();
         return resp.body();
     }
 
@@ -91,7 +97,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void send(String message, String from, String[] recipients, Callback<List<Recipient>> callback) {
+    public void send(String message, String from, String[] recipients, Callback<SendMessageResponse> callback) {
         sms.send(username, formatRecipients(recipients), from, message).enqueue(makeCallback(callback));
     }
 
@@ -101,7 +107,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> send(String message, String[] recipients) throws IOException {
+    public SendMessageResponse send(String message, String[] recipients) throws IOException {
         return send(message, null, recipients);
     }
 
@@ -113,7 +119,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void send(String message, String[] recipients, Callback<List<Recipient>> callback) {
+    public void send(String message, String[] recipients, Callback<SendMessageResponse> callback) {
         send(message, null, recipients, callback);
     }
 
@@ -126,8 +132,8 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendBulk(String message, String from, boolean enqueue, String[] recipients) throws IOException {
-        Response<List<Recipient>> resp = sms.sendBulk(username,
+    public SendMessageResponse sendBulk(String message, String from, boolean enqueue, String[] recipients) throws IOException {
+        Response<SendMessageResponse> resp = sms.sendBulk(username,
                 formatRecipients(recipients), from, message,
                 1, enqueue ? "1":null).execute();
         return resp.body();
@@ -140,7 +146,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendBulk(String message, String from, boolean enqueue, String[] recipients, Callback<List<Recipient>> callback) {
+    public void sendBulk(String message, String from, boolean enqueue, String[] recipients, Callback<SendMessageResponse> callback) {
         sms.sendBulk(username,
                 formatRecipients(recipients), from, message,
                 1, enqueue ? "1":null).enqueue(makeCallback(callback));
@@ -152,7 +158,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendBulk(String message, String from, String[] recipients) throws IOException {
+    public SendMessageResponse sendBulk(String message, String from, String[] recipients) throws IOException {
         return sendBulk(message, from, false, recipients);
     }
 
@@ -163,7 +169,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendBulk(String message, String from, String[] recipients, Callback<List<Recipient>> callback) {
+    public void sendBulk(String message, String from, String[] recipients, Callback<SendMessageResponse> callback) {
         sendBulk(message, from, false, recipients, callback);
     }
 
@@ -173,7 +179,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendBulk(String message, boolean enqueue, String[] recipients) throws IOException {
+    public SendMessageResponse sendBulk(String message, boolean enqueue, String[] recipients) throws IOException {
         return sendBulk(message, null, enqueue, recipients);
     }
 
@@ -184,7 +190,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendBulk(String message, boolean enqueue, String[] recipients, Callback<List<Recipient>> callback) {
+    public void sendBulk(String message, boolean enqueue, String[] recipients, Callback<SendMessageResponse> callback) {
         sendBulk(message, null, enqueue, recipients, callback);
     }
 
@@ -194,7 +200,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendBulk(String message, String[] recipients) throws IOException {
+    public SendMessageResponse sendBulk(String message, String[] recipients) throws IOException {
         return sendBulk(message, null, false, recipients);
     }
 
@@ -205,7 +211,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendBulk(String message, String[] recipients, Callback<List<Recipient>> callback) {
+    public void sendBulk(String message, String[] recipients, Callback<SendMessageResponse> callback) {
         sendBulk(message, null, false, recipients, callback);
     }
 
@@ -218,9 +224,9 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
+    public SendMessageResponse sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
-        Response<List<Recipient>> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration).execute();
+        Response<SendMessageResponse> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration).execute();
         return resp.body();
     }
 
@@ -231,7 +237,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<List<Recipient>> callback) {
+    public void sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<SendMessageResponse> callback) {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
         sms.sendPremium(username, formatRecipients(recipients),
                 from, message, keyword, linkId, retryDuration)
@@ -244,7 +250,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
+    public SendMessageResponse sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
         return sendPremium(message, null, keyword, linkId, retryDurationInHours, recipients);
     }
 
@@ -255,7 +261,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<List<Recipient>> callback){
+    public void sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<SendMessageResponse> callback){
         sendPremium(message, null, keyword, linkId, retryDurationInHours, recipients, callback);
     }
 
@@ -265,7 +271,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendPremium(String message, String from, String keyword, String linkId, String[] recipients) throws IOException {
+    public SendMessageResponse sendPremium(String message, String from, String keyword, String linkId, String[] recipients) throws IOException {
         return sendPremium(message, from, keyword, linkId, -1, recipients);
     }
 
@@ -276,7 +282,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendPremium(String message, String from, String keyword, String linkId, String[] recipients, Callback<List<Recipient>> callback){
+    public void sendPremium(String message, String from, String keyword, String linkId, String[] recipients, Callback<SendMessageResponse> callback){
         sendPremium(message, from, keyword, linkId, -1, recipients, callback);
     }
 
@@ -286,7 +292,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> sendPremium(String message, String keyword, String linkId, String[] recipients) throws IOException {
+    public SendMessageResponse sendPremium(String message, String keyword, String linkId, String[] recipients) throws IOException {
         return sendPremium(message, null, keyword, linkId, -1, recipients);
     }
 
@@ -297,7 +303,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void sendPremium(String message, String keyword, String linkId, String[] recipients, Callback<List<Recipient>> callback){
+    public void sendPremium(String message, String keyword, String linkId, String[] recipients, Callback<SendMessageResponse> callback){
         sendPremium(message, null, keyword, linkId, -1, recipients, callback);
     }
 

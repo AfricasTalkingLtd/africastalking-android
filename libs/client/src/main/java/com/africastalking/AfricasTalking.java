@@ -22,6 +22,7 @@ public final class AfricasTalking{
   static Environment ENV = Environment.SANDBOX;
   static Boolean LOGGING = false;
   static Logger LOGGER = new BaseLogger();
+  static CallType CALLTYPE = CallType.MOCK;
 
 
   public static void initialize(String host){

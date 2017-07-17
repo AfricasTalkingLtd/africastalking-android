@@ -5,6 +5,7 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.*;
 import retrofit2.Call;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ abstract class Service {
     String username;
     String token;
     Currency currency;
+
 
     Service(final String username, final Format format, Currency currency) {
 
@@ -43,21 +45,27 @@ abstract class Service {
             httpClient.addInterceptor(logger);
         }
 
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-                Request request = original.newBuilder()
-                        .addHeader("token", token)
-                        .addHeader("Accept", format.toString())
-                        .build();
+        if(AfricasTalking.CALLTYPE == CallType.MOCK){
+            httpClient.addInterceptor(new SMSMockInterceptor());
+        }
+        else {
+            httpClient.addInterceptor(new Interceptor() {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request original = chain.request();
+                    Request request = original.newBuilder()
+                            .addHeader("token", token)
+                            .addHeader("Accept", format.toString())
+                            .build();
 
-                return chain.proceed(request);
-            }
-        });
+                    return chain.proceed(request);
+                }
+            });
+        }
+
 
         retrofitBuilder = new Retrofit.Builder()
-                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create()) // switched from ScalarsConverterFactory
                 .client(httpClient.build());
 
         initService();
