@@ -1,0 +1,14 @@
+{"Subscriptions" :
+[
+  {
+    "id" : 100,
+    "phoneNumber" : "+254711XXXYYY",
+    "date" : "Timestamp"
+  },
+  {
+    "id" : 200,
+    "phoneNumber" : "+254733YYYZZZ",
+    "date" : "Timestamp"
+  }
+]
+}

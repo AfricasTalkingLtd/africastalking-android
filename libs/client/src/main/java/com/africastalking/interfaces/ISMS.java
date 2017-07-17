@@ -1,10 +1,12 @@
 package com.africastalking.interfaces;
 
+import com.africastalking.models.FetchMessageResponse;
 import com.africastalking.models.Message;
 import com.africastalking.models.Recipient;
 import com.africastalking.models.SendMessageResponse;
 import com.africastalking.models.Subscription;
 import com.africastalking.models.SubscriptionResponse;
+import com.africastalking.models.Subscriptions;
 
 import java.util.List;
 
@@ -35,12 +37,12 @@ public interface ISMS {
                                       @Field("retryDurationInHours") String retryDurationInHours);
 
     @GET("messaging")
-    Call<List<Message>> fetchMessage(@Query("username") String username, @Query("lastReceivedId") String lastReceivedId);
+    Call<FetchMessageResponse> fetchMessage(@Query("username") String username, @Query("lastReceivedId") String lastReceivedId);
 
 
     @GET("subscription")
-    Call<List<Subscription>> fetchSubsciption(@Query("username") String username, @Query("shortCode") String shortCode,
-                                              @Query("keyword") String keyword, @Query("lastReceivedId") String lastReceivedId);
+    Call<Subscriptions> fetchSubsciption(@Query("username") String username, @Query("shortCode") String shortCode,
+                                         @Query("keyword") String keyword, @Query("lastReceivedId") String lastReceivedId);
 
     @FormUrlEncoded
     @POST("subscription/create")

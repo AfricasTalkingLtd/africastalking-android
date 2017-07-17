@@ -3,11 +3,13 @@ package com.africastalking;
 import android.text.TextUtils;
 
 import com.africastalking.interfaces.ISMS;
+import com.africastalking.models.FetchMessageResponse;
 import com.africastalking.models.Message;
 import com.africastalking.models.Recipient;
 import com.africastalking.models.SendMessageResponse;
 import com.africastalking.models.Subscription;
 import com.africastalking.models.SubscriptionResponse;
+import com.africastalking.models.Subscriptions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -315,8 +317,8 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Message> fetchMessage(String lastReceivedId) throws IOException {
-        Response<List<Message>> resp = sms.fetchMessage(username, lastReceivedId).execute();
+    public FetchMessageResponse fetchMessage(String lastReceivedId) throws IOException {
+        Response<FetchMessageResponse> resp = sms.fetchMessage(username, lastReceivedId).execute();
         return resp.body();
     }
 
@@ -326,7 +328,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Message> fetchMessage() throws IOException {
+    public FetchMessageResponse fetchMessage() throws IOException {
         return fetchMessage("0");
     }
 
@@ -337,7 +339,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void fetchMessage(String lastReceivedId, Callback<List<Message>> callback) {
+    public void fetchMessage(String lastReceivedId, Callback<FetchMessageResponse> callback) {
         sms.fetchMessage(username, lastReceivedId).enqueue(makeCallback(callback));
     }
 
@@ -348,7 +350,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void fetchMessage(Callback<List<Message>> callback) {
+    public void fetchMessage(Callback<FetchMessageResponse> callback) {
         fetchMessage("0", callback);
     }
 
@@ -360,8 +362,8 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Subscription> fetchSubscription(String shortCode, String keyword, String lastReceivedId) throws IOException {
-        Response<List<Subscription>> resp = sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).execute();
+    public Subscriptions fetchSubscription(String shortCode, String keyword, String lastReceivedId) throws IOException {
+        Response<Subscriptions> resp = sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).execute();
         return resp.body();
     }
 
@@ -372,7 +374,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void fetchSubscription(String shortCode, String keyword, String lastReceivedId, Callback<List<Subscription>> callback) {
+    public void fetchSubscription(String shortCode, String keyword, String lastReceivedId, Callback<Subscriptions> callback) {
         sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).enqueue(makeCallback(callback));
 
     }
@@ -383,7 +385,7 @@ public final class SMSService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public List<Subscription> fetchSubscription(String shortCode, String keyword) throws IOException {
+    public Subscriptions fetchSubscription(String shortCode, String keyword) throws IOException {
         return fetchSubscription(shortCode, keyword, "0");
     }
 
@@ -395,7 +397,7 @@ public final class SMSService extends Service {
      * occurred
      * </p>
      */
-    public void fetchSubscription(String shortCode, String keyword, Callback<List<Subscription>> callback) {
+    public void fetchSubscription(String shortCode, String keyword, Callback<Subscriptions> callback) {
         fetchSubscription(shortCode, keyword, "0", callback);
     }
 
