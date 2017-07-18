@@ -2,11 +2,11 @@ package com.africastalking;
 
 import android.util.Log;
 
-import com.africastalking.proto.RemoteToken.ClientTokenRequest;
-import com.africastalking.proto.RemoteToken.ClientTokenResponse;
+
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceStub;
+import com.africastalking.proto.SdkServerServiceOuterClass;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ class Token {
 
     private static SdkServerServiceStub asyncStub;
     private static SdkServerServiceBlockingStub blockingStub;
-    private static ClientTokenResponse resp;
+    private static SdkServerServiceOuterClass.ClientTokenResponse resp;
     private static String token;
     private static long expiration;
 
@@ -46,17 +46,17 @@ class Token {
         return expiration;
     }
 
-    private static ClientTokenResponse getToken() throws IOException {
-        ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
+    private static SdkServerServiceOuterClass.ClientTokenResponse getToken() throws IOException {
+        SdkServerServiceOuterClass.ClientTokenRequest req = SdkServerServiceOuterClass.ClientTokenRequest.newBuilder().build();
         resp = blockingStub.getToken(req);
         return resp;
     }
 
     private void getToken(final Callback<String> callback) {
-        ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
-        asyncStub.getToken(req, new StreamObserver<ClientTokenResponse>() {
+        SdkServerServiceOuterClass.ClientTokenRequest req = SdkServerServiceOuterClass.ClientTokenRequest.newBuilder().build();
+        asyncStub.getToken(req, new StreamObserver<SdkServerServiceOuterClass.ClientTokenResponse>() {
             @Override
-            public void onNext(ClientTokenResponse value) {
+            public void onNext(SdkServerServiceOuterClass.ClientTokenResponse value) {
                 callback.onSuccess(value.getToken());
             }
 

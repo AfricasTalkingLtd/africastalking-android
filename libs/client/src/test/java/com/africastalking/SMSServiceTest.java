@@ -6,6 +6,7 @@ import android.test.InstrumentationTestCase;
 import android.text.TextUtils;
 
 import com.africastalking.models.Recipient;
+import com.africastalking.models.SendMessageResponse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class SMSServiceTest  {
 
     @Test
     public void testSend() throws Exception {
-        List<Recipient> actual = sms.send("message","from",new String[]{"to"});
+        SendMessageResponse actual = sms.send ("message","from",new String[]{"to"});
         assertNull("Response is null", actual);
     }
 
