@@ -3,14 +3,8 @@
  */
 
 /* Libs */
-Set<String> libs = new HashSet<String>()
-//libs << 'server'
-libs << 'client'
-
-libs.each { lib ->
-    include lib
-    project(":${lib}").projectDir = file("libs/${lib}")
-}
+include 'libs:client'
+include 'libs:server:java'
 
 /* Examples */
 Set<String> examples = new HashSet<String>()
