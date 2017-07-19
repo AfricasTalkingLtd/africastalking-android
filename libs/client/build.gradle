@@ -6,7 +6,6 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
@@ -49,7 +48,7 @@ android {
             java.srcDirs = ['src/main/java', '../common/src/main/java']
 
             proto {
-                srcDir '../common/src/main/proto'
+                srcDir '../common/proto'
             }
         }
     }
