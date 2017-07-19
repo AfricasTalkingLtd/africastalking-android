@@ -55,14 +55,6 @@ public class SMSServiceTest  {
                 return output.substring(1, output.length());
             }
         });
-        PowerMockito.mockStatic(Resources.class);
-        PowerMockito.when(Resources.getSystem().getAssets().open("sendResponse.json")).thenAnswer(new Answer<InputStream>() {
-
-            @Override
-            public InputStream answer(InvocationOnMock invocation) throws Throwable {
-                return this.getClass().getClassLoader().getResourceAsStream("rs/sendResponse.json");
-            }
-        });
     }
 
     @Test
@@ -85,16 +77,4 @@ public class SMSServiceTest  {
         String expected = "john";
         assertEquals("Failed formatRecipients",expected,actual);
     }
-
-    @Test
-    public void testSyncTest() throws Exception {
-//        assertTrue("sms.send returns type Response<List<Recipient>>", sms.send("jay", "john,jean", new String[]{"Jay","joseph"}, "Hey there").execute());
-    }
-
-    @Test
-    public void testSend() throws Exception {
-        SendMessageResponse actual = sms.send ("message","from",new String[]{"to"});
-        assertNull("Response is null", actual);
-    }
-
 }
