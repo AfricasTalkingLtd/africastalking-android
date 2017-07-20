@@ -2,8 +2,19 @@ syntax = "proto3";
 option java_package = "com.africastalking.proto";
 
 message ClientTokenRequest {
-  int64 nonce = 1;
-  int32 capabilities = 2;
+
+  enum Capability {
+    SMS = 0;
+    VOICE = 1;
+    USSD = 2;
+    AIRTIME = 3;
+
+    C2B = 4;
+    B2C = 5;
+    B2B = 6;
+  }
+
+  Capability capability = 1;
 }
 
 message ClientTokenResponse {

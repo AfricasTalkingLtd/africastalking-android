@@ -2,7 +2,7 @@ package com.africastalking.test;
 
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.ClientVerifier;
+import com.africastalking.Authenticator;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenRequest;
@@ -49,9 +49,9 @@ public class ATServerTest {
     public static void startServer() throws IOException {
         server = AfricasTalking.initialize(Fixtures.USERNAME, Fixtures.API_KEY, "sandbox");
         server.addSipCredentials("test", "secret", "sip://at.dev");
-        server.setClientVerifier(new ClientVerifier() {
+        server.setAuthenticator(new Authenticator() {
             @Override
-            public boolean isValid(String client) {
+            public boolean authenticate(String client) {
                 return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
             }
         });
@@ -99,7 +99,9 @@ public class ATServerTest {
 
     @Test
     public void testGetToken() throws IOException {
-        ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
+        ClientTokenRequest req = ClientTokenRequest.newBuilder()
+            .setCapability(ClientTokenRequest.Capability.B2C)
+            .build();
         ClientTokenResponse res = client.getToken(req);
         assertNotNull(res);
         assertNotNull(res.getToken());
