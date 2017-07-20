@@ -1,7 +1,10 @@
 syntax = "proto3";
 option java_package = "com.africastalking.proto";
 
-message ClientTokenRequest { }
+message ClientTokenRequest {
+  int64 nonce = 1;
+  int32 capabilities = 2;
+}
 
 message ClientTokenResponse {
   string token = 1;
