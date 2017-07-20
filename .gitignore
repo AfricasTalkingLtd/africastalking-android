@@ -84,3 +84,4 @@ local.properties
 .project
 .classpath
 bin/
+bazel-*
