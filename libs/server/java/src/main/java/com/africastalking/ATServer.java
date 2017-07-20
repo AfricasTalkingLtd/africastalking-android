@@ -26,7 +26,7 @@ public final class ATServer {
 
     private Server mGrpc;
     private SdkServerService mSdkService;
-    private ClientVerifier mClientVerifier = null;
+    private Authenticator mAuthenticator = null;
     ATServer(String username, String apiKey, String environment) {
         mSdkService = new SdkServerService(username, apiKey, environment);
 
@@ -39,16 +39,16 @@ public final class ATServer {
         this.addSipCredentials(username, password, host, 5060);
     }
 
-    public void setClientVerifier(ClientVerifier verifier) {
-        if (verifier == null) throw new NullPointerException("Client verifier cannot be null");
-        mClientVerifier = verifier;
+    public void setAuthenticator(Authenticator authenticator) {
+        if (authenticator == null) throw new NullPointerException("Authenticator cannot be null");
+        mAuthenticator = authenticator;
     }
 
     public void start(File certChainFile, File privateKeyFile, int port) throws IOException {
-        if (mClientVerifier == null) throw new NullPointerException("call setClientVerifier() before start()");
+        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
         mGrpc = ServerBuilder.forPort(port)
                 .useTransportSecurity(certChainFile, privateKeyFile)
-                .addService(ServerInterceptors.intercept(mSdkService, new ClientIdInterceptor(this.mClientVerifier)))
+                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
                 .build();
         mGrpc.start();
     }
@@ -57,19 +57,19 @@ public final class ATServer {
         this.start(certChainFile, privateKeyFile, DEFAULT_PORT);
     }
 
-    static class ClientIdInterceptor implements ServerInterceptor {
+    static class AuthenticationInterceptor implements ServerInterceptor {
         static final Listener NOOP_LISTENER = new Listener() {};
         
-        ClientVerifier verifier;
+        Authenticator authenticator;
 
-        ClientIdInterceptor(ClientVerifier verifier) {
-            this.verifier = verifier;
+        AuthenticationInterceptor(Authenticator authenticator) {
+            this.authenticator = authenticator;
         }
 
         @Override
         public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
             String clientId = headers.get(CLIENT_ID_HEADER_KEY);
-            if (clientId == null || !verifier.isValid(clientId)) {
+            if (clientId == null || !authenticator.authenticate(clientId)) {
                 call.close(Status.UNAUTHENTICATED.withDescription("Invalid or unknown client"), headers);
                 return NOOP_LISTENER;
             }
