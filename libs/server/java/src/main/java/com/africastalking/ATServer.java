@@ -57,6 +57,18 @@ public final class ATServer {
         this.start(certChainFile, privateKeyFile, DEFAULT_PORT);
     }
 
+    public void startInsecure(int port) throws IOException {
+        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
+        mGrpc = ServerBuilder.forPort(port)
+                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
+                .build();
+        mGrpc.start();
+    }
+
+    public void startInsecure() throws IOException {
+        startInsecure(DEFAULT_PORT);
+    }
+
     static class AuthenticationInterceptor implements ServerInterceptor {
         static final Listener NOOP_LISTENER = new Listener() {};
         
