@@ -15,7 +15,7 @@ public final class AfricasTalking{
   private static AirtimeService airtime;
   private static PaymentsService payments;
   private static SMSService sms;
-  private static Voice voice;
+  private static VoiceService voice;
   private static Token token;
 
   private static ManagedChannel CHANNEL;
