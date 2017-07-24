@@ -1,15 +1,11 @@
 package com.africastalking;
 
-import io.grpc.stub.StreamObserver;
+
 
 import java.util.ArrayList;
 import java.util.List;
-import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceImplBase;
-import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenRequest;
-import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenResponse;
-import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
-import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsResponse;
-import com.africastalking.proto.SdkServerServiceOuterClass;
+
+import io.grpc.stub.StreamObserver;
 
 final class SdkServerService extends SdkServerServiceImplBase {
 

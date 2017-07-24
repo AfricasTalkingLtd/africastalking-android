@@ -1,7 +1,7 @@
 buildscript {
-	repositories {
-	    jcenter()
-	}
+    repositories {
+        jcenter()
+    }
     dependencies {
         classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
         classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
@@ -41,9 +41,9 @@ clean {
 
 sourceSets {
     main {
-      proto {
-          srcDir '../../common/proto'
-      }
+        proto {
+            srcDir '../../common/proto'
+        }
     }
 }
 
@@ -58,7 +58,7 @@ shadowJar {
 jar {
     manifest {
         attributes 'Implementation-Title': 'Africa\'s Talking SDK',
-            'Implementation-Version': properties.getProperty("bintray.version")
+                'Implementation-Version': properties.getProperty("bintray.version")
     }
 }
 
@@ -100,7 +100,7 @@ test {
 }
 
 repositories {
-   jcenter()
+    jcenter()
 }
 
 dependencies {

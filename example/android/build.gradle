@@ -40,17 +40,16 @@ android {
 
 repositories {
     maven {
-        url  "http://dl.bintray.com/africastalking/java"
+        url "http://dl.bintray.com/africastalking/java"
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:design:25.3.1'
     compile 'com.jraska:console:0.4.3'
     compile 'com.jraska:console-timber-tree:0.4.3'
     compile 'com.google.code.gson:gson:2.8.0'
-
-//    compile "com.africastalking:client:1.1.2-rc4"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
 }

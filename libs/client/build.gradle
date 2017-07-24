@@ -1,3 +1,8 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
 buildscript {
     repositories {
         mavenCentral()
@@ -9,11 +14,6 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
-
-apply plugin: 'com.android.library'
-apply plugin: 'com.google.protobuf'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -46,7 +46,6 @@ android {
     sourceSets {
         main {
             java.srcDirs = ['src/main/java', '../common/src/main/java']
-
             proto {
                 srcDir '../common/proto'
             }
@@ -109,6 +108,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    compile 'com.android.support:support-annotations:25.3.1'
 }
 
 task sourcesJar(type: Jar) {
@@ -176,7 +176,7 @@ install {
                     developer {
                         id 'jaykayitare'
                         name 'Jay Kayitare'
-                        email ''
+                        email 'jaykayitare@gmail.com'
                     }
                 }
                 scm {
