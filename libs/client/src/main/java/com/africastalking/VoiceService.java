@@ -1,8 +1,12 @@
 package com.africastalking;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.sip.SipAudioCall;
+import android.net.sip.SipException;
 import android.net.sip.SipManager;
 import android.net.sip.SipProfile;
+import android.util.Log;
 
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
@@ -24,6 +28,8 @@ public final class VoiceService {
     SdkServerServiceGrpc.SdkServerServiceStub asyncStub;
     Context context;
     List<SipCredentials> sipCredentials;
+    private SipAudioCall.Listener callListener;
+    private SipAudioCall call;
 
     public VoiceService(Context context){
         this.context = context;
@@ -40,6 +46,8 @@ public final class VoiceService {
         HOST = getHost();
         PASSWORD = getPassword();
         USERNAME = getUsername();
+
+        initService();
     }
 
     VoiceService(String username) {
@@ -52,6 +60,8 @@ public final class VoiceService {
         HOST = getHost();
         PASSWORD = getPassword();
         USERNAME = username;
+
+        initService();
     }
 
     private void initService() {
@@ -70,18 +80,20 @@ public final class VoiceService {
         return SipManager.isApiSupported(context) && SipManager.isVoipSupported(context);
     }
 
-    private Boolean isInitialized() {
+    public Boolean isInitialized() {
       return sipManager != null;
     }
 
     private void createSipProfile() {
         SipProfile.Builder builder = null;
         try {
-            builder = new SipProfile.Builder(USERNAME, HOST);
+            builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
+//            builder = new SipProfile.Builder(USERNAME, HOST);
         } catch (ParseException e) {
 
         }
-        builder.setPassword(PASSWORD);
+        builder.setPassword("DOPx_7bb9eab00b");
+//        builder.setPassword(PASSWORD);
         sipProfile = builder.build();
     }
 
@@ -129,7 +141,38 @@ public final class VoiceService {
     }
 
     public void makeCall(String phoneNumber) { // TODO initiate call
+        callListener = new SipAudioCall.Listener() {
+            @Override
+            public void onCallEstablished(SipAudioCall call) {
+                call.startAudio();
+            }
 
+            @Override
+            public void onCallEnded(SipAudioCall call) {
+                try {
+                    call.endCall();
+                } catch (SipException e) {
+                    Log.d("Error ending call", e.getMessage());
+                }
+            }
+        };
+        try {
+            call = sipManager.makeAudioCall(sipProfile.getUriString(), phoneNumber, callListener, 30);
+        } catch (SipException e) {
+            Log.d("Error making call", e.getMessage());
+        }
+    }
+
+    public void takeAudioCall(Intent intent, SipAudioCall.Listener listener) {
+        try {
+            SipAudioCall incomingCall = sipManager.takeAudioCall(intent, listener);
+            incomingCall.answerCall(30);
+            incomingCall.startAudio();
+            if (incomingCall.isMuted())
+                incomingCall.toggleMute();
+        } catch (SipException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/libs/server/java/java.iml" filepath="$PROJECT_DIR$/libs/server/java/java.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/libs.iml" filepath="$PROJECT_DIR$/libs/libs.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/server/server.iml" filepath="$PROJECT_DIR$/libs/server/server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/example/web/web.iml" filepath="$PROJECT_DIR$/example/web/web.iml" />
     </modules>
   </component>
 </project>
