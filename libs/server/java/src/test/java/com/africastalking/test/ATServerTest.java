@@ -14,6 +14,7 @@ import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRespons
 import io.grpc.Attributes;
 import io.grpc.CallCredentials;
 import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;
@@ -56,10 +57,15 @@ public class ATServerTest {
             }
         });
         server.start(certFile, privateKeyFile, TEST_PORT);
+        
+        // server.startInsecure(TEST_PORT);
+        // ManagedChannel ch = ManagedChannelBuilder.forAddress("localhost", TEST_PORT).usePlaintext(true).build();
 
         ManagedChannel ch = NettyChannelBuilder.forAddress("localhost", TEST_PORT)
             .sslContext(GrpcSslContexts.forClient().trustManager(certFile).build())
             .build();
+
+            
         client = SdkServerServiceGrpc.newBlockingStub(ch)
             .withCallCredentials(new CallCredentials(){
                 @Override
