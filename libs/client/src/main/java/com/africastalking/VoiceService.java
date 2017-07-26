@@ -69,7 +69,7 @@ public final class VoiceService {
             if (isInitialized()) {
                 sipManager = SipManager.newInstance(context);
             }
-            createSipProfile();
+            sipProfile = createSipProfile();
         }
         else { // if android sip is not available, initialize PJSIP
 
@@ -84,7 +84,7 @@ public final class VoiceService {
       return sipManager != null;
     }
 
-    private void createSipProfile() {
+    private SipProfile createSipProfile() {
         SipProfile.Builder builder = null;
         try {
             builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
@@ -94,7 +94,7 @@ public final class VoiceService {
         }
         builder.setPassword("DOPx_7bb9eab00b");
 //        builder.setPassword(PASSWORD);
-        sipProfile = builder.build();
+        return builder.build();
     }
 
     private List<SipCredentials> getSipCredentials(){

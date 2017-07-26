@@ -45,6 +45,7 @@ abstract class Service {
             httpClient.addInterceptor(logger);
         }
 
+        // Mock response for testing purposes
         if(AfricasTalking.CALLTYPE == CallType.MOCK){
             httpClient.addInterceptor(new SMSMockInterceptor());
         }
