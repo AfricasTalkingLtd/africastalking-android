@@ -1,5 +1,6 @@
 package com.africastalking.interfaces;
 
+import com.africastalking.models.AccountResponse;
 import com.africastalking.models.UserData;
 
 import retrofit2.Call;
@@ -11,5 +12,5 @@ import retrofit2.http.Query;
  */
 public interface IAccount {
     @GET("user")
-    Call<UserData> getUser(@Query("username") String username);
+    Call<AccountResponse> getUser(@Query("username") String username);
 }

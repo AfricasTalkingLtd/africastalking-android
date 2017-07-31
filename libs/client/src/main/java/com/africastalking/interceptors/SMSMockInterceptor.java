@@ -1,10 +1,6 @@
-package com.africastalking;
+package com.africastalking.interceptors;
 
 import android.content.Context;
-import android.content.res.Resources;
-
-
-
 
 import java.io.BufferedReader;
 import java.io.IOException;

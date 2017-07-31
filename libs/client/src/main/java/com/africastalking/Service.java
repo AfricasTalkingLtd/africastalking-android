@@ -1,12 +1,17 @@
 package com.africastalking;
 
+import com.africastalking.interceptors.AccountMockInterceptor;
+import com.africastalking.interceptors.AirtimeMockInterceptor;
+import com.africastalking.interceptors.PaymentMockInterceptor;
+import com.africastalking.interceptors.SMSMockInterceptor;
+import com.google.gson.GsonBuilder;
+
 import okhttp3.*;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.*;
 import retrofit2.Call;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import java.io.IOException;
 
@@ -47,7 +52,14 @@ abstract class Service {
 
         // Mock response for testing purposes
         if(AfricasTalking.CALLTYPE == CallType.MOCK){
-            httpClient.addInterceptor(new SMSMockInterceptor());
+            if(AfricasTalking.CALLSERVICE == CallService.SMS)
+                httpClient.addInterceptor(new SMSMockInterceptor());
+            if(AfricasTalking.CALLSERVICE == CallService.AIRTIME)
+                httpClient.addInterceptor(new AirtimeMockInterceptor());
+            if(AfricasTalking.CALLSERVICE == CallService.ACCOUNT)
+                httpClient.addInterceptor(new AccountMockInterceptor());
+            if(AfricasTalking.CALLSERVICE == CallService.PAYMENT)
+                httpClient.addInterceptor(new PaymentMockInterceptor());
         }
         else {
             httpClient.addInterceptor(new Interceptor() {
@@ -66,7 +78,7 @@ abstract class Service {
 
 
         retrofitBuilder = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create()) // switched from ScalarsConverterFactory
+                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create())) // switched from ScalarsConverterFactory
                 .client(httpClient.build());
 
         initService();

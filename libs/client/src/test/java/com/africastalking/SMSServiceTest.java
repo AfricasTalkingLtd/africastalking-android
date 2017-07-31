@@ -39,6 +39,7 @@ public class SMSServiceTest {
 
     @Before
     public void setup() throws IOException {
+        AfricasTalking.CALLSERVICE = CallService.SMS;
         sms = new SMSService("testuser", Format.JSON, Currency.KES);
         PowerMockito.mockStatic(TextUtils.class);
         PowerMockito.when(TextUtils.join(any(CharSequence.class), any(List.class))).thenAnswer(new Answer<String>() {
@@ -73,12 +74,6 @@ public class SMSServiceTest {
     }
 
     @Test
-    public void destroyService() throws Exception {
-        sms.destroyService();
-        assertNull("SMSService not destroyed", sms);
-    }
-
-    @Test
     public void send() throws Exception {
         assertNotNull("SMS not sent", sms.send("Test sms", "", new String[]{"+250784476268"}));
         assertEquals("SMS not sent", "Success", sms.send("Test sms", "", new String[]{"+250784476268"}).getSMSMessageData().getRecipients().get(0).getStatus());
@@ -96,17 +91,17 @@ public class SMSServiceTest {
 
     @Test
     public void fetchMessage() throws Exception {
-        assertNotNull("Fetch message failed", "");
+        assertNotNull("Fetch message failed", sms.fetchMessage());
     }
 
     @Test
     public void fetchSubscription() throws Exception {
-        assertNotNull("Fetch Subscription failed", "");
+        assertNotNull("Fetch Subscription failed", sms.fetchSubscription("","",""));
     }
 
     @Test
     public void createSubscription() throws Exception {
-        assertNotNull("Create subscription", "");
+        assertNotNull("Create subscription", sms.createSubscription("","",""));
     }
 
 }

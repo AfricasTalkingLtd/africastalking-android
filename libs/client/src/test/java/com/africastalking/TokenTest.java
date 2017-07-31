@@ -19,16 +19,4 @@ public class TokenTest {
 
     }
 
-    @Test
-    public void getTokenString() throws Exception {
-        assertNotNull("Token response null", token.getTokenString());
-        assertNotEquals("Token response is empty string", "", token.getTokenString());
-    }
-
-    @Test
-    public void getExpiration() throws Exception {
-        assertNotNull("Expiration response null", token.getExpiration());
-        assertNotEquals("Expiration response equals to 0", 0L, token.getExpiration());
-    }
-
 }

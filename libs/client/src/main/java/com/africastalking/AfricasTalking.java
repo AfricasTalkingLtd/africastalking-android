@@ -25,6 +25,7 @@ public final class AfricasTalking {
     static Boolean LOGGING = false;
     static Logger LOGGER = new BaseLogger();
     static CallType CALLTYPE = CallType.MOCK;
+    public static CallService CALLSERVICE;
 
 
     public static void initialize(String host) {
@@ -64,6 +65,7 @@ public final class AfricasTalking {
     }
 
     public static SMSService getSmsService() {
+        CALLSERVICE = CallService.SMS;
         if (sms == null) {
             sms = new SMSService();
             return sms;
@@ -72,6 +74,7 @@ public final class AfricasTalking {
     }
 
     public static AirtimeService getAirtimeService() {
+        CALLSERVICE = CallService.AIRTIME;
         if (airtime == null) {
             airtime = new AirtimeService();
         }
@@ -79,6 +82,7 @@ public final class AfricasTalking {
     }
 
     public static PaymentsService getPaymentsService() {
+        CALLSERVICE = CallService.PAYMENT;
         if (payments == null) {
             payments = new PaymentsService();
         }
@@ -86,6 +90,7 @@ public final class AfricasTalking {
     }
 
     public static AccountService getAccount() {
+        CALLSERVICE = CallService.ACCOUNT;
         if (account == null) {
             account = new AccountService();
         }

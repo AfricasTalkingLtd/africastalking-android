@@ -20,7 +20,7 @@ public final class AirtimeService extends Service {
     private static AirtimeService sInstance;
     private IAirtime service;
 
-    private AirtimeService(String username, Format format, Currency currency) {
+    AirtimeService(String username, Format format, Currency currency) {
         super(username, format, currency);
     }
 
@@ -30,7 +30,6 @@ public final class AirtimeService extends Service {
 
     @Override
     protected AirtimeService getInstance(String username, Format format, Currency currency) {
-
         if (sInstance == null) {
             sInstance = new AirtimeService(username, format, currency);
         }
@@ -134,7 +133,7 @@ public final class AirtimeService extends Service {
      * @return
      * @throws IOException
      */
-    private String _makeRecipientsJSON(HashMap<String, Float> recipients) throws IOException {
+    protected String _makeRecipientsJSON(HashMap<String, Float> recipients) throws IOException {
 
         if (recipients == null || recipients.size() == 0) {
             throw new IOException("Invalid recipients");

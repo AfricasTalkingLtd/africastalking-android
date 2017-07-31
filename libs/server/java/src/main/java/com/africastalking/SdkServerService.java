@@ -3,7 +3,9 @@ package com.africastalking;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.africastalking.proto.SdkServerServiceGrpc.*;
+import com.africastalking.proto.SdkServerServiceOuterClass;
+import com.africastalking.proto.SdkServerServiceOuterClass.*;
 import io.grpc.stub.StreamObserver;
 
 final class SdkServerService extends SdkServerServiceImplBase {

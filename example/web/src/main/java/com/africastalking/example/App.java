@@ -1,5 +1,10 @@
 package com.africastalking.example;
 
+import com.africastalking.ATServer;
+import com.africastalking.AfricasTalking;
+import com.africastalking.Authenticator;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,13 +31,18 @@ public class App {
 
 
     private static HandlebarsTemplateEngine hbs = new HandlebarsTemplateEngine("/views");
-//    ATServer server;
+    static ATServer server;
 
     public static void main(String[] args) {
         // configure spark
         port(3000);
         staticFiles.location("/public");
         staticFiles.expireTime(300L);
+        try {
+            setupAfricastalking();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //        enableDebugScreen();
 
         // set up routes
@@ -63,10 +73,16 @@ public class App {
     }
 
 
-//    private void setupAfricastalking() throws IOException {
-//        server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
-//        server.startInsecure(3000);
-//        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
-//    }
+    private static void setupAfricastalking() throws IOException {
+        server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
+        server.setAuthenticator(new Authenticator() {
+            @Override
+            public boolean authenticate(String client) {
+                return false;
+            }
+        });
+        server.startInsecure(35897);
+        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
+    }
 
 }

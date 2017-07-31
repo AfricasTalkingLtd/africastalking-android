@@ -31,6 +31,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName version
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -42,6 +43,9 @@ android {
         disable 'InvalidPackage', 'HardcodedText'
         textReport true
         textOutput "stdout"
+    }
+    testOptions {
+//        unitTests.returnDefaultValues = true
     }
 
     sourceSets {
@@ -94,22 +98,31 @@ dependencies {
     compile 'io.grpc:grpc-okhttp:1.3.0'
     compile 'io.grpc:grpc-protobuf-lite:1.3.0'
 
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+
     compile 'javax.annotation:javax.annotation-api:1.2'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     androidTestCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    // mmocking frameworks
     testCompile "org.powermock:powermock-module-junit4:1.6.2"
     testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
     testCompile "org.powermock:powermock-api-mockito:1.6.2"
     testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
     androidTestCompile 'com.squareup.retrofit2:retrofit-mock:2.0.0'
-    androidTestCompile ('com.squareup.okhttp:mockwebserver:2.7.0')
+    androidTestCompile('com.squareup.okhttp:mockwebserver:2.7.0')
+
+    // test frameworks
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+
     compile 'com.android.support:support-annotations:25.3.1'
+
 }
 
 task sourcesJar(type: Jar) {
@@ -132,7 +145,7 @@ artifacts {
 }
 
 task findConventions {
-    doLast{
+    doLast {
         println project.getConvention()
     }
 }

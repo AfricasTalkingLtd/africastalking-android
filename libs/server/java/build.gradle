@@ -44,6 +44,10 @@ sourceSets {
         proto {
             srcDir '../../common/proto'
         }
+        java {
+            srcDir 'gen/main/java'
+            srcDir 'gen/main/grpc'
+        }
     }
 }
 

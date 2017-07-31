@@ -23,7 +23,7 @@ public class PaymentsService extends Service {
     IPayments payment;
 
 
-    private PaymentsService(String username) {
+    PaymentsService(String username, Format format, Currency currency) {
         super(username, Format.JSON, Currency.KES);
 
     }
@@ -35,7 +35,7 @@ public class PaymentsService extends Service {
     @Override
     protected PaymentsService getInstance(String username, Format format, Currency currency) {
         if(sInstance == null) {
-            sInstance = new PaymentsService(username);
+            sInstance = new PaymentsService(username, format, currency);
         }
         return sInstance;
     }
@@ -64,6 +64,7 @@ public class PaymentsService extends Service {
 
 
     private HashMap<String, Object> makeCheckoutRequest(String product, String phone, float amount, Currency currency, Map metadata) {
+        AfricasTalking.CALLSERVICE = CallService.CHECKOUT;
         HashMap<String, Object> body = new HashMap<>();
         body.put("username", username);
         body.put("productName", product);
@@ -75,6 +76,7 @@ public class PaymentsService extends Service {
     }
 
     private HashMap<String, Object> makeB2CRequest(String product, List<Consumer> recipients) {
+        AfricasTalking.CALLSERVICE = CallService.B2C;
         HashMap<String, Object> body = new HashMap<>();
         body.put("username", username);
         body.put("productName", product);
@@ -84,6 +86,7 @@ public class PaymentsService extends Service {
     }
 
     private HashMap<String, Object> makeB2BRequest(String product, Business recipient) {
+        AfricasTalking.CALLSERVICE = CallService.B2B;
         HashMap<String, Object> body = new HashMap<>();
         body.put("username", username);
         body.put("productName", product);
@@ -108,7 +111,7 @@ public class PaymentsService extends Service {
      * @throws IOException
      */
     public CheckoutResponse checkout(String productName, String phoneNumber, float amount, Currency currency, Map metadata) throws IOException {
-
+        AfricasTalking.CALLSERVICE = CallService.CHECKOUT;
         HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, amount, currency, metadata);
 
         Call<CheckoutResponse> call = payment.checkout(body);
@@ -140,6 +143,7 @@ public class PaymentsService extends Service {
      * @param callback
      */
     public void checkout(String productName, String phoneNumber, float amount, Currency currency, Map metadata, Callback<CheckoutResponse> callback) {
+        AfricasTalking.CALLSERVICE = CallService.CHECKOUT;
         HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, amount, currency, metadata);
         Call<CheckoutResponse> call = payment.checkout(body);
         call.enqueue(makeCallback(callback));
@@ -157,6 +161,7 @@ public class PaymentsService extends Service {
      * @return
      */
     public B2CResponse payConsumers(String product, List<Consumer> recipients) throws IOException {
+        AfricasTalking.CALLSERVICE = CallService.B2C;
         HashMap<String, Object> body = makeB2CRequest(product, recipients);
         Call<B2CResponse> call = payment.requestB2C(body);
         Response<B2CResponse> res = call.execute();
@@ -176,6 +181,7 @@ public class PaymentsService extends Service {
      * @param callback
      */
     public void payConsumers(String product, List<Consumer> recipients, Callback<B2CResponse> callback) {
+        AfricasTalking.CALLSERVICE = CallService.B2C;
         HashMap<String, Object> body = makeB2CRequest(product, recipients);
         Call<B2CResponse> call = payment.requestB2C(body);
         call.enqueue(makeCallback(callback));
@@ -188,6 +194,7 @@ public class PaymentsService extends Service {
     }
 
     public B2BResponse payBusiness(String product, Business recipient) throws IOException {
+        AfricasTalking.CALLSERVICE = CallService.B2B;
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
         Response<B2BResponse> res = call.execute();
@@ -195,6 +202,7 @@ public class PaymentsService extends Service {
     }
 
     public void payBusiness(String product, Business recipient, Callback<B2BResponse> callback) {
+        AfricasTalking.CALLSERVICE = CallService.B2B;
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
         call.enqueue(makeCallback(callback));

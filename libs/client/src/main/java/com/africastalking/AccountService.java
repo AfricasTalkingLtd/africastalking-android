@@ -2,6 +2,7 @@ package com.africastalking;
 
 
 import com.africastalking.interfaces.IAccount;
+import com.africastalking.models.AccountResponse;
 import com.africastalking.models.UserData;
 
 import retrofit2.Response;
@@ -17,7 +18,7 @@ public class AccountService extends Service {
     private static AccountService sInstance;
     private IAccount service;
 
-    private AccountService(String username, Format format, Currency currency) {
+    AccountService(String username, Format format, Currency currency) {
         super(username, format, currency);
     }
 
@@ -69,8 +70,8 @@ public class AccountService extends Service {
      * @return String in specified format, xml or json
      * @throws IOException
      */
-    public UserData getUser() throws IOException {
-        Response<UserData> resp = service.getUser(username).execute();
+    public AccountResponse getUser() throws IOException {
+        Response<AccountResponse> resp = service.getUser(username).execute();
         return resp.body();
     }
 
@@ -82,7 +83,7 @@ public class AccountService extends Service {
      * </p>
      * @param callback
      */
-    public void getUser(final Callback<UserData> callback) {
+    public void getUser(final Callback<AccountResponse> callback) {
         service.getUser(username).enqueue(makeCallback(callback));
     }
 }

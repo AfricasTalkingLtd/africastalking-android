@@ -64,15 +64,29 @@ public final class VoiceService {
         initService();
     }
 
+    VoiceService(String username, String password, String host) {
+//        ManagedChannel channel = AfricasTalking.getChannel();
+//        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
+//        asyncStub = SdkServerServiceGrpc.newStub(channel);
+//
+//        sipCredentials = getSipCredentials();
+
+        HOST = host;
+        PASSWORD = password;
+        USERNAME = username;
+
+//        initService();
+    }
+
     private void initService() {
         if (isSipAvailable()) {
-            if (isInitialized()) {
+            if (!isInitialized()) {
                 sipManager = SipManager.newInstance(context);
             }
             sipProfile = createSipProfile();
         }
         else { // if android sip is not available, initialize PJSIP
-
+            // TODO PJSIP
         }
     }
 
@@ -84,25 +98,25 @@ public final class VoiceService {
       return sipManager != null;
     }
 
-    private SipProfile createSipProfile() {
+    protected SipProfile createSipProfile() {
         SipProfile.Builder builder = null;
         try {
-            builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
-//            builder = new SipProfile.Builder(USERNAME, HOST);
+//            builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
+            builder = new SipProfile.Builder(USERNAME, HOST);
         } catch (ParseException e) {
 
         }
-        builder.setPassword("DOPx_7bb9eab00b");
-//        builder.setPassword(PASSWORD);
+//        builder.setPassword("DOPx_7bb9eab00b");
+        builder.setPassword(PASSWORD);
         return builder.build();
     }
 
-    private List<SipCredentials> getSipCredentials(){
+    protected List<SipCredentials> getSipCredentials(){
         SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
         return blockingStub.getSipCredentials(req).getCredentialsList();
     }
 
-    private String getHost() {
+    protected String getHost() {
         if (sipCredentials != null) {
             if (USERNAME != null) {
                 return sipCredentials.get(getIndex(USERNAME)).getHost();
@@ -112,14 +126,14 @@ public final class VoiceService {
         return null;
     }
 
-    private String getUsername(){
+    protected String getUsername(){
         if (sipCredentials != null) {
             return sipCredentials.get(0).getHost();
         }
         return null;
     }
 
-    private String getPassword(){
+    protected String getPassword(){
         if (sipCredentials != null) {
             if (USERNAME != null) {
                 return sipCredentials.get(getIndex(USERNAME)).getPassword();
@@ -130,7 +144,7 @@ public final class VoiceService {
     }
 
     // get index of object SipCredential object with provided credentials
-    private int getIndex(String username) {
+    protected int getIndex(String username) {
         if(username != null && sipCredentials != null) {
             for(SipCredentials credentials: sipCredentials){
                 if(credentials.getUsername().equals(USERNAME))

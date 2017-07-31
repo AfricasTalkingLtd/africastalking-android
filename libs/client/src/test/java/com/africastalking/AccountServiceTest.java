@@ -15,7 +15,8 @@ public class AccountServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        account = new AccountService();
+        AfricasTalking.CALLSERVICE = CallService.ACCOUNT;
+        account = new AccountService("testuser", Format.JSON, Currency.KES);
     }
 
     @After
@@ -27,7 +28,7 @@ public class AccountServiceTest {
     @Test
     public void getUser() throws Exception {
         assertNotNull("GetUser: Response is null", account.getUser());
-        assertNotEquals("GetUser: Balance is an empty string", "", account.getUser().getBalance());
+        assertEquals("GetUser: Balance is not 2000", "2000", account.getUser().getUserData().getBalance().trim());
     }
 
 }
