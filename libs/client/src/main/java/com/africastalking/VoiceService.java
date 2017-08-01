@@ -33,6 +33,15 @@ public final class VoiceService {
 
     public VoiceService(Context context){
         this.context = context;
+        ManagedChannel channel = AfricasTalking.getChannel();
+        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
+        asyncStub = SdkServerServiceGrpc.newStub(channel);
+
+        sipCredentials = getSipCredentials();
+
+        HOST = getHost();
+        PASSWORD = getPassword();
+        USERNAME = getUsername();
         initService();
     }
 

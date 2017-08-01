@@ -48,7 +48,7 @@ public final class ATServer {
         if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
         mGrpc = ServerBuilder.forPort(port)
                 .useTransportSecurity(certChainFile, privateKeyFile)
-                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
+                .addService(mSdkService)
                 .build();
         mGrpc.start();
     }
@@ -60,7 +60,7 @@ public final class ATServer {
     public void startInsecure(int port) throws IOException {
         if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
         mGrpc = ServerBuilder.forPort(port)
-                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
+                .addService(mSdkService)
                 .build();
         mGrpc.start();
     }

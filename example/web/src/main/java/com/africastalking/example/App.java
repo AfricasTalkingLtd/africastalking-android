@@ -13,6 +13,7 @@ import spark.template.handlebars.HandlebarsTemplateEngine;
 
 import static spark.Spark.get;
 import static spark.Spark.port;
+import static spark.Spark.post;
 import static spark.Spark.staticFiles;
 
 /**
@@ -28,6 +29,7 @@ public class App {
     private static final String SIP_USERNAME = "+254792424735";
     private static final String SIP_PASSWORD = "DOPx_7bb9eab00b";
     private static final String SIP_HOST = "sandbox.sip.africastalking.com";
+    final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
 
 
     private static HandlebarsTemplateEngine hbs = new HandlebarsTemplateEngine("/views");
@@ -70,6 +72,11 @@ public class App {
             Map<String, Object> data = new HashMap<>();
             return hbs.render(new ModelAndView(data, "voice.hbs"));
         });
+
+        post("/registervoice", (req, res) -> {
+            Map<String, Object> data = new HashMap<>();
+            return hbs.render(new ModelAndView(data, "voice.hbs"));
+        });
     }
 
 
@@ -78,11 +85,12 @@ public class App {
         server.setAuthenticator(new Authenticator() {
             @Override
             public boolean authenticate(String client) {
-                return false;
+                return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
             }
         });
-        server.startInsecure(35897);
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
+        server.startInsecure(35897);
+
     }
 
 }

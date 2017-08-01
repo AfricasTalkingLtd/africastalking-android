@@ -31,14 +31,20 @@ public class VoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice);
 
-        AfricasTalking.initialize("134.213.52.79", 8082);
+//        try {
+            AfricasTalking.initialize("192.168.1.68", 35897);
 
-        voiceService = new VoiceService(this);
+            voiceService = new VoiceService(this);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("android.africastalking.INCOMING_CALL");
-        callReceiver = new IncomingCallReceiver();
-        this.registerReceiver(callReceiver, filter);
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("android.africastalking.INCOMING_CALL");
+            callReceiver = new IncomingCallReceiver();
+            this.registerReceiver(callReceiver, filter);
+//        }
+//        catch (Exception e){
+//            Log.d("Initialization Error", e.getMessage());
+//        }
+
     }
 
     public void takeAudioCall(Intent intent, SipAudioCall.Listener listener) {
