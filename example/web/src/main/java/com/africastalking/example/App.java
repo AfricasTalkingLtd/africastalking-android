@@ -78,7 +78,7 @@ public class App {
         server.setAuthenticator(new Authenticator() {
             @Override
             public boolean authenticate(String client) {
-                return false;
+                return true;
             }
         });
         server.startInsecure(35897);
