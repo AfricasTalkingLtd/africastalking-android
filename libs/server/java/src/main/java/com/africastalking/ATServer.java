@@ -29,7 +29,11 @@ public final class ATServer {
     private Authenticator mAuthenticator = null;
     ATServer(String username, String apiKey, String environment) {
         mSdkService = new SdkServerService(username, apiKey, environment);
-
+    }
+    ATServer(String username, String apiKey, String environment, Authenticator authenticator) {
+        this(username, apiKey, environment);
+        if (authenticator == null) throw new NullPointerException("Authenticator cannot be null");
+        mAuthenticator = authenticator;
     }
     public void addSipCredentials(String username, String password, String host, int port) {
         mSdkService.addSipCredentials(username, password, host, port);
@@ -39,17 +43,15 @@ public final class ATServer {
         this.addSipCredentials(username, password, host, 5060);
     }
 
-    public void setAuthenticator(Authenticator authenticator) {
-        if (authenticator == null) throw new NullPointerException("Authenticator cannot be null");
-        mAuthenticator = authenticator;
-    }
-
     public void start(File certChainFile, File privateKeyFile, int port) throws IOException {
-        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
-        mGrpc = ServerBuilder.forPort(port)
-                .useTransportSecurity(certChainFile, privateKeyFile)
-                .addService(mSdkService)
-                .build();
+        ServerBuilder builder = ServerBuilder.forPort(port).useTransportSecurity(certChainFile, privateKeyFile);
+        if (mAuthenticator != null) {
+            builder.addService(ServerInterceptors.intercept(
+                mSdkService, new AuthenticationInterceptor(this.mAuthenticator)));
+        } else {
+            builder.addService(mSdkService);
+        }
+        mGrpc = builder.build();
         mGrpc.start();
     }
 
@@ -58,10 +60,14 @@ public final class ATServer {
     }
 
     public void startInsecure(int port) throws IOException {
-        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
-        mGrpc = ServerBuilder.forPort(port)
-                .addService(mSdkService)
-                .build();
+        ServerBuilder builder = ServerBuilder.forPort(port);
+        if (mAuthenticator != null) {
+            builder.addService(ServerInterceptors.intercept(
+                mSdkService, new AuthenticationInterceptor(this.mAuthenticator)));
+        } else {
+            builder.addService(mSdkService);
+        }
+        mGrpc = builder.build();
         mGrpc.start();
     }
 

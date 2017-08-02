@@ -82,12 +82,6 @@ public class App {
 
     private static void setupAfricastalking() throws IOException {
         server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
-        server.setAuthenticator(new Authenticator() {
-            @Override
-            public boolean authenticate(String client) {
-                return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
-            }
-        });
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
         server.startInsecure(35897);
 
