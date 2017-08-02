@@ -16,12 +16,13 @@ import java.text.ParseException;
 import java.util.List;
 
 import io.grpc.ManagedChannel;
+import io.grpc.okhttp.internal.framed.FrameReader;
 
 public final class VoiceService {
     private static String HOST;
     private static String USERNAME;
     private static String PASSWORD;
-//    private static int PORT;
+    //    private static int PORT;
     private SipManager sipManager = null;
     private SipProfile sipProfile = null;
     SdkServerServiceGrpc.SdkServerServiceBlockingStub blockingStub;
@@ -31,8 +32,11 @@ public final class VoiceService {
     private SipAudioCall.Listener callListener;
     private SipAudioCall call;
 
-    public VoiceService(Context context){
+    public VoiceService(Context context, String host, int port) {
         this.context = context;
+
+        AfricasTalking.initialize(host, port, false);
+
         ManagedChannel channel = AfricasTalking.getChannel();
         blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
         asyncStub = SdkServerServiceGrpc.newStub(channel);
@@ -93,8 +97,7 @@ public final class VoiceService {
                 sipManager = SipManager.newInstance(context);
             }
             sipProfile = createSipProfile();
-        }
-        else { // if android sip is not available, initialize PJSIP
+        } else { // if android sip is not available, initialize PJSIP
             // TODO PJSIP
         }
     }
@@ -104,7 +107,7 @@ public final class VoiceService {
     }
 
     public Boolean isInitialized() {
-      return sipManager != null;
+        return sipManager != null;
     }
 
     protected SipProfile createSipProfile() {
@@ -120,7 +123,7 @@ public final class VoiceService {
         return builder.build();
     }
 
-    protected List<SipCredentials> getSipCredentials(){
+    protected List<SipCredentials> getSipCredentials() {
         SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
         return blockingStub.getSipCredentials(req).getCredentialsList();
     }
@@ -135,14 +138,14 @@ public final class VoiceService {
         return null;
     }
 
-    protected String getUsername(){
+    protected String getUsername() {
         if (sipCredentials != null) {
             return sipCredentials.get(0).getHost();
         }
         return null;
     }
 
-    protected String getPassword(){
+    protected String getPassword() {
         if (sipCredentials != null) {
             if (USERNAME != null) {
                 return sipCredentials.get(getIndex(USERNAME)).getPassword();
@@ -154,9 +157,9 @@ public final class VoiceService {
 
     // get index of object SipCredential object with provided credentials
     protected int getIndex(String username) {
-        if(username != null && sipCredentials != null) {
-            for(SipCredentials credentials: sipCredentials){
-                if(credentials.getUsername().equals(USERNAME))
+        if (username != null && sipCredentials != null) {
+            for (SipCredentials credentials : sipCredentials) {
+                if (credentials.getUsername().equals(USERNAME))
                     return sipCredentials.indexOf(credentials);
             }
         }

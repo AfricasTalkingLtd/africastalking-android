@@ -10,7 +10,7 @@ import io.grpc.ManagedChannelBuilder;
 public final class AfricasTalking {
 
     private static String HOST;
-    private static int PORT = 35897;
+    private static int PORT = 35897; // FIXME
 
     private static String tokenString;
 
@@ -39,6 +39,14 @@ public final class AfricasTalking {
         PORT = port;
         CHANNEL = getChannel();
         tokenString = getToken();
+    }
+
+    public static void initialize(String host, int port, boolean token) {
+        HOST = host;
+        PORT = port;
+        CHANNEL = getChannel();
+        if(token)
+            tokenString = getToken();
     }
 
     public static void destroy() {

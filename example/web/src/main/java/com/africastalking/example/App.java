@@ -85,11 +85,7 @@ public class App {
         server.setAuthenticator(new Authenticator() {
             @Override
             public boolean authenticate(String client) {
-<<<<<<< HEAD
                 return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
-=======
-                return true;
->>>>>>> 74fbbf72aea9a7f57b2308d6eb0e5b0867efe316
             }
         });
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);

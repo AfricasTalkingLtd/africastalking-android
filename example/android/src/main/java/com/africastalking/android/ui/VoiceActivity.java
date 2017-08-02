@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.VoiceService;
@@ -31,19 +32,17 @@ public class VoiceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voice);
 
-//        try {
-            AfricasTalking.initialize("192.168.1.68", 35897);
-
-            voiceService = new VoiceService(this);
+        try {
+            voiceService = new VoiceService(this, "192.168.1.68", 35897);
 
             IntentFilter filter = new IntentFilter();
             filter.addAction("android.africastalking.INCOMING_CALL");
             callReceiver = new IncomingCallReceiver();
             this.registerReceiver(callReceiver, filter);
-//        }
-//        catch (Exception e){
-//            Log.d("Initialization Error", e.getMessage());
-//        }
+        }
+        catch (Exception e){
+            Toast.makeText(VoiceActivity.this, "An error occured" + e.getMessage(), Toast.LENGTH_SHORT);
+        }
 
     }
 

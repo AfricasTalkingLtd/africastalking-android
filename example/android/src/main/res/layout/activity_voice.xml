@@ -21,6 +21,7 @@
             android:layout_height="100dp"
             android:layout_margin="1dp"
             android:background="#FFF"
+            android:textColor="@color/colorPrimaryDark"
             android:textAlignment="center" />
     </LinearLayout>
 
