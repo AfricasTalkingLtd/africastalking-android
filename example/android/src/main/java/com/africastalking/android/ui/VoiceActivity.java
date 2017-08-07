@@ -1,5 +1,7 @@
 package com.africastalking.android.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
@@ -44,51 +46,19 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
 
 
         try {
+
             AfricasTalking.initialize("192.168.1.35", 35897);
             mVoiceService = AfricasTalking.getVoiceService(this, this);
-            Intent incomingCallIntent = new Intent(this, VoiceActivity.class);
-            incomingCallIntent.setAction(INCOMING_CALL);
-            mVoiceService.setIncomingCallActivity(incomingCallIntent);
 
-            // when started with incoming intent, check for active call
-            Intent intent = getIntent();
-            String action = intent.getAction();
-            if (action != null && action.compareTo(INCOMING_CALL) == 0) {
-                handleIncomingCall();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void handleIncomingCall() {
-        SipAudioCall call = mVoiceService.getActiveCall(new SipAudioCall.Listener() {
-            @Override
-            public void onCallEstablished(SipAudioCall call) {
-                call.startAudio();
-                if(call.isMuted()) {
-                    call.toggleMute();
-                }
-            }
-            @Override
-            public void onCallEnded(SipAudioCall call) {
-                try {
-                    call.endCall();
-                } catch (SipException e) {
-                    Log.d("Error ending call", e.getMessage());
-                }
-            }
-        });
-        try {
-            call.answerCall(30);
-        } catch (SipException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @OnClick(R.id.call_btn)
     public void makeCall() {
-
         try {
             mVoiceService.makeCall(display.getText().toString(), new SipAudioCall.Listener() {
                 @Override
@@ -99,13 +69,13 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
 
                 @Override
                 public void onRinging(SipAudioCall call, SipProfile caller) {
+                    Log.i("Ringing", "Ring ring");
                     super.onRinging(call, caller);
-                    Log.e("Ringing", "Ring ring");
                 }
 
                 @Override
                 public void onCallEstablished(SipAudioCall call) {
-                    Log.e("Starting call", call.getPeerProfile().getAuthUserName());
+                    Log.e("Starting call", call.getPeerProfile().getProfileName() + "");
                     call.startAudio();
                     if(call.isMuted()) {
                         call.toggleMute();
@@ -113,6 +83,7 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
                 }
                 @Override
                 public void onCallEnded(SipAudioCall call) {
+                    Log.i("Call Ended", "Ring ring");
                     try {
                         call.endCall();
                     } catch (SipException e) {
@@ -121,6 +92,16 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @OnClick(R.id.cancel_btn)
+    public void endCall() {
+        display.setText(null);
+        try {
+            mVoiceService.endCall();
+        } catch (SipException e) {
             e.printStackTrace();
         }
     }
