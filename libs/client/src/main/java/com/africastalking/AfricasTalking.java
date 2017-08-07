@@ -2,8 +2,6 @@ package com.africastalking;
 
 import android.content.Context;
 
-import java.io.IOException;
-
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -18,6 +16,8 @@ public final class AfricasTalking {
     private static AirtimeService airtime;
     private static PaymentsService payments;
     private static SMSService sms;
+    private static VoiceService voice;
+
     private static Token token;
 
     private static ManagedChannel CHANNEL;
@@ -103,6 +103,17 @@ public final class AfricasTalking {
             account = new AccountService();
         }
         return account;
+    }
+
+    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener, String username) throws Exception {
+        if (voice == null) {
+            voice = new VoiceService(context.getApplicationContext(), listener, username);
+        }
+        return voice;
+    }
+
+    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener) throws Exception {
+        return getVoiceService(context, listener, null);
     }
 
     protected static String getToken() {

@@ -32,7 +32,6 @@ public final class ATServer {
     }
     ATServer(String username, String apiKey, String environment, Authenticator authenticator) {
         this(username, apiKey, environment);
-        if (authenticator == null) throw new NullPointerException("Authenticator cannot be null");
         mAuthenticator = authenticator;
     }
     public void addSipCredentials(String username, String password, String host, int port) {

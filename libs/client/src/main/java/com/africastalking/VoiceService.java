@@ -1,204 +1,204 @@
 package com.africastalking;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.sip.SipAudioCall;
-import android.net.sip.SipException;
-import android.net.sip.SipManager;
-import android.net.sip.SipProfile;
+import android.content.IntentFilter;
+import android.net.sip.*;
 import android.util.Log;
 
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
 
-import java.text.ParseException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.grpc.ManagedChannel;
-import io.grpc.okhttp.internal.framed.FrameReader;
 
 public final class VoiceService {
-    private static String HOST;
-    private static String USERNAME;
-    private static String PASSWORD;
-    //    private static int PORT;
-    private SipManager sipManager = null;
-    private SipProfile sipProfile = null;
-    SdkServerServiceGrpc.SdkServerServiceBlockingStub blockingStub;
-    SdkServerServiceGrpc.SdkServerServiceStub asyncStub;
-    Context context;
-    List<SipCredentials> sipCredentials;
-    private SipAudioCall.Listener callListener;
-    private SipAudioCall call;
 
-    public VoiceService(Context context, String host, int port) {
-        this.context = context;
+    private static final String TAG = VoiceService.class.getName();
 
-        AfricasTalking.initialize(host, port, false);
+    private static final String SIP_CALL_ACTION = "com.africastalking.INCOMING_CALL";
 
-        ManagedChannel channel = AfricasTalking.getChannel();
-        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
-        asyncStub = SdkServerServiceGrpc.newStub(channel);
+    private List<SipCredentials> mSipCredentials;
+    private SipCredentials mCredentials;
 
-        sipCredentials = getSipCredentials();
+    private SipManager mSipManager = null;
+    private SipProfile mSipProfile = null;
 
-        HOST = getHost();
-        PASSWORD = getPassword();
-        USERNAME = getUsername();
-        initService();
-    }
+    private Intent mUIIntent = null;
+    private SipAudioCall mActiveCall = null;
 
-    VoiceService() {
-        ManagedChannel channel = AfricasTalking.getChannel();
-        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
-        asyncStub = SdkServerServiceGrpc.newStub(channel);
-
-        sipCredentials = getSipCredentials();
-
-        HOST = getHost();
-        PASSWORD = getPassword();
-        USERNAME = getUsername();
-
-        initService();
-    }
-
-    VoiceService(String username) {
-        ManagedChannel channel = AfricasTalking.getChannel();
-        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
-        asyncStub = SdkServerServiceGrpc.newStub(channel);
-
-        sipCredentials = getSipCredentials();
-
-        HOST = getHost();
-        PASSWORD = getPassword();
-        USERNAME = username;
-
-        initService();
-    }
-
-    VoiceService(String username, String password, String host) {
-//        ManagedChannel channel = AfricasTalking.getChannel();
-//        blockingStub = SdkServerServiceGrpc.newBlockingStub(channel);
-//        asyncStub = SdkServerServiceGrpc.newStub(channel);
-//
-//        sipCredentials = getSipCredentials();
-
-        HOST = host;
-        PASSWORD = password;
-        USERNAME = username;
-
-//        initService();
-    }
-
-    private void initService() {
-        if (isSipAvailable()) {
-            if (!isInitialized()) {
-                sipManager = SipManager.newInstance(context);
-            }
-            sipProfile = createSipProfile();
-        } else { // if android sip is not available, initialize PJSIP
-            // TODO PJSIP
+    private VoiceListener mCallback = new VoiceListener() {
+        @Override
+        public void onError(Throwable error) {
+            Log.d("Default Listener", "Error " + error.getMessage());
         }
+
+        @Override
+        public void onRegistration() {
+            Log.d("Default Listener", "Reg. Done");
+        }
+    };
+
+    public interface VoiceListener {
+        void onError(Throwable error);
+        void onRegistration();
     }
 
-    private Boolean isSipAvailable() {
+
+    VoiceService(Context context, VoiceListener listener, String username) throws Exception {
+        if (listener != null) {
+            this.mCallback = listener;
+        }
+
+        ManagedChannel channel = AfricasTalking.getChannel();
+        SdkServerServiceGrpc.SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+
+        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
+        mSipCredentials = stub.getSipCredentials(req).getCredentialsList();
+
+        initService(context, username);
+    }
+
+
+    VoiceService(Context context, VoiceListener listener) throws Exception {
+        this(context, listener, null);
+    }
+
+
+    private void initService(Context context, String username) throws Exception {
+        if (isAndroidSipAvailable(context)) {
+            if (!isInitialized()) {
+                mSipManager = SipManager.newInstance(context);
+            }
+            mSipProfile = createSipProfile(username);
+        } else { // if android sip is not available, initialize PJSIP
+            // TODO: PJSIP
+            throw new RuntimeException("SIP is not supported on this device");
+        }
+
+        // Incoming call
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(SIP_CALL_ACTION);
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                takeAudioCall(context, intent);
+            }
+        }, filter);
+
+        mSipManager.open(mSipProfile, PendingIntent.getBroadcast(context, 0, new Intent(SIP_CALL_ACTION), Intent.FILL_IN_DATA), new SipRegistrationListener() {
+            @Override
+            public void onRegistering(String localProfileUri) {
+                Log.d(TAG, "Reg. In Progress: " + localProfileUri);
+            }
+
+            @Override
+            public void onRegistrationDone(String localProfileUri, long expiryTime) {
+                Log.d(TAG, "Reg. Success: " + localProfileUri);
+                mCallback.onRegistration();
+            }
+
+            @Override
+            public void onRegistrationFailed(String localProfileUri, int errorCode, String errorMessage) {
+                Log.d(TAG, "Reg. Error: " + localProfileUri  + " - " + errorCode + " - " + errorMessage);
+                mCallback.onError(new Throwable(errorMessage, new Exception(String.format("Failed to register (%d): %s", errorCode, localProfileUri))));
+            }
+        });
+
+    }
+
+    private Boolean isAndroidSipAvailable(Context context) {
         return SipManager.isApiSupported(context) && SipManager.isVoipSupported(context);
     }
 
     public Boolean isInitialized() {
-        return sipManager != null;
+        return mSipManager != null;
     }
 
-    protected SipProfile createSipProfile() {
-        SipProfile.Builder builder = null;
-        try {
-//            builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
-            builder = new SipProfile.Builder(USERNAME, HOST);
-        } catch (ParseException e) {
 
+    private SipProfile createSipProfile(String defaultUsername) throws Exception {
+
+        if (mSipCredentials == null || mSipCredentials.size() == 0) {
+            throw new RuntimeException("No SIP credentials found");
         }
-//        builder.setPassword("DOPx_7bb9eab00b");
-        builder.setPassword(PASSWORD);
+
+        mCredentials = defaultUsername == null ? mSipCredentials.get(0) : mSipCredentials.get(getIndex(defaultUsername));
+
+        String host = mCredentials.getHost();
+        String username = mCredentials.getUsername();
+        String password = mCredentials.getPassword();
+
+        SipProfile.Builder builder = null;
+
+        // builder = new SipProfile.Builder("+254792424735", "sandbox.sip.africastalking.com");
+        builder = new SipProfile.Builder(username, host);
+        // builder.setPassword("DOPx_7bb9eab00b");
+        builder.setPassword(password);
         return builder.build();
     }
 
-    protected List<SipCredentials> getSipCredentials() {
-        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
-        return blockingStub.getSipCredentials(req).getCredentialsList();
-    }
-
-    protected String getHost() {
-        if (sipCredentials != null) {
-            if (USERNAME != null) {
-                return sipCredentials.get(getIndex(USERNAME)).getHost();
-            }
-            return sipCredentials.get(0).getHost();
-        }
-        return null;
-    }
-
-    protected String getUsername() {
-        if (sipCredentials != null) {
-            return sipCredentials.get(0).getHost();
-        }
-        return null;
-    }
-
-    protected String getPassword() {
-        if (sipCredentials != null) {
-            if (USERNAME != null) {
-                return sipCredentials.get(getIndex(USERNAME)).getPassword();
-            }
-            return sipCredentials.get(0).getPassword();
-        }
-        return null;
-    }
 
     // get index of object SipCredential object with provided credentials
-    protected int getIndex(String username) {
-        if (username != null && sipCredentials != null) {
-            for (SipCredentials credentials : sipCredentials) {
-                if (credentials.getUsername().equals(USERNAME))
-                    return sipCredentials.indexOf(credentials);
+    private int getIndex(String username) throws Exception {
+        if (username != null && mSipCredentials != null) {
+            for (SipCredentials credentials : mSipCredentials) {
+                if (credentials.getUsername().equals(username))
+                    return mSipCredentials.indexOf(credentials);
             }
         }
-        return 0;
+         throw new Exception("Invalid username");
     }
 
-    public void makeCall(String phoneNumber) { // TODO initiate call
-        callListener = new SipAudioCall.Listener() {
-            @Override
-            public void onCallEstablished(SipAudioCall call) {
-                call.startAudio();
+    public void makeCall(String address, SipAudioCall.Listener listener, int timeout) throws Exception {
+        String peerUri = address;
+        if (isSipUri(peerUri)) {
+            if (!peerUri.startsWith("sip:")) {
+                peerUri = "sip:" + peerUri;
             }
-
-            @Override
-            public void onCallEnded(SipAudioCall call) {
-                try {
-                    call.endCall();
-                } catch (SipException e) {
-                    Log.d("Error ending call", e.getMessage());
-                }
-            }
-        };
-        try {
-            call = sipManager.makeAudioCall(sipProfile.getUriString(), phoneNumber, callListener, 30);
-        } catch (SipException e) {
-            Log.d("Error making call", e.getMessage());
+        } else {
+            SipProfile peer = new SipProfile.Builder(address, mCredentials.getHost()).build();
+            peerUri = peer.getUriString();
         }
+        mActiveCall = mSipManager.makeAudioCall(mSipProfile.getUriString(), peerUri, listener, timeout);
     }
 
-    public void takeAudioCall(Intent intent, SipAudioCall.Listener listener) {
+    public void makeCall(String phoneNumber, SipAudioCall.Listener listener) throws Exception {
+        Log.d(TAG, "Calling " + phoneNumber);
+        this.makeCall(phoneNumber, listener, 10000);
+    }
+
+    public SipAudioCall getActiveCall(SipAudioCall.Listener listener) {
+        mActiveCall.setListener(listener);
+        return mActiveCall;
+    }
+
+    public void setIncomingCallActivity(Intent intent) {
+        this.mUIIntent = intent;
+    }
+
+    private void takeAudioCall(Context context, Intent intent) {
         try {
-            SipAudioCall incomingCall = sipManager.takeAudioCall(intent, listener);
-            incomingCall.answerCall(30);
-            incomingCall.startAudio();
-            if (incomingCall.isMuted())
-                incomingCall.toggleMute();
+            mActiveCall = mSipManager.takeAudioCall(intent, new SipAudioCall.Listener(){});
+            if (this.mUIIntent != null) {
+                context.startActivity(mUIIntent);
+            }
         } catch (SipException e) {
+            Log.e(TAG, "Failed to take audio call");
             e.printStackTrace();
         }
+    }
+
+    private static boolean isSipUri(String uri) {
+        String expression = "/^(sip:)?(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$/";
+        Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(uri);
+        return matcher.matches();
     }
 
 }

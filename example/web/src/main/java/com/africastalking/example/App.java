@@ -22,13 +22,13 @@ import static spark.Spark.staticFiles;
 
 public class App {
 
-    private static final int HTTP_PORT = 3000;
-    private static final int RPC_PORT = 3001;
+    private static final int HTTP_PORT = 3001;
+    private static final int RPC_PORT = 35897;
     private static final String USERNAME = "sandbox";
     private static final String API_KEY = "3cb2185af3e13541cfc38047b463a39e2a255b9ca9e781e9d923ec668a21a07f";
-    private static final String SIP_USERNAME = "+254792424735";
-    private static final String SIP_PASSWORD = "DOPx_7bb9eab00b";
-    private static final String SIP_HOST = "sandbox.sip.africastalking.com";
+    private static final String SIP_USERNAME = "test.aksalj";
+    private static final String SIP_PASSWORD = "DOPx_9bf185d689";
+    private static final String SIP_HOST = "ke.sip.africastalking.com";
     final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
 
 
@@ -37,7 +37,7 @@ public class App {
 
     public static void main(String[] args) {
         // configure spark
-        port(3000);
+        port(HTTP_PORT);
         staticFiles.location("/public");
         staticFiles.expireTime(300L);
         try {
@@ -83,7 +83,7 @@ public class App {
     private static void setupAfricastalking() throws IOException {
         server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
-        server.startInsecure(35897);
+        server.startInsecure(RPC_PORT);
 
     }
 
