@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 //import java.util.StringJoiner;
 
+import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
 
 
@@ -23,21 +24,21 @@ public final class SMSService extends Service {
 
     private static SMSService smsService;
     private ISMS sms;
-    private String callType = "server";
 
-    SMSService(String username, Format format, Currency currency) {
-        super(username, format, currency);
-    }
-
-    SMSService(){
+    SMSService() throws IOException {
         super();
     }
 
     @Override
-    protected SMSService getInstance(String username, Format format, Currency currency) {
+    protected void fetchToken(String host, int port) throws IOException {
+        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.SMS);
+    }
+
+    @Override
+    protected SMSService getInstance() throws IOException {
 
         if(smsService == null){
-            smsService = new SMSService(username, format, currency);
+            smsService = new SMSService();
         }
 
         return smsService;
@@ -73,10 +74,6 @@ public final class SMSService extends Service {
 
         return TextUtils.join(",", Arrays.asList(recipients));
 
-    }
-
-    public void setCallType(String callType){
-        this.callType = callType;
     }
 
     // -> Normal

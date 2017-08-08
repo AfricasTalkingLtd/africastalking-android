@@ -1,6 +1,17 @@
 package com.africastalking;
 
 public enum Environment {
-    PRODUCTION,
-    SANDBOX
+    PRODUCTION("production"),
+    SANDBOX("sandbox");
+
+    String text;
+
+    Environment(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

@@ -4,6 +4,7 @@ package com.africastalking;
 import com.africastalking.interfaces.IAirtime;
 import com.africastalking.models.AirtimeResponses;
 
+import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -20,18 +21,20 @@ public final class AirtimeService extends Service {
     private static AirtimeService sInstance;
     private IAirtime service;
 
-    AirtimeService(String username, Format format, Currency currency) {
-        super(username, format, currency);
-    }
-
-    AirtimeService() {
+    AirtimeService() throws IOException {
         super();
     }
 
+
     @Override
-    protected AirtimeService getInstance(String username, Format format, Currency currency) {
+    protected void fetchToken(String host, int port) throws IOException {
+        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.AIRTIME);
+    }
+
+    @Override
+    protected AirtimeService getInstance() throws IOException {
         if (sInstance == null) {
-            sInstance = new AirtimeService(username, format, currency);
+            sInstance = new AirtimeService();
         }
 
         return sInstance;
@@ -67,12 +70,12 @@ public final class AirtimeService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      * @param phone
-     * @param amount
+     * @param amount String in the format "KES XXX"
      * @return
      * @throws IOException
      */
-    public AirtimeResponses send(String phone, float amount) throws IOException {
-        HashMap<String, Float> map = new HashMap<>();
+    public AirtimeResponses send(String phone, String amount) throws IOException {
+        HashMap<String, String> map = new HashMap<>();
         map.put(phone, amount);
         return send(map);
     }
@@ -84,11 +87,11 @@ public final class AirtimeService extends Service {
      * occurred
      * </p>
      * @param phone
-     * @param amount
+     * @param amount String in the format "KES XXX"
      * @param callback
      */
-    public void send(String phone, float amount, Callback<AirtimeResponses> callback) {
-        HashMap<String, Float> map = new HashMap<>();
+    public void send(String phone, String amount, Callback<AirtimeResponses> callback) {
+        HashMap<String, String> map = new HashMap<>();
         map.put(phone, amount);
         send(map, callback);
     }
@@ -102,7 +105,7 @@ public final class AirtimeService extends Service {
      * @return
      * @throws IOException
      */
-    public AirtimeResponses send(HashMap<String, Float> recipients) throws IOException {
+    public AirtimeResponses send(HashMap<String, String> recipients) throws IOException {
         String json = _makeRecipientsJSON(recipients);
         Response<AirtimeResponses> resp = service.send(username, json).execute();
         return resp.body();
@@ -117,7 +120,7 @@ public final class AirtimeService extends Service {
      * @param recipients
      * @param callback
      */
-    public void send(HashMap<String, Float> recipients, Callback<AirtimeResponses> callback) {
+    public void send(HashMap<String, String> recipients, Callback<AirtimeResponses> callback) {
         try{
             String json = _makeRecipientsJSON(recipients);
             service.send(username, json).enqueue(makeCallback(callback));
@@ -133,7 +136,7 @@ public final class AirtimeService extends Service {
      * @return
      * @throws IOException
      */
-    protected String _makeRecipientsJSON(HashMap<String, Float> recipients) throws IOException {
+    protected String _makeRecipientsJSON(HashMap<String, String> recipients) throws IOException {
 
         if (recipients == null || recipients.size() == 0) {
             throw new IOException("Invalid recipients");
@@ -142,7 +145,7 @@ public final class AirtimeService extends Service {
         StringBuilder body = new StringBuilder();
         int count = recipients.size();
         for (String phone:recipients.keySet()) {
-            String amount = currency.toString() + " " + recipients.get(phone).toString();
+            String amount = recipients.get(phone);
             String target = "{\"phoneNumber\":\"" + phone + "\", \"amount\": \""+ amount +"\"}";
             body.append(target);
 

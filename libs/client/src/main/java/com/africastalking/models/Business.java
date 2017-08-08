@@ -1,7 +1,5 @@
 package com.africastalking.models;
 
-import com.africastalking.Currency;
-
 import java.util.HashMap;
 
 public class Business {
@@ -43,7 +41,7 @@ public class Business {
 
     }
 
-    public Currency currencyCode;
+    public String currencyCode;
     public float amount;
     public String provider = Provider.ATHENA.toString();
     public String transferType;
@@ -51,7 +49,7 @@ public class Business {
     public String destinationAccount = null;
     public HashMap<String, String> metadata = new HashMap<>();
 
-    public Business(String destinationChannel, String destinationAccount, TransferType transferType, Currency currency, float amount) {
+    public Business(String destinationChannel, String destinationAccount, TransferType transferType, String currency, float amount) {
         this.transferType = transferType.toString();
         this.destinationChannel = destinationChannel;
         this.destinationAccount = destinationAccount;

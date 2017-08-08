@@ -1,11 +1,12 @@
 package com.africastalking;
 
-import com.africastalking.interceptors.AccountMockInterceptor;
-import com.africastalking.interceptors.AirtimeMockInterceptor;
-import com.africastalking.interceptors.PaymentMockInterceptor;
-import com.africastalking.interceptors.SMSMockInterceptor;
+import com.africastalking.proto.SdkServerServiceGrpc;
 import com.google.gson.GsonBuilder;
 
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import com.africastalking.proto.SdkServerServiceGrpc.*;
+import com.africastalking.proto.SdkServerServiceOuterClass.*;
 import okhttp3.*;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,18 +24,16 @@ abstract class Service {
 
     Retrofit.Builder retrofitBuilder;
 
+    ClientTokenResponse token;
+
     String username;
-    String token;
-    Currency currency;
 
+    Service() throws IOException {
 
-    Service(final String username, final Format format, Currency currency) {
+        this.username = AfricasTalking.USERNAME;
 
-        this.username = username;
-        this.currency = currency;
-
-        if(token != null) { //TODO check if token is not expired
-            token = AfricasTalking.getToken();
+        if(token == null || token.getExpiration() < System.currentTimeMillis()) {
+            fetchToken(AfricasTalking.HOST, AfricasTalking.PORT);
         }
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -50,31 +49,18 @@ abstract class Service {
             httpClient.addInterceptor(logger);
         }
 
-        // Mock response for testing purposes
-        if(AfricasTalking.CALLTYPE == CallType.MOCK){
-            if(AfricasTalking.CALLSERVICE == CallService.SMS)
-                httpClient.addInterceptor(new SMSMockInterceptor());
-            if(AfricasTalking.CALLSERVICE == CallService.AIRTIME)
-                httpClient.addInterceptor(new AirtimeMockInterceptor());
-            if(AfricasTalking.CALLSERVICE == CallService.ACCOUNT)
-                httpClient.addInterceptor(new AccountMockInterceptor());
-            if(AfricasTalking.CALLSERVICE == CallService.PAYMENT)
-                httpClient.addInterceptor(new PaymentMockInterceptor());
-        }
-        else {
-            httpClient.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request original = chain.request();
-                    Request request = original.newBuilder()
-                            .addHeader("token", token)
-                            .addHeader("Accept", format.toString())
-                            .build();
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                Request request = original.newBuilder()
+                        .addHeader("Token", token.getToken())
+                        .addHeader("Accept", "application/json")
+                        .build();
 
-                    return chain.proceed(request);
-                }
-            });
-        }
+                return chain.proceed(request);
+            }
+        });
 
 
         retrofitBuilder = new Retrofit.Builder()
@@ -84,7 +70,22 @@ abstract class Service {
         initService();
     }
 
-    Service() {}
+    static ManagedChannel getChannel(String host, int port) {
+        ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder
+                .forAddress(host, port)
+                .usePlaintext(true); // FIXME: Remove to Setup TLS
+        return channelBuilder.build();
+    }
+
+    protected ClientTokenResponse fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
+        ManagedChannel channel = getChannel(host, port);
+        SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+        ClientTokenRequest req = ClientTokenRequest.newBuilder()
+                .setCapability(capability)
+                .setEnvironment(AfricasTalking.ENV.toString())
+                .build();
+        return stub.getToken(req);
+    }
 
 
     /**
@@ -111,15 +112,15 @@ abstract class Service {
         };
     }
 
+
+    protected abstract void fetchToken(String host, int port) throws IOException;
+
     /**
      * Get an instance of a service.
-     * @param username
-     * @param format
-     * @param currency
      * @param <T>
      * @return
      */
-    protected abstract <T extends Service> T getInstance(String username, Format format, Currency currency);
+    protected abstract <T extends Service> T getInstance() throws IOException;
 
     /**
      * Check if a service is initialized

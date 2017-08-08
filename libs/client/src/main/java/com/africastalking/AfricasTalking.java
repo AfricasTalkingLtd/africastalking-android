@@ -2,15 +2,15 @@ package com.africastalking;
 
 import android.content.Context;
 
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import java.io.IOException;
+
 
 public final class AfricasTalking {
 
-    private static String HOST;
-    private static int PORT = 35897; // FIXME
+    static String USERNAME;
+    static String HOST;
+    static int PORT = 35897;
 
-    private static String tokenString;
 
     private static AccountService account;
     private static AirtimeService airtime;
@@ -18,62 +18,39 @@ public final class AfricasTalking {
     private static SMSService sms;
     private static VoiceService voice;
 
-    private static Token token;
-
-    private static ManagedChannel CHANNEL;
-    static Environment ENV = Environment.SANDBOX;
+    static Environment ENV = Environment.PRODUCTION;
     static Boolean LOGGING = false;
     static Logger LOGGER = new BaseLogger();
-    static CallType CALLTYPE = CallType.MOCK;
-    public static CallService CALLSERVICE;
 
-
-    public static void initialize(String host) {
-        HOST = host;
-        CHANNEL = getChannel();
-        tokenString = getToken();
-    }
-
-    public static void initialize(String host, int port) {
+    public static void initialize(String username, String host, int port, Environment environment) throws IOException {
         HOST = host;
         PORT = port;
-        CHANNEL = getChannel();
-        tokenString = getToken();
+        ENV = environment;
     }
 
-    public static void initialize(String host, int port, boolean token) {
-        HOST = host;
-        PORT = port;
-        CHANNEL = getChannel();
-        if(token)
-            tokenString = getToken();
+    public static void initialize(String username, String host, int port) throws IOException {
+        initialize(username, host, port, Environment.PRODUCTION);
     }
+
+    public static void initialize(String username, String host, Environment environment) throws IOException {
+        initialize(username, host, PORT, environment);
+    }
+
+    public static void initialize(String username, String host) throws IOException {
+        initialize(username, host, PORT, Environment.PRODUCTION);
+    }
+
 
     public static void destroy() {
         HOST = null;
         PORT = 0;
-        CHANNEL = null;
-        tokenString = null;
         account = null;
         airtime = null;
         payments = null;
         sms = null;
-        token = null;
     }
 
-    public static ManagedChannel getChannel() {
-        if (HOST == null || PORT == -1)
-            throw new RuntimeException("call AfricasTalking.initialize(host, port, token) first");
-        if (CHANNEL == null) {
-            // TODO
-            ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder.forAddress(HOST, PORT).usePlaintext(true); // FIXME: Remove to Setup TLS
-            CHANNEL = channelBuilder.build();
-        }
-        return CHANNEL;
-    }
-
-    public static SMSService getSmsService() {
-        CALLSERVICE = CallService.SMS;
+    public static SMSService getSmsService() throws IOException {
         if (sms == null) {
             sms = new SMSService();
             return sms;
@@ -81,52 +58,36 @@ public final class AfricasTalking {
         return sms;
     }
 
-    public static AirtimeService getAirtimeService() {
-        CALLSERVICE = CallService.AIRTIME;
+    public static AirtimeService getAirtimeService() throws IOException {
         if (airtime == null) {
             airtime = new AirtimeService();
         }
         return airtime;
     }
 
-    public static PaymentsService getPaymentsService() {
-        CALLSERVICE = CallService.PAYMENT;
+    public static PaymentsService getPaymentsService() throws IOException {
         if (payments == null) {
             payments = new PaymentsService();
         }
         return payments;
     }
 
-    public static AccountService getAccount() {
-        CALLSERVICE = CallService.ACCOUNT;
+    public static AccountService getAccount() throws IOException {
         if (account == null) {
             account = new AccountService();
         }
         return account;
     }
 
-    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener, String username) throws Exception {
+    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener, String sipUsername) throws Exception {
         if (voice == null) {
-            voice = new VoiceService(context.getApplicationContext(), listener, username);
+            voice = new VoiceService(context.getApplicationContext(), listener, sipUsername);
         }
         return voice;
     }
 
     public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener) throws Exception {
         return getVoiceService(context, listener, null);
-    }
-
-    protected static String getToken() {
-        if (token == null) {
-            token = new Token();
-            tokenString = token.getTokenString();
-        } else {
-            //TODO check if token not expired
-            if (token.getExpiration() != 0) {
-
-            }
-        }
-        return tokenString;
     }
 
     public static void setEnvironment(Environment env) {

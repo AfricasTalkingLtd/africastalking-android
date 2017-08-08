@@ -15,6 +15,7 @@ message ClientTokenRequest {
   }
 
   Capability capability = 1;
+  string environment = 2;
 }
 
 message ClientTokenResponse {

@@ -1,6 +1,7 @@
 package com.africastalking;
 
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import android.app.PendingIntent;
@@ -11,7 +12,10 @@ import android.content.IntentFilter;
 import android.net.sip.*;
 import android.util.Log;
 
+import com.africastalking.interfaces.IVoice;
+import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
+import com.africastalking.proto.SdkServerServiceOuterClass;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
 
@@ -20,8 +24,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.grpc.ManagedChannel;
+import retrofit2.Response;
 
-public final class VoiceService {
+public final class VoiceService extends Service {
 
     private static final String TAG = VoiceService.class.getName();
 
@@ -45,41 +50,62 @@ public final class VoiceService {
     private VoiceListener mCallback = null;
 
     private static VoiceService sInstance;
+    private IVoice voice;
 
 
 
-    VoiceService(Context context, VoiceListener listener, String username, String broadcastAction) throws Exception {
+    VoiceService(Context context, VoiceListener listener, String username) throws IOException, SipException, ParseException {
+        super();
         if (listener != null) {
             this.mCallback = listener;
         }
 
-        ManagedChannel channel = AfricasTalking.getChannel();
+        ManagedChannel channel = Service.getChannel(AfricasTalking.HOST, AfricasTalking.PORT);
         SdkServerServiceGrpc.SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
 
         SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
         mSipCredentials = stub.getSipCredentials(req).getCredentialsList();
 
-        initService(context, username, broadcastAction);
+        initService(context, username);
 
         sInstance = this;
     }
 
 
-    VoiceService(Context context, VoiceListener listener, String broadcastAction) throws Exception {
-        this(context, listener, null, broadcastAction);
-    }
-
     VoiceService(Context context, VoiceListener listener) throws Exception {
-        this(context, listener, null, null);
+        this(context, listener, null);
     }
 
-    public static VoiceService getInstance() {
+
+    @Override
+    protected void fetchToken(String host, int port) throws IOException {
+        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.VOICE);
+    }
+
+    @Override
+    protected VoiceService getInstance() throws IOException {
+        if (sInstance == null) {
+            throw new IOException("VoiceService not initialized");
+        }
         return sInstance;
     }
 
-    private void initService(Context context, String username, final String broadcastAction) throws Exception {
-        if (isAndroidSipAvailable(context)) {
+    @Override
+    protected boolean isInitialized() {
+        return sInstance != null && mSipManager != null;
+    }
 
+
+    @Override
+    protected void initService() {
+        String baseUrl = "https://voice."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN) + "/";
+        voice =  retrofitBuilder.baseUrl(baseUrl).build().create(IVoice.class) ;
+    }
+
+    private void initService(Context context, String username) throws SipException, ParseException {
+        initService();
+
+        if (isAndroidSipAvailable(context)) {
             mSipManager = SipManager.newInstance(context);
             mSipProfile = createSipProfile(username);
 
@@ -127,7 +153,7 @@ public final class VoiceService {
         return SipManager.isApiSupported(context) && SipManager.isVoipSupported(context);
     }
 
-    private SipProfile createSipProfile(String defaultUsername) throws Exception {
+    private SipProfile createSipProfile(String defaultUsername) throws ParseException {
 
         if (mSipCredentials == null || mSipCredentials.size() == 0) {
             throw new RuntimeException("No SIP credentials found");
@@ -170,6 +196,23 @@ public final class VoiceService {
         return matcher.matches();
     }
 
+    @Override
+    protected void destroyService() {
+        if (mActiveCall != null) {
+            try {
+                mActiveCall.endCall();
+            } catch (SipException e) { /* ignore */ }
+        }
+
+        if (mSipManager != null) {
+            try {
+                if (mSipProfile != null) {
+                    mSipManager.close(mSipProfile.getUriString());
+                }
+            } catch (SipException e) { /* ignore */  }
+        }
+        sInstance = null;
+    }
 
     /**
      * Initiate a voice call
@@ -264,4 +307,34 @@ public final class VoiceService {
         pickCall(listener, 30);
     }
 
+
+    /**
+     * Upload media file. This media file will be played when called upon by one of our voice actions.
+     * @param url
+     * @return
+     * @throws IOException
+     */
+    public String mediaUpload(String url) throws IOException {
+        Response<String> response = voice.mediaUpload(username, url).execute();
+        return response.body();
+    }
+
+    public void mediaUpload(String url, Callback<String> callback) {
+        voice.mediaUpload(username, url).enqueue(makeCallback(callback));
+    }
+
+    /**
+     * Get queue status
+     * @param phoneNumbers
+     * @return
+     * @throws IOException
+     */
+    public List<QueueStatus> queueStatus(String phoneNumbers) throws IOException {
+        Response<List<QueueStatus>> response = voice.queueStatus(username, phoneNumbers).execute();
+        return response.body();
+    }
+
+    public void queueStatus(String phoneNumbers, Callback<List<QueueStatus>> callback) {
+        voice.queueStatus(username, phoneNumbers).enqueue(makeCallback(callback));
+    }
 }

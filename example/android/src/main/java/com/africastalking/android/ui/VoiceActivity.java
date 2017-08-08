@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
 import android.net.sip.SipProfile;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,14 +46,22 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
         ButterKnife.bind(this);
 
 
-        try {
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try {
 
-            AfricasTalking.initialize("192.168.1.35", 35897);
-            mVoiceService = AfricasTalking.getVoiceService(this, this);
+                    AfricasTalking.initialize("aksalj", "192.168.0.28");
+                    mVoiceService = AfricasTalking.getVoiceService(VoiceActivity.this, VoiceActivity.this);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        };
+        task.execute();
+
     }
 
 

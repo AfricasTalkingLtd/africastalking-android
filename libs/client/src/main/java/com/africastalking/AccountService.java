@@ -3,8 +3,8 @@ package com.africastalking;
 
 import com.africastalking.interfaces.IAccount;
 import com.africastalking.models.AccountResponse;
-import com.africastalking.models.UserData;
 
+import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -18,22 +18,23 @@ public class AccountService extends Service {
     private static AccountService sInstance;
     private IAccount service;
 
-    AccountService(String username, Format format, Currency currency) {
-        super(username, format, currency);
-    }
-
-    AccountService() {
+    AccountService() throws IOException {
         super();
     }
 
     @Override
-    protected AccountService getInstance(String username, Format format, Currency currency) {
+    protected AccountService getInstance() throws IOException {
 
         if (sInstance == null) {
-            sInstance = new AccountService(username, format, currency);
+            sInstance = new AccountService();
         }
 
         return sInstance;
+    }
+
+    @Override
+    protected void fetchToken(String host, int port) throws IOException {
+        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.UNRECOGNIZED);
     }
 
     @Override
