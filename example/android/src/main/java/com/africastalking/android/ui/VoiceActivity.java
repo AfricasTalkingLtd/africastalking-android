@@ -70,7 +70,7 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
                 }
 
                 @Override
-                public void onRinging(SipAudioCall call, SipProfile caller) {
+                public void onRingingBack(SipAudioCall call) {
                     Log.e("Ringing", "Ring ring");
                 }
 
@@ -121,5 +121,11 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        mVoiceService.destroy(this);
+        super.onDestroy();
     }
 }

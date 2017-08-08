@@ -54,6 +54,14 @@ public final class VoiceService extends Service {
     private IVoice voice;
 
 
+    private BroadcastReceiver mCallReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mActiveCallIntent = intent;
+            context.sendBroadcast(new Intent(INCOMING_CALL));
+        }
+    };
+
 
     VoiceService(Context context, VoiceListener listener, String username) throws IOException, SipException, ParseException {
         super();
@@ -118,13 +126,7 @@ public final class VoiceService extends Service {
         // Incoming call
         IntentFilter filter = new IntentFilter();
         filter.addAction(SIP_CALL_ACTION);
-        context.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mActiveCallIntent = intent;
-                context.sendBroadcast(new Intent(INCOMING_CALL));
-            }
-        }, filter);
+        context.registerReceiver(mCallReceiver, filter);
 
         mSipManager.open(mSipProfile, PendingIntent.getBroadcast(context, 0, new Intent(SIP_CALL_ACTION), Intent.FILL_IN_DATA), null);
         mSipManager.setRegistrationListener(mSipProfile.getUriString(), new SipRegistrationListener() {
@@ -199,7 +201,16 @@ public final class VoiceService extends Service {
                 }
             } catch (SipException e) { /* ignore */  }
         }
+
         sInstance = null;
+    }
+
+    public void destroy(Context context) {
+        if (mCallReceiver != null) {
+            context.unregisterReceiver(mCallReceiver);
+            mCallReceiver = null;
+        }
+        destroyService();
     }
 
     /**
@@ -225,7 +236,6 @@ public final class VoiceService extends Service {
         }
         Log.d(TAG, "Calling " + peerUri);
         mActiveCall = mSipManager.makeAudioCall(mSipProfile.getUriString(), peerUri, listener, timeout);
-        mActiveCall.setListener(listener, true);
     }
 
     /**
@@ -245,6 +255,7 @@ public final class VoiceService extends Service {
      */
     public void endCall() throws SipException {
         if (mActiveCall != null) {
+            mActiveCall.setListener(null);
             mActiveCall.endCall();
             mActiveCall = null;
             mActiveCallIntent = null;

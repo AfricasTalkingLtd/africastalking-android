@@ -25,6 +25,7 @@ public final class AfricasTalking {
     public static void initialize(String username, String host, int port, Environment environment) throws IOException {
         HOST = host;
         PORT = port;
+        USERNAME = username;
         ENV = environment;
     }
 
@@ -81,7 +82,7 @@ public final class AfricasTalking {
 
     public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener, String sipUsername) throws Exception {
         if (voice == null) {
-            voice = new VoiceService(context.getApplicationContext(), listener, sipUsername);
+            voice = new VoiceService(context, listener, sipUsername);
         }
         return voice;
     }

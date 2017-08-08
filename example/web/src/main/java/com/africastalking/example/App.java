@@ -28,7 +28,7 @@ public class App {
     private static final String API_KEY = "3cb2185af3e13541cfc38047b463a39e2a255b9ca9e781e9d923ec668a21a07f";
     private static final String SIP_USERNAME = "android";
     private static final String SIP_PASSWORD = "salama";
-    private static final String SIP_HOST = "192.168.0.38";
+    private static final String SIP_HOST = "192.168.0.27";
     final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
 
 
