@@ -6,6 +6,8 @@ import android.os.Bundle;
 import com.africastalking.AfricasTalking;
 import com.africastalking.android.R;
 
+import java.io.IOException;
+
 public class AccountActivity extends AppCompatActivity {
 
     @Override
@@ -13,6 +15,10 @@ public class AccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
-        AfricasTalking.initialize("134.213.52.79", 8082);
+        try {
+            AfricasTalking.initialize("aksalj", "134.213.52.79");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

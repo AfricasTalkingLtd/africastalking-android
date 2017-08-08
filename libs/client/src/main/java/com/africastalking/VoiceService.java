@@ -45,6 +45,7 @@ public final class VoiceService extends Service {
     private SipManager mSipManager = null;
     private SipProfile mSipProfile = null;
 
+    private Intent mActiveCallIntent = null;
     private SipAudioCall mActiveCall = null;
 
     private VoiceListener mCallback = null;
@@ -120,10 +121,8 @@ public final class VoiceService extends Service {
         context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "Received call");
-                if (takeAudioCall(intent)) {
-                    context.sendBroadcast(new Intent(INCOMING_CALL));
-                }
+                mActiveCallIntent = intent;
+                context.sendBroadcast(new Intent(INCOMING_CALL));
             }
         }, filter);
 
@@ -178,17 +177,6 @@ public final class VoiceService extends Service {
         return builder.build();
     }
 
-    private boolean takeAudioCall(Intent intent) {
-        try {
-            mActiveCall = mSipManager.takeAudioCall(intent, new SipAudioCall.Listener(){});
-            return true;
-        } catch (SipException e) {
-            Log.e(TAG, "Failed to take audio call");
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private static boolean isSipUri(String uri) {
         String expression = "/^(sip:)?(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$/";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
@@ -235,7 +223,9 @@ public final class VoiceService extends Service {
                 throw new SipException("Invalid destination");
             }
         }
+        Log.d(TAG, "Calling " + peerUri);
         mActiveCall = mSipManager.makeAudioCall(mSipProfile.getUriString(), peerUri, listener, timeout);
+        mActiveCall.setListener(listener, true);
     }
 
     /**
@@ -245,7 +235,6 @@ public final class VoiceService extends Service {
      * @throws Exception
      */
     public void makeCall(String destination, SipAudioCall.Listener listener) throws Exception {
-        Log.d(TAG, "Calling " + destination);
         this.makeCall(destination, listener, 10000);
     }
 
@@ -258,6 +247,7 @@ public final class VoiceService extends Service {
         if (mActiveCall != null) {
             mActiveCall.endCall();
             mActiveCall = null;
+            mActiveCallIntent = null;
         }
     }
 
@@ -293,8 +283,13 @@ public final class VoiceService extends Service {
      * @throws SipException
      */
     public void pickCall(SipAudioCall.Listener listener, int timeout) throws SipException {
-        mActiveCall.setListener(listener, true);
-        mActiveCall.answerCall(timeout);
+        try {
+            mActiveCall = mSipManager.takeAudioCall(mActiveCallIntent, listener);
+            mActiveCall.answerCall(timeout);
+        } catch (SipException e) {
+            Log.e(TAG, "Failed to take audio call");
+            e.printStackTrace();
+        }
     }
 
 

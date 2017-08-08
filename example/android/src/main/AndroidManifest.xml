@@ -30,7 +30,7 @@
         <activity android:name=".ui.PaymentActivity" />
         <activity android:name=".ui.SmsActivity" />
         <activity android:name=".ui.VoiceActivity"/>
-        <activity android:name=".ui.VoiceIncomingActivity"/>
+        <activity android:name=".ui.VoiceIncomingActivity" android:launchMode="singleInstance"/>
         <receiver android:name=".services.IncomingCallReceiver">
             <intent-filter>
                 <action android:name="com.africastalking.voice.INCOMING_CALL"></action>

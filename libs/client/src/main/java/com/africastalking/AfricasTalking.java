@@ -86,6 +86,11 @@ public final class AfricasTalking {
         return voice;
     }
 
+    public static VoiceService getVoiceService() {
+        if (voice == null) throw new RuntimeException("VoiceService is not initialized");
+        return voice;
+    }
+
     public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener) throws Exception {
         return getVoiceService(context, listener, null);
     }

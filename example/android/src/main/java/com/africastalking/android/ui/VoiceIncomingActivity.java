@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.africastalking.AfricasTalking;
 import com.africastalking.VoiceService;
 import com.africastalking.android.R;
 
@@ -21,7 +22,7 @@ public class VoiceIncomingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_voice_incoming);
         ButterKnife.bind(this);
 
-        voice = VoiceService.getInstance();
+        voice = AfricasTalking.getVoiceService();
     }
 
     @OnClick(R.id.btnPickUp)
@@ -31,31 +32,27 @@ public class VoiceIncomingActivity extends AppCompatActivity {
             voice.pickCall(new SipAudioCall.Listener() {
                 @Override
                 public void onError(SipAudioCall call, int errorCode, String errorMessage) {
-                    super.onError(call, errorCode, errorMessage);
                     Log.e("Error making call", errorMessage + "(" + errorCode + ")");
                 }
 
                 @Override
                 public void onRinging(SipAudioCall call, SipProfile caller) {
-                    Log.i("Ringing", "Ring ring");
-                    super.onRinging(call, caller);
+                    Log.e("Ringing", "");
                 }
 
                 @Override
                 public void onCallEstablished(SipAudioCall call) {
-                    Log.e("Starting call", call.getPeerProfile().getProfileName() + "");
+                    Log.e("Starting call", "");
                     call.startAudio();
-                    if(call.isMuted()) {
-                        call.toggleMute();
-                    }
+                    call.setSpeakerMode(false);
                 }
                 @Override
                 public void onCallEnded(SipAudioCall call) {
-                    Log.i("Call Ended", "Ring ring");
+                    Log.e("Call Ended", "");
                     try {
                         call.endCall();
                     } catch (SipException e) {
-                        Log.d("Error ending call", e.getMessage());
+                        Log.e("Error ending call", e.getMessage() + "");
                     }
                 }
             });

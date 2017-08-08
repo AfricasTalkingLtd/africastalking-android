@@ -24,8 +24,6 @@ import butterknife.OnClick;
 
 public class VoiceActivity extends AppCompatActivity implements VoiceService.VoiceListener {
 
-    private static final String INCOMING_CALL = "handleIncomingCall";
-
     private VoiceService mVoiceService;
 
     @BindView(R.id.call_btn)
@@ -50,7 +48,6 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
             @Override
             protected Object doInBackground(Object[] objects) {
                 try {
-
                     AfricasTalking.initialize("aksalj", "192.168.0.28");
                     mVoiceService = AfricasTalking.getVoiceService(VoiceActivity.this, VoiceActivity.this);
 
@@ -61,10 +58,7 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
             }
         };
         task.execute();
-
     }
-
-
 
     @OnClick(R.id.call_btn)
     public void makeCall() {
@@ -72,31 +66,27 @@ public class VoiceActivity extends AppCompatActivity implements VoiceService.Voi
             mVoiceService.makeCall(display.getText().toString(), new SipAudioCall.Listener() {
                 @Override
                 public void onError(SipAudioCall call, int errorCode, String errorMessage) {
-                    super.onError(call, errorCode, errorMessage);
                     Log.e("Error making call", errorMessage + "(" + errorCode + ")");
                 }
 
                 @Override
                 public void onRinging(SipAudioCall call, SipProfile caller) {
-                    Log.i("Ringing", "Ring ring");
-                    super.onRinging(call, caller);
+                    Log.e("Ringing", "Ring ring");
                 }
 
                 @Override
                 public void onCallEstablished(SipAudioCall call) {
-                    Log.e("Starting call", call.getPeerProfile().getProfileName() + "");
+                    Log.e("Starting call", "");
                     call.startAudio();
-                    if(call.isMuted()) {
-                        call.toggleMute();
-                    }
+                    call.setSpeakerMode(false);
                 }
                 @Override
                 public void onCallEnded(SipAudioCall call) {
-                    Log.i("Call Ended", "Ring ring");
+                    Log.e("Call Ended", "");
                     try {
                         call.endCall();
                     } catch (SipException e) {
-                        Log.d("Error ending call", e.getMessage());
+                        Log.e("Error ending call", e.getMessage() + "");
                     }
                 }
             });
