@@ -10,6 +10,7 @@ import com.africastalking.android.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.africastalking.android.ui.voice.OutgoingCallActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.voice_layout) void voice() {
-        startActivity(new Intent(this, VoiceActivity.class));
+        startActivity(new Intent(this, OutgoingCallActivity.class));
     }
 
     @Override

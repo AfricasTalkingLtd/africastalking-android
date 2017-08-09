@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
     tools:context="com.africastalking.android.ui.MainActivity">
 
     <TextView
@@ -25,7 +24,8 @@
         <ImageView
             android:id="@+id/account_image"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="100dp"
+                android:src="@mipmap/ic_launcher_round"/>
         <TextView
             android:id="@+id/account_text"
             android:text="ACCOUNT"
@@ -45,7 +45,8 @@
         <ImageView
             android:id="@+id/airtime_image"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher_round" />
         <TextView
             android:id="@+id/airtime_text"
             android:text="AIRTIME"
@@ -65,7 +66,8 @@
         <ImageView
             android:id="@+id/payment_image"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher_round" />
         <TextView
             android:id="@+id/payment_text"
             android:text="PAYMENT"
@@ -85,7 +87,8 @@
         <ImageView
             android:id="@+id/sms_image"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher_round" />
         <TextView
             android:id="@+id/sms_text"
             android:text="SMS"
@@ -105,7 +108,8 @@
         <ImageView
             android:id="@+id/voice_image"
             android:layout_width="100dp"
-            android:layout_height="100dp" />
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher_round" />
         <TextView
             android:id="@+id/voice_text"
             android:text="VOICE"

@@ -1,6 +1,9 @@
 package com.africastalking;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Handler;
 
 import java.io.IOException;
 
@@ -41,14 +44,19 @@ public final class AfricasTalking {
         initialize(username, host, PORT, Environment.PRODUCTION);
     }
 
+    public static void setEnvironment(Environment env) {
+        ENV = env;
+    }
 
-    public static void destroy() {
-        HOST = null;
-        PORT = 0;
-        account = null;
-        airtime = null;
-        payments = null;
-        sms = null;
+    private static void enableLogging(boolean enable) {
+        LOGGING = enable;
+    }
+
+    public static void setLogger(Logger logger) {
+        if (logger != null) {
+            enableLogging(true);
+        }
+        LOGGER = logger;
     }
 
     public static SMSService getSmsService() throws IOException {
@@ -80,34 +88,52 @@ public final class AfricasTalking {
         return account;
     }
 
-    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener, String sipUsername) throws Exception {
+    public static VoiceService getVoiceService() throws Exception {
         if (voice == null) {
-            voice = new VoiceService(context, listener, sipUsername);
+            voice = new VoiceService();
         }
         return voice;
     }
 
-    public static VoiceService getVoiceService() {
-        if (voice == null) throw new RuntimeException("VoiceService is not initialized");
-        return voice;
+    /**
+     * Bind to voice SIP service, setting the preferred SIP username
+     * @param context
+     * @param connection
+     * @param sipUsername
+     */
+    public static void bindVoiceBackgroundService(final Context context, final ServiceConnection connection, String sipUsername) {
+        Intent intent = new Intent(context, VoiceBackgroundService.class);
+        intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
+
+        // (re)-start
+        context.startService(intent);
+
+
+        // then bind after a while
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                context.bindService(new Intent(context, VoiceBackgroundService.class), connection, 0);
+            }
+        }, 500);
     }
 
-    public static VoiceService getVoiceService(Context context, VoiceService.VoiceListener listener) throws Exception {
-        return getVoiceService(context, listener, null);
+    /**
+     * Bind to voice SIP service
+     * @param context
+     * @param connection
+     */
+    public static void bindVoiceBackgroundService(Context context, ServiceConnection connection) {
+        bindVoiceBackgroundService(context, connection, null);
     }
 
-    public static void setEnvironment(Environment env) {
-        ENV = env;
-    }
-
-    private static void enableLogging(boolean enable) {
-        LOGGING = enable;
-    }
-
-    public static void setLogger(Logger logger) {
-        if (logger != null) {
-            enableLogging(true);
-        }
-        LOGGER = logger;
+    /**
+     * Unbind from voice SIP service
+     * @param context
+     * @param connection
+     */
+    public static void unbindVoiceBackgroundService(Context context, ServiceConnection connection) {
+        context.unbindService(connection);
     }
 }

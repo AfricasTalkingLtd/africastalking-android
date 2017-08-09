@@ -6,7 +6,7 @@
               android:layout_height="match_parent"
               android:padding="5dp"
               android:orientation="vertical"
-              tools:context="com.africastalking.android.ui.VoiceActivity">
+              tools:context="com.africastalking.android.ui.voice.OutgoingCallActivity">
 
     <LinearLayout
             android:id="@+id/display_layout"
@@ -32,20 +32,22 @@
             android:layout_height="wrap_content"
             android:weightSum="2">
 
-        <Button
+        <ImageButton
                 android:id="@+id/cancel_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:src="@android:drawable/stat_sys_phone_call_on_hold"
                 android:text="Reset"/>
 
-        <Button
+        <ImageButton
                 android:id="@+id/call_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
+                android:src="@android:drawable/stat_sys_phone_call"
                 android:text="Call"
                 android:enabled="false"/>
     </LinearLayout>

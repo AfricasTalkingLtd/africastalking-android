@@ -29,13 +29,17 @@
         <activity android:name=".ui.AirtimeActivity" />
         <activity android:name=".ui.PaymentActivity" />
         <activity android:name=".ui.SmsActivity" />
-        <activity android:name=".ui.VoiceActivity"/>
-        <activity android:name=".ui.VoiceIncomingActivity" android:launchMode="singleInstance"/>
+        <activity android:name=".ui.voice.OutgoingCallActivity"/>
+        <activity android:name=".ui.voice.IncomingCallActivity" android:launchMode="singleInstance"/>
+
         <receiver android:name=".services.IncomingCallReceiver">
             <intent-filter>
                 <action android:name="com.africastalking.voice.INCOMING_CALL"></action>
             </intent-filter>
         </receiver>
+
+        <service android:name="com.africastalking.VoiceBackgroundService" />
+
     </application>
 
 </manifest>
