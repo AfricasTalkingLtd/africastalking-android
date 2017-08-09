@@ -246,6 +246,7 @@ public final class VoiceBackgroundService extends Service {
         Log.d(TAG, "Initializing SIP...");
 
         if (isAndroidSipAvailable()) {
+
             mSipManager = SipManager.newInstance(this);
             mSipProfile = createSipProfile(username);
 
@@ -260,8 +261,13 @@ public final class VoiceBackgroundService extends Service {
         filter.addAction(SIP_CALL_ACTION);
         registerReceiver(mCallReceiver, filter);
 
+
+        Log.d(TAG, "Opening local SIP profile...");
+
         mSipManager.open(mSipProfile, PendingIntent.getBroadcast(this, 0,
                 new Intent(SIP_CALL_ACTION), Intent.FILL_IN_DATA), null);
+
+        Log.d(TAG, "Setting registration listener...");
         mSipManager.setRegistrationListener(mSipProfile.getUriString(), new SipRegistrationListener() {
             @Override
             public void onRegistering(String localProfileUri) {
@@ -314,10 +320,16 @@ public final class VoiceBackgroundService extends Service {
         }
 
         String host = mCredentials.getHost();
+        int port = mCredentials.getPort();
+        String transport = mCredentials.getTransport();
         String username = mCredentials.getUsername();
         String password = mCredentials.getPassword();
 
+
+
         SipProfile.Builder builder =  new SipProfile.Builder(username, host);
+        builder.setPort(port);
+        builder.setProtocol(transport);
         builder.setPassword(password);
         return builder.build();
     }

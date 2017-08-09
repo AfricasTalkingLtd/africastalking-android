@@ -28,7 +28,9 @@ public class App {
     private static final String API_KEY = "3cb2185af3e13541cfc38047b463a39e2a255b9ca9e781e9d923ec668a21a07f";
     private static final String SIP_USERNAME = "android";
     private static final String SIP_PASSWORD = "salama";
-    private static final String SIP_HOST = "192.168.0.41";
+    private static final String SIP_HOST = "192.168.0.24";
+    private static final int SIP_PORT = 5060;
+    private static final String SIP_TRANSPORT = "udp";
     final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
 
 
@@ -82,7 +84,7 @@ public class App {
 
     private static void setupAfricastalking() throws IOException {
         server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
-        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
+        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);
         server.startInsecure(RPC_PORT);
 
     }

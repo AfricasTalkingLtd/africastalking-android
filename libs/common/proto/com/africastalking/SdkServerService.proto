@@ -30,6 +30,7 @@ message SipCredentials {
   int32 port = 2;
   string username = 3;
   string password = 4;
+  string transport = 5;
 }
 
 message SipCredentialsResponse {

@@ -25,8 +25,8 @@ final class SdkServerService extends SdkServerServiceImplBase {
         // TODO: TOKEN_HOST based on environment?
     }
 
-    void addSipCredentials(String username, String password, String host, int port) {
-        mSipCredentials.add(new SipCredentials(username, password, host, port));
+    void addSipCredentials(String username, String password, String host, int port, String transport) {
+        mSipCredentials.add(new SipCredentials(username, password, host, port, transport));
     }
 
     @Override
@@ -52,6 +52,7 @@ final class SdkServerService extends SdkServerServiceImplBase {
                 .setPort(item.port)
                 .setUsername(item.username)
                 .setPassword(item.password)
+                .setTransport(item.transport)
                 .build();
             credentials.add(cred);
         }
@@ -66,12 +67,14 @@ final class SdkServerService extends SdkServerServiceImplBase {
         public String username, password;
         public String host;
         public int port;
+        public String transport;
 
-        SipCredentials(String username, String password, String host, int port) {
+        SipCredentials(String username, String password, String host, int port, String transport) {
             this.username = username;
             this.password = password;
             this.host = host;
             this.port = port;
+            this.transport = transport;
         }
     }
 }

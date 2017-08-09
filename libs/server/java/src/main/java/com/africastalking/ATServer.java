@@ -34,12 +34,12 @@ public final class ATServer {
         this(username, apiKey, environment);
         mAuthenticator = authenticator;
     }
-    public void addSipCredentials(String username, String password, String host, int port) {
-        mSdkService.addSipCredentials(username, password, host, port);
+    public void addSipCredentials(String username, String password, String host, int port, String transport) {
+        mSdkService.addSipCredentials(username, password, host, port, transport);
     }
 
     public void addSipCredentials(String username, String password, String host) {
-        this.addSipCredentials(username, password, host, 5060);
+        this.addSipCredentials(username, password, host, 5060, "udp");
     }
 
     public void start(File certChainFile, File privateKeyFile, int port) throws IOException {

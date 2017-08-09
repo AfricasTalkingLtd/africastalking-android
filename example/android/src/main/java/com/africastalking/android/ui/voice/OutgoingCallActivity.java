@@ -97,6 +97,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
         try {
             AfricasTalking.initialize("aksalj", "192.168.0.28"); // blocking
+            // TODO: Request permissions on Lollipop+ before doing this
             AfricasTalking.bindVoiceBackgroundService(this, mConnection);
         } catch (Exception ex) {
             ex.printStackTrace();
