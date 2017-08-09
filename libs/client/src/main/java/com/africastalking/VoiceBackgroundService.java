@@ -202,23 +202,28 @@ public final class VoiceBackgroundService extends Service {
                     protected void onPostExecute(List<SipCredentials> sipCredentials) {
                         if (sipCredentials != null) {
                             mSipCredentials = sipCredentials;
+
+                            try {
+                                initializeSIP(sipUsername);
+                            } catch (Exception e) {
+                                Log.e(TAG, e.getMessage() + "");
+                                e.printStackTrace();
+                            }
                         }
-                        try {
-                            initializeSIP(sipUsername);
-                        } catch (Exception e) {
-                            Log.e(TAG, e.getMessage() + "");
-                            e.printStackTrace();
-                        }
+
                     }
 
                     @Override
                     protected List<SipCredentials> doInBackground(Void[] objects) {
-
-                        ManagedChannel channel = com.africastalking.Service.getChannel(hostname, portNumber);
-                        SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
-
-                        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
-                        return stub.getSipCredentials(req).getCredentialsList();
+                        try {
+                            ManagedChannel channel = com.africastalking.Service.getChannel(hostname, portNumber);
+                            SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+                            SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
+                            return stub.getSipCredentials(req).getCredentialsList();
+                        } catch (Exception ex) {
+                            Log.e(TAG, ex.getMessage() + "");
+                        }
+                        return null;
                     }
                 };
 
