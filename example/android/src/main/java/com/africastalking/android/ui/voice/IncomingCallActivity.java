@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.africastalking.AfricasTalking;
 import com.africastalking.VoiceBackgroundService;
 import com.africastalking.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
@@ -72,11 +73,6 @@ public class IncomingCallActivity extends AppCompatActivity {
                 @Override
                 public void onCallEnded(SipAudioCall call) {
                     Log.e("Call Ended", "");
-                    try {
-                        call.endCall();
-                    } catch (SipException e) {
-                        Log.e("Error ending call", e.getMessage() + "");
-                    }
                 }
             });
         } catch (SipException e) {
@@ -100,4 +96,9 @@ public class IncomingCallActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        AfricasTalking.unbindVoiceBackgroundService(this, mConnection);
+        super.onDestroy();
+    }
 }

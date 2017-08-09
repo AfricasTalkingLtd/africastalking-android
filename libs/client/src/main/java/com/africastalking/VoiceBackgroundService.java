@@ -7,15 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.sip.*;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import com.africastalking.proto.SdkServerServiceGrpc;
-import com.africastalking.proto.SdkServerServiceOuterClass.*;
+import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
+import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
+import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
 import io.grpc.ManagedChannel;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,11 +28,13 @@ public final class VoiceBackgroundService extends Service {
 
     private static final String TAG = VoiceBackgroundService.class.getName();
 
-    public static final String EXTRA_USERNAME = "username";
+    static final String EXTRA_HOST = "host";
+    static final String EXTRA_PORT = "port";
+    static final String EXTRA_USERNAME = "username";
+
     public static final String INCOMING_CALL = "com.africastalking.voice.INCOMING_CALL";
     private static final String SIP_CALL_ACTION = "com.africastalking.voice.internal.INCOMING_CALL";
 
-    private static VoiceService mVoiceService;
     private static VoiceListener mRegistrationListener;
     private static SipAudioCall.Listener mCallListener;
 
@@ -39,11 +45,13 @@ public final class VoiceBackgroundService extends Service {
     private SipProfile mSipProfile;
     private SipAudioCall mCall;
 
+    private boolean mSipReady = false;
     private VoiceServiceBinder mBinder = new VoiceServiceBinder();
 
     public interface VoiceListener {
-        void onError(Throwable error);
-        void onRegistration();
+        void onFailedRegistration(Throwable error);
+        void onStartRegistration();
+        void onCompleteRegistration();
     }
 
     public final class VoiceServiceBinder extends Binder {
@@ -55,7 +63,7 @@ public final class VoiceBackgroundService extends Service {
     private SipAudioCall.Listener mBaseCallListener = new SipAudioCall.Listener() {
         @Override
         public void onError(SipAudioCall call, int errorCode, String errorMessage) {
-            Log.e(TAG, "Inbound Call Error:" + errorMessage);
+            Log.e(TAG, "Call Error: " + errorMessage);
             if (mCallListener != null) {
                 mCallListener.onError(call, errorCode, errorMessage);
             }
@@ -63,7 +71,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onRinging(SipAudioCall call, SipProfile caller) {
-            Log.d(TAG, "Inbound Call Ringing");
+            Log.d(TAG, "Call Ringing");
             if (mCallListener != null) {
                 mCallListener.onRinging(call, caller);
             }
@@ -71,7 +79,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onRingingBack(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Ring Back");
+            Log.d(TAG, "Call Ring Back");
             if (mCallListener != null) {
                 mCallListener.onRingingBack(call);
             }
@@ -79,7 +87,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onCallBusy(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Busy");
+            Log.d(TAG, "Call Busy");
             if (mCallListener != null) {
                 mCallListener.onCallBusy(call);
             }
@@ -87,7 +95,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onCallEnded(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Ended");
+            Log.d(TAG, "Call Ended");
             if (mCallListener != null) {
                 mCallListener.onCallEnded(call);
             }
@@ -98,7 +106,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onCallEstablished(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Established");
+            Log.d(TAG, "Call Established");
             if (mCallListener != null) {
                 mCallListener.onCallEstablished(call);
             }
@@ -106,7 +114,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onCallHeld(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Held");
+            Log.d(TAG, "Call Held");
             if (mCallListener != null) {
                 mCallListener.onCallHeld(call);
             }
@@ -114,7 +122,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onCalling(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Calling");
+            Log.d(TAG, "Call Calling");
             if (mCallListener != null) {
                 mCallListener.onCalling(call);
             }
@@ -122,7 +130,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onChanged(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Changed");
+            Log.d(TAG, "Call Changed");
             if (mCallListener != null) {
                 mCallListener.onChanged(call);
             }
@@ -130,7 +138,7 @@ public final class VoiceBackgroundService extends Service {
 
         @Override
         public void onReadyToCall(SipAudioCall call) {
-            Log.d(TAG, "Inbound Call Ready To Call");
+            Log.d(TAG, "Call Ready To Call");
             if (mCallListener != null) {
                 mCallListener.onReadyToCall(call);
             }
@@ -147,7 +155,7 @@ public final class VoiceBackgroundService extends Service {
                 e.printStackTrace();
             }
 
-            // if bound, notify; if not broadcast
+            // TODO: if bound, notify; if not broadcast
             context.sendBroadcast(new Intent(INCOMING_CALL));
         }
     };
@@ -160,54 +168,65 @@ public final class VoiceBackgroundService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        String username = intent == null ? null : intent.getStringExtra(EXTRA_USERNAME);
-        if (username != null) {
-            // Re-init if new username
-
-            if (mCall != null) {
-                try {
-                    mCall.endCall();
-                } catch (SipException e) { /* ignore */ }
-            }
-
-            if (mSipManager != null) {
-                try {
-                    if (mSipProfile != null) {
-                        mSipManager.close(mSipProfile.getUriString());
-                    }
-                } catch (SipException e) { /* ignore */  }
-            }
-
-            try {
-                initializeSIP(intent);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (SipException e) {
-                e.printStackTrace();
-            }
-
-        }
         return mBinder;
     }
 
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, int flags, int startId) {
 
-        if (mVoiceService == null || mSipManager == null) {
+        if (mSipManager == null) {
             try {
+                String username = null;
+                String host = AfricasTalking.HOST;
+                int port = AfricasTalking.PORT;
+                if (intent != null) {
+                    username = intent.getStringExtra(EXTRA_USERNAME);
+                    host = intent.getStringExtra(EXTRA_HOST);
+                    port = intent.getIntExtra(EXTRA_PORT, port);
+                }
 
-                ManagedChannel channel = com.africastalking.Service.getChannel(AfricasTalking.HOST, AfricasTalking.PORT);
-                SdkServerServiceGrpc.SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+                if (host == null) {
+                    Log.e(TAG, "No SDK host, shutting down...");
+                    return START_NOT_STICKY;
+                }
 
-                SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
-                mSipCredentials = stub.getSipCredentials(req).getCredentialsList();
 
-                initializeSIP(intent);
+                final String hostname = host;
+                final int portNumber = port;
+                final String sipUsername = username;
+
+                AsyncTask<Void, Void, List<SipCredentials>> task = new AsyncTask<Void, Void, List<SipCredentials>> () {
+
+                    @Override
+                    protected void onPostExecute(List<SipCredentials> sipCredentials) {
+                        if (sipCredentials != null) {
+                            mSipCredentials = sipCredentials;
+                        }
+                        try {
+                            initializeSIP(sipUsername);
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getMessage() + "");
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    protected List<SipCredentials> doInBackground(Void[] objects) {
+
+                        ManagedChannel channel = com.africastalking.Service.getChannel(hostname, portNumber);
+                        SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+
+                        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
+                        return stub.getSipCredentials(req).getCredentialsList();
+                    }
+                };
+
+                task.execute();
 
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage() + "");
-                mVoiceService = null;
+                mSipManager = null;
             }
         }
 
@@ -217,10 +236,11 @@ public final class VoiceBackgroundService extends Service {
     }
 
 
-    private void initializeSIP(Intent intent) throws ParseException, SipException {
+    private void initializeSIP(String username) throws ParseException, SipException {
+
+        Log.d(TAG, "Initializing SIP...");
 
         if (isAndroidSipAvailable()) {
-            String username = intent == null ? null : intent.getStringExtra(EXTRA_USERNAME);
             mSipManager = SipManager.newInstance(this);
             mSipProfile = createSipProfile(username);
 
@@ -240,22 +260,29 @@ public final class VoiceBackgroundService extends Service {
         mSipManager.setRegistrationListener(mSipProfile.getUriString(), new SipRegistrationListener() {
             @Override
             public void onRegistering(String localProfileUri) {
-                Log.d(TAG, "Reg. In Progress: " + localProfileUri);
+                Log.d(TAG, "Registration In Progress: " + localProfileUri);
+                mSipReady = false;
+                if (mRegistrationListener != null) {
+                    mRegistrationListener.onStartRegistration();
+                }
             }
 
             @Override
             public void onRegistrationDone(String localProfileUri, long expiryTime) {
                 Log.d(TAG, "Registration Complete!");
+                mSipReady = true;
                 if (mRegistrationListener != null) {
-                    mRegistrationListener.onRegistration();
+                    mRegistrationListener.onCompleteRegistration();
                 }
             }
 
             @Override
             public void onRegistrationFailed(String localProfileUri, int errorCode, String errorMessage) {
                 Log.e(TAG, "Registration Error (" + errorCode + "): " + errorMessage);
+                mSipReady = false;
                 if (mRegistrationListener != null) {
-                    mRegistrationListener.onError(new Exception(String.format("Failed to register (%d): %s", errorCode, localProfileUri)));
+                    mRegistrationListener.onFailedRegistration(
+                            new Exception(String.format(Locale.ENGLISH, "Failed to register (%d): %s", errorCode, localProfileUri)));
                 }
             }
         });
@@ -300,6 +327,8 @@ public final class VoiceBackgroundService extends Service {
 
     @Override
     public void onDestroy() {
+        mSipReady = false;
+
         if (mCall != null) {
             try {
                 mCall.endCall();
@@ -360,9 +389,7 @@ public final class VoiceBackgroundService extends Service {
      */
     public void endCall() throws SipException {
         if (mCall != null) {
-            mCall.setListener(null);
             mCall.endCall();
-            mCall = null;
         }
     }
 
@@ -418,14 +445,24 @@ public final class VoiceBackgroundService extends Service {
     }
 
 
-
+    /**
+     * Set the registration listener
+     * @param listener
+     */
     public void setRegistrationListener(VoiceListener listener) {
         if (listener != null) {
             mRegistrationListener = listener;
+            if (mSipReady) {
+                mRegistrationListener.onCompleteRegistration();
+            }
         }
     }
 
 
+    /**
+     * Set the call listener
+     * @param listener
+     */
     public void setCallListener(SipAudioCall.Listener listener) {
         if (listener != null) {
             mCallListener = listener;

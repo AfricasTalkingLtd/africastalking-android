@@ -104,6 +104,8 @@ public final class AfricasTalking {
     public static void bindVoiceBackgroundService(final Context context, final ServiceConnection connection, String sipUsername) {
         Intent intent = new Intent(context, VoiceBackgroundService.class);
         intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
+        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, AfricasTalking.HOST);
+        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, AfricasTalking.PORT);
 
         // (re)-start
         context.startService(intent);
@@ -116,7 +118,7 @@ public final class AfricasTalking {
             public void run() {
                 context.bindService(new Intent(context, VoiceBackgroundService.class), connection, 0);
             }
-        }, 500);
+        }, 300);
     }
 
     /**

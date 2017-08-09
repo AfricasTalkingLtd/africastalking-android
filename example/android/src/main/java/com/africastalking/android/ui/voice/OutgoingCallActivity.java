@@ -40,12 +40,31 @@ public class OutgoingCallActivity extends AppCompatActivity {
             mService = binder.getService();
             mService.setRegistrationListener(new VoiceBackgroundService.VoiceListener() {
                 @Override
-                public void onError(Throwable error) {
+                public void onFailedRegistration(Throwable error) {
                     Log.e("onError", error.getMessage() + "");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(OutgoingCallActivity.this, "Registration error!", Toast.LENGTH_SHORT).show();
+                            callBtn.setEnabled(false);
+                        }
+                    });
                 }
 
                 @Override
-                public void onRegistration() {
+                public void onStartRegistration() {
+                    Log.i("onRegistration", "Registration starting...");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(OutgoingCallActivity.this, "Registration starting...", Toast.LENGTH_SHORT).show();
+                            callBtn.setEnabled(false);
+                        }
+                    });
+                }
+
+                @Override
+                public void onCompleteRegistration() {
                     Log.i("onRegistration", "Registration complete!");
                     runOnUiThread(new Runnable() {
                         @Override
@@ -55,6 +74,8 @@ public class OutgoingCallActivity extends AppCompatActivity {
                         }
                     });
                 }
+
+
             });
 
         }
@@ -92,13 +113,18 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
             mService.makeCall(display.getText().toString(), new SipAudioCall.Listener() {
                 @Override
+                public void onCallBusy(SipAudioCall call) {
+                    Log.e("Callee Busy", "");
+                }
+
+                @Override
                 public void onError(SipAudioCall call, int errorCode, String errorMessage) {
                     Log.e("Error making call", errorMessage + "(" + errorCode + ")");
                 }
 
                 @Override
                 public void onRingingBack(SipAudioCall call) {
-                    Log.e("Ringing", "Ring ring");
+                    Log.e("Ringing", "Ring back");
                 }
 
                 @Override
