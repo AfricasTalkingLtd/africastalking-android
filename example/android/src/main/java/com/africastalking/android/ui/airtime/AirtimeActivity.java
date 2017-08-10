@@ -1,4 +1,4 @@
-package com.africastalking.android.ui;
+package com.africastalking.android.ui.airtime;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

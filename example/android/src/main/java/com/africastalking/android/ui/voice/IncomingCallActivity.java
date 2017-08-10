@@ -27,6 +27,16 @@ public class IncomingCallActivity extends AppCompatActivity {
             VoiceServiceBinder binder = (VoiceServiceBinder) service;
             mService = binder.getService();
 
+            if (mService.callInProgress()) {
+                Log.e("Call In Progress", "");
+                mService.setCallListener(new SipAudioCall.Listener(){
+                    @Override
+                    public void onCallEnded(SipAudioCall call) {
+                        finish();
+                    }
+                });
+            }
+
         }
 
         @Override
@@ -91,6 +101,7 @@ public class IncomingCallActivity extends AppCompatActivity {
             }
 
             mService.endCall();
+            finish();
         } catch (SipException e) {
             e.printStackTrace();
         }

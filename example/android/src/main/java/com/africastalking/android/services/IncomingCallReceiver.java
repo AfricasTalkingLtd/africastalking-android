@@ -9,6 +9,8 @@ import com.africastalking.android.ui.voice.IncomingCallActivity;
 public class IncomingCallReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        context.startActivity(new Intent(context, IncomingCallActivity.class));
+        Intent i = new Intent(context, IncomingCallActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(i);
     }
 }

@@ -19,7 +19,6 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -30,16 +29,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.AccountActivity" />
-        <activity android:name=".ui.AirtimeActivity" />
-        <activity android:name=".ui.PaymentActivity" />
-        <activity android:name=".ui.SmsActivity" />
+        <activity android:name=".ui.airtime.AirtimeActivity" />
+        <activity android:name=".ui.payment.PaymentActivity" />
+        <activity android:name=".ui.sms.SmsActivity" />
         <activity android:name=".ui.voice.OutgoingCallActivity"/>
         <activity android:name=".ui.voice.IncomingCallActivity" android:launchMode="singleInstance"/>
 
         <receiver android:name=".services.IncomingCallReceiver">
             <intent-filter>
-                <action android:name="com.africastalking.voice.INCOMING_CALL"></action>
+                <action android:name="com.africastalking.voice.INCOMING_CALL" />
             </intent-filter>
         </receiver>
 

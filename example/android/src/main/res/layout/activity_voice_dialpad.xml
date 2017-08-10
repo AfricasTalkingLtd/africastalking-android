@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="15dp">
+
+    <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/phone_number"
+            android:layout_marginTop="20dip"
+            android:layout_marginBottom="10dip"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
+            android:textSize="33sp"
+            android:freezesText="true"
+            android:focusableInTouchMode="true"
+            android:hint="xxx-xxx-xxx"
+            android:gravity="center"
+            android:cursorVisible="true">
+    </EditText>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout1"
+            android:layout_marginTop="10dip">
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="1"
+                android:id="@+id/one"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="2"
+                android:id="@+id/two"
+                android:gravity="center"
+                android:onClick="onDigit" />
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="3"
+                android:id="@+id/three"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout2"
+            android:layout_marginTop="10dip">
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="4"
+                android:id="@+id/four"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="5"
+                android:id="@+id/five"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="6"
+                android:id="@+id/six"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout3"
+            android:layout_marginTop="10dip">
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="7"
+                android:id="@+id/seven"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="8"
+                android:id="@+id/eight"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="9"
+                android:id="@+id/nine"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout4"
+            android:layout_marginTop="10dip">
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="*"
+                android:id="@+id/asterisk"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="0"
+                android:id="@+id/zero"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+
+        <Button
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:text="#"
+                android:id="@+id/hash"
+                android:gravity="center"
+                android:onClick="onDigit"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayout5"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="20dip"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp">
+
+        <Button
+                android:layout_height="wrap_content"
+                android:text="Dial"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:id="@+id/dialButton"
+                android:gravity="center"
+                android:onClick="onDial"/>
+
+    </LinearLayout>
+</LinearLayout>

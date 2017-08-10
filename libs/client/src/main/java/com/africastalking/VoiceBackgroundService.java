@@ -464,6 +464,15 @@ public final class VoiceBackgroundService extends Service {
 
 
     /**
+     * Check if there is a call in progress
+     * @return
+     */
+    public boolean callInProgress() {
+        return mCall != null && mCall.isInCall();
+    }
+
+
+    /**
      * Set the registration listener
      * @param listener
      */

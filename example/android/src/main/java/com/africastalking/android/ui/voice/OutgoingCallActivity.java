@@ -1,6 +1,7 @@
 package com.africastalking.android.ui.voice;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
@@ -8,8 +9,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,13 +25,11 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
     private VoiceBackgroundService mService;
 
-    @BindView(R.id.call_btn)
-    ImageButton callBtn;
 
-    @BindView(R.id.cancel_btn)
-    ImageButton resetBtn;
+    @BindView(R.id.dialButton)
+    Button callBtn;
 
-    @BindView(R.id.display)
+    @BindView(R.id.phone_number)
     EditText display;
 
 
@@ -90,7 +90,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_voice);
+        setContentView(R.layout.activity_voice_dialpad);
 
         ButterKnife.bind(this);
         callBtn.setEnabled(false);
@@ -104,7 +104,11 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.call_btn)
+    public void onDigit(View sender) {
+        display.setText(display.getText().toString() + ((Button)sender).getText());
+    }
+
+    @OnClick(R.id.dialButton)
     public void makeCall() {
         try {
             if (mService == null) {
@@ -118,7 +122,13 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onError(SipAudioCall call, int errorCode, String errorMessage) {
+                public void onError(SipAudioCall call, final int errorCode, final String errorMessage) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(OutgoingCallActivity.this, errorMessage + "(" + errorCode + ")", Toast.LENGTH_LONG).show();
+                        }
+                    });
                     Log.e("Error making call", errorMessage + "(" + errorCode + ")");
                 }
 
@@ -130,8 +140,14 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 @Override
                 public void onCallEstablished(SipAudioCall call) {
                     Log.e("Starting call", "");
+
                     call.startAudio();
                     call.setSpeakerMode(false);
+
+                    // show in-call ui
+                    Intent i = new Intent(OutgoingCallActivity.this, IncomingCallActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
                 }
                 @Override
                 public void onCallEnded(SipAudioCall call) {
@@ -144,18 +160,6 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @OnClick(R.id.cancel_btn)
-    public void endCall() {
-        display.setText(null);
-        try {
-            if (mService != null) {
-                mService.endCall();
-            }
-        } catch (SipException e) {
             e.printStackTrace();
         }
     }
