@@ -6,7 +6,6 @@ const restify = require('restify');
 const ATServer = require('../../../libs/server/node/lib/server');
 
 
-
 function respond(req, res, next) {
     res.send('hello ' + req.params.name);
     next();
@@ -23,7 +22,7 @@ server.listen(3001, "0.0.0.0", function() {
         format: "json",
         sandbox:true
     });
-    atServer.addSipCredentials("android", "salama", "192.168.0.7", "udp");
+    atServer.addSipCredentials("android", "salama", "192.168.0.7", 5060, "udp");
     atServer.start({
         port,
         insecure: true

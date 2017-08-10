@@ -1,19 +1,41 @@
 package com.africastalking;
 
-import android.content.Context;
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 public final class AfricasTalking {
+
+    private static final String TAG = AfricasTalking.class.getName();
 
     static String USERNAME;
     static String HOST;
     static int PORT = 35897;
 
+    private static final List<String> PERMISSION_LIST = Arrays.asList(
+            Manifest.permission.INTERNET,
+            Manifest.permission.USE_SIP,
+            Manifest.permission.WAKE_LOCK,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            Manifest.permission.ACCESS_WIFI_STATE
+    );
 
     private static AccountService account;
     private static AirtimeService airtime;
@@ -101,24 +123,57 @@ public final class AfricasTalking {
      * @param connection
      * @param sipUsername
      */
-    public static void bindVoiceBackgroundService(final Context context, final ServiceConnection connection, String sipUsername) {
-        Intent intent = new Intent(context, VoiceBackgroundService.class);
-        intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
-        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, AfricasTalking.HOST);
-        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, AfricasTalking.PORT);
+    public static void bindVoiceBackgroundService(final Activity context, final ServiceConnection connection, final String sipUsername) {
 
-        // (re)-start
-        context.startService(intent);
+        // Permissions
+        Dexter.withActivity(context)
+                .withPermissions(PERMISSION_LIST)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                        if (!report.areAllPermissionsGranted()) {
+                            Log.e(TAG, "The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST));
+                            connection.onServiceDisconnected(context.getComponentName());
+                            return;
+                        }
+
+                        Intent intent = new Intent(context, VoiceBackgroundService.class);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, AfricasTalking.HOST);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, AfricasTalking.PORT);
+
+                        // (re)-start
+                        context.startService(intent);
 
 
-        // then bind after a while
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                context.bindService(new Intent(context, VoiceBackgroundService.class), connection, 0);
-            }
-        }, 300);
+                        // then bind after a while
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                context.bindService(new Intent(context, VoiceBackgroundService.class), connection, 0);
+                            }
+                        }, 300);
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+
+                    }
+                })
+                .withErrorListener(new PermissionRequestErrorListener() {
+                    @Override
+                    public void onError(DexterError error) {
+                        Log.e(TAG, error.name());
+                        Log.e(TAG, "The following permissions are required: " + TextUtils.join("\n", PERMISSION_LIST));
+                        connection.onServiceDisconnected(context.getComponentName());
+                        return;
+                    }
+                })
+                .onSameThread()
+                .check();
     }
 
     /**
@@ -126,7 +181,7 @@ public final class AfricasTalking {
      * @param context
      * @param connection
      */
-    public static void bindVoiceBackgroundService(Context context, ServiceConnection connection) {
+    public static void bindVoiceBackgroundService(Activity context, ServiceConnection connection) {
         bindVoiceBackgroundService(context, connection, null);
     }
 
@@ -135,7 +190,11 @@ public final class AfricasTalking {
      * @param context
      * @param connection
      */
-    public static void unbindVoiceBackgroundService(Context context, ServiceConnection connection) {
-        context.unbindService(connection);
+    public static void unbindVoiceBackgroundService(Activity context, ServiceConnection connection) {
+        try {
+            context.unbindService(connection);
+        } catch (Exception ex) {
+            Log.e(TAG, ex.getMessage() + "");
+        }
     }
 }
