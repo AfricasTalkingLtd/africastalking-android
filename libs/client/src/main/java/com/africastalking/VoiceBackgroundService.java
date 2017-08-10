@@ -222,6 +222,7 @@ public final class VoiceBackgroundService extends Service {
                             return stub.getSipCredentials(req).getCredentialsList();
                         } catch (Exception ex) {
                             Log.e(TAG, ex.getMessage() + "");
+                            ex.printStackTrace();
                         }
                         return null;
                     }
