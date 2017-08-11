@@ -10,6 +10,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.africastalking.AfricasTalking;
@@ -18,6 +23,13 @@ import com.africastalking.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
 
 public class IncomingCallActivity extends AppCompatActivity {
+
+
+    @BindView(R.id.title)
+    TextView title;
+
+    @BindView(R.id.btnPickUp)
+    Button pickUp;
 
     private VoiceBackgroundService mService;
 
@@ -28,15 +40,18 @@ public class IncomingCallActivity extends AppCompatActivity {
             mService = binder.getService();
 
             if (mService.callInProgress()) {
-                Log.e("Call In Progress", "");
+                title.setText("Call In Progress");
+                pickUp.setVisibility(View.GONE);
                 mService.setCallListener(new SipAudioCall.Listener(){
                     @Override
                     public void onCallEnded(SipAudioCall call) {
                         finish();
                     }
                 });
+            } else {
+                title.setText("Incoming Call");
+                pickUp.setVisibility(View.VISIBLE);
             }
-
         }
 
         @Override
@@ -83,6 +98,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                 @Override
                 public void onCallEnded(SipAudioCall call) {
                     Log.e("Call Ended", "");
+                    finish();
                 }
             });
         } catch (SipException e) {

@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.voice.IncomingCallActivity">
 
 
-    <Button
+
+    <TextView
+        android:id="@+id/title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Call In Progress"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:textSize="42sp"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:padding="20dp">
+
+        <Button
             android:id="@+id/btnPickUp"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Pick Up"/>
+            android:text="Pick Up"
+            android:layout_weight="1"/>
 
-    <Button
+        <Button
             android:id="@+id/btnHangUp"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Hang Up"/>
+            android:text="Hang Up" />
 
-</LinearLayout>
+    </LinearLayout>
+
+
+
+
+</FrameLayout>
