@@ -175,7 +175,7 @@ public final class VoiceBackgroundService extends Service {
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
 
-        if (mSipManager == null) {
+        if (!mSipReady || mSipManager == null) {
             try {
                 String username = null;
                 String host = AfricasTalking.HOST;
