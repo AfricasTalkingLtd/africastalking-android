@@ -15,6 +15,10 @@ import android.net.sip.SipException;
  */
 public class AfricasTalkingException extends Exception {
 
+    public AfricasTalkingException(Throwable cause) {
+        super(cause);
+    }
+
     public AfricasTalkingException(String message) {
         super(message);
     }

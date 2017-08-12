@@ -18,6 +18,7 @@ import io.grpc.ManagedChannel;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public final class VoiceBackgroundService extends Service implements CallController {
@@ -105,7 +106,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
                                     mSipStack = PJSipStack.newInstance(VoiceBackgroundService.this, credentials);
                                 }
 
-                            } catch (ParseException | SipException e) {
+                            } catch (Exception e) {
                                 Log.e(TAG, e.getMessage() + "");
                                 e.printStackTrace();
                             }
