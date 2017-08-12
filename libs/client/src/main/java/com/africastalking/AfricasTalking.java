@@ -125,7 +125,7 @@ public final class AfricasTalking {
      * @param connection
      * @param sipUsername
      */
-    public static void bindVoiceBackgroundService(final Activity context, final ServiceConnection connection, final String sipUsername) {
+    public static void bindVoiceBackgroundService(final Activity context, final ServiceConnection connection, final String sipUsername, final String sipStack) {
 
         // Permissions
         Dexter.withActivity(context)
@@ -144,6 +144,7 @@ public final class AfricasTalking {
                         intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
                         intent.putExtra(VoiceBackgroundService.EXTRA_HOST, AfricasTalking.HOST);
                         intent.putExtra(VoiceBackgroundService.EXTRA_PORT, AfricasTalking.PORT);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_SIP_STACK, sipStack);
 
                         // (re)-start
                         context.startService(intent);
@@ -184,7 +185,7 @@ public final class AfricasTalking {
      * @param connection
      */
     public static void bindVoiceBackgroundService(Activity context, ServiceConnection connection) {
-        bindVoiceBackgroundService(context, connection, null);
+        bindVoiceBackgroundService(context, connection, null, null);
     }
 
     /**

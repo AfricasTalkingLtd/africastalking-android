@@ -2,7 +2,6 @@ package com.africastalking.voice;
 
 import android.app.Service;
 import android.content.Intent;
-import android.net.sip.SipException;
 import android.net.sip.SipManager;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -14,11 +13,10 @@ import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
-import io.grpc.ManagedChannel;
 
-import java.text.ParseException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+
+import io.grpc.ManagedChannel;
 
 
 public final class VoiceBackgroundService extends Service implements CallController {
@@ -28,6 +26,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
     public static final String EXTRA_HOST = "host";
     public static final String EXTRA_PORT = "port";
     public static final String EXTRA_USERNAME = "username";
+    public static final String EXTRA_SIP_STACK = "sip_stack";
 
     public static final String INCOMING_CALL = "com.africastalking.voice.INCOMING_CALL";
 
@@ -60,6 +59,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
 
         if (mSipStack == null || !mSipStack.isReady()) {
             try {
+                String sipStack = null;
                 String username = null;
                 String host = null;
                 int port = -1;
@@ -96,16 +96,22 @@ public final class VoiceBackgroundService extends Service implements CallControl
                                 throw new RuntimeException("Invalid username: " + sipUsername);
                             }
 
+                            String sipStack = intent == null ? null : intent.getStringExtra(EXTRA_SIP_STACK);
 
                             try {
-
-                                boolean useAndroidSip = isAndroidSipAvailable(); // HUH: Use PJSIP by default?
-                                if (useAndroidSip) {
+                                if (sipStack == null) {
+                                    // use Android SIP if available
+                                    boolean useAndroidSip = isAndroidSipAvailable();
+                                    if (useAndroidSip) {
+                                        mSipStack = AndroidSipStack.newInstance(VoiceBackgroundService.this, credentials);
+                                    } else {
+                                        mSipStack = PJSipStack.newInstance(VoiceBackgroundService.this, credentials);
+                                    }
+                                } else if (sipStack.contentEquals("android")) {
                                     mSipStack = AndroidSipStack.newInstance(VoiceBackgroundService.this, credentials);
-                                } else {
+                                } else if (sipStack.contentEquals("pjsip")) {
                                     mSipStack = PJSipStack.newInstance(VoiceBackgroundService.this, credentials);
                                 }
-
                             } catch (Exception e) {
                                 Log.e(TAG, e.getMessage() + "");
                                 e.printStackTrace();

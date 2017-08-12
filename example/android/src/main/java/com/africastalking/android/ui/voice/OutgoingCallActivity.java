@@ -97,7 +97,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
         try {
             AfricasTalking.initialize("aksalj", "192.168.0.2"); // blocking
-            AfricasTalking.bindVoiceBackgroundService(this, mConnection);
+            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "pjsip");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
