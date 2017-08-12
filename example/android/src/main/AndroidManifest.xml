@@ -41,7 +41,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.africastalking.VoiceBackgroundService" />
+        <service android:name="com.africastalking.voice.VoiceBackgroundService" />
 
     </application>
 

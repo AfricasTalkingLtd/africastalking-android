@@ -3,8 +3,6 @@ package com.africastalking.android.ui.voice;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.sip.SipAudioCall;
-import android.net.sip.SipException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +15,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.africastalking.AfricasTalking;
-import com.africastalking.VoiceBackgroundService;
-import com.africastalking.VoiceBackgroundService.VoiceServiceBinder;
+import com.africastalking.AfricasTalkingException;
+import com.africastalking.voice.CallInfo;
+import com.africastalking.voice.CallListener;
+import com.africastalking.voice.VoiceBackgroundService;
+import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
+import com.africastalking.voice.VoiceListener;
 
 public class OutgoingCallActivity extends AppCompatActivity {
 
@@ -38,7 +40,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             VoiceServiceBinder binder = (VoiceServiceBinder) service;
             mService = binder.getService();
-            mService.setRegistrationListener(new VoiceBackgroundService.VoiceListener() {
+            mService.setRegistrationListener(new VoiceListener() {
                 @Override
                 public void onFailedRegistration(Throwable error) {
                     Log.e("onError", error.getMessage() + "");
@@ -74,8 +76,6 @@ public class OutgoingCallActivity extends AppCompatActivity {
                         }
                     });
                 }
-
-
             });
 
         }
@@ -115,14 +115,14 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 return;
             }
 
-            mService.makeCall(display.getText().toString(), new SipAudioCall.Listener() {
+            mService.makeCall(display.getText().toString(), new CallListener() {
                 @Override
-                public void onCallBusy(SipAudioCall call) {
+                public void onCallBusy(CallInfo call) {
                     Log.e("Callee Busy", "");
                 }
 
                 @Override
-                public void onError(SipAudioCall call, final int errorCode, final String errorMessage) {
+                public void onError(CallInfo call, final int errorCode, final String errorMessage) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -133,33 +133,29 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onRingingBack(SipAudioCall call) {
+                public void onRingingBack(CallInfo call) {
                     Log.e("Ringing", "Ring back");
                 }
 
                 @Override
-                public void onCallEstablished(SipAudioCall call) {
+                public void onCallEstablished(CallInfo call) {
                     Log.e("Starting call", "");
 
-                    call.startAudio();
-                    call.setSpeakerMode(false);
+                    mService.startAudio();
+                    mService.setSpeakerMode(false);
 
                     // show in-call ui
                     Intent i = new Intent(OutgoingCallActivity.this, IncomingCallActivity.class);
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 }
+
                 @Override
-                public void onCallEnded(SipAudioCall call) {
+                public void onCallEnded(CallInfo call) {
                     Log.e("Call Ended", "");
-                    try {
-                        call.endCall();
-                    } catch (SipException e) {
-                        Log.e("Error ending call", e.getMessage() + "");
-                    }
                 }
             });
-        } catch (Exception e) {
+        } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
     }

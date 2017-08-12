@@ -7,6 +7,8 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.africastalking.voice.VoiceBackgroundService;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;

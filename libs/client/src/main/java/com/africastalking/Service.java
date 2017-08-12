@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * A given service offered by AT API
  */
-abstract class Service {
+public abstract class Service {
 
     Retrofit.Builder retrofitBuilder;
 
@@ -70,14 +70,14 @@ abstract class Service {
         initService();
     }
 
-    static ManagedChannel getChannel(String host, int port) {
+    public static ManagedChannel getChannel(String host, int port) {
         ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder
                 .forAddress(host, port)
                 .usePlaintext(true); // FIXME: Remove to Setup TLS
         return channelBuilder.build();
     }
 
-    protected ClientTokenResponse fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
+    ClientTokenResponse fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
         ManagedChannel channel = getChannel(host, port);
         SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
         ClientTokenRequest req = ClientTokenRequest.newBuilder()

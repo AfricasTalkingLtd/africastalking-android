@@ -3,9 +3,6 @@ package com.africastalking.android.ui.voice;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.sip.SipAudioCall;
-import android.net.sip.SipException;
-import android.net.sip.SipProfile;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +15,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.africastalking.AfricasTalking;
-import com.africastalking.VoiceBackgroundService;
-import com.africastalking.VoiceBackgroundService.VoiceServiceBinder;
+import com.africastalking.AfricasTalkingException;
+import com.africastalking.voice.CallInfo;
+import com.africastalking.voice.CallListener;
+import com.africastalking.voice.VoiceBackgroundService;
+import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
 
 public class IncomingCallActivity extends AppCompatActivity {
@@ -39,12 +39,12 @@ public class IncomingCallActivity extends AppCompatActivity {
             VoiceServiceBinder binder = (VoiceServiceBinder) service;
             mService = binder.getService();
 
-            if (mService.callInProgress()) {
+            if (mService.isCallInProgress()) {
                 title.setText("Call In Progress");
                 pickUp.setVisibility(View.GONE);
-                mService.setCallListener(new SipAudioCall.Listener(){
+                mService.setCallListener(new CallListener() {
                     @Override
-                    public void onCallEnded(SipAudioCall call) {
+                    public void onCallEnded(CallInfo callInfo) {
                         finish();
                     }
                 });
@@ -78,30 +78,30 @@ public class IncomingCallActivity extends AppCompatActivity {
         }
 
         try {
-            mService.pickCall(new SipAudioCall.Listener() {
+            mService.pickCall(new CallListener() {
                 @Override
-                public void onError(SipAudioCall call, int errorCode, String errorMessage) {
+                public void onError(CallInfo call, int errorCode, String errorMessage) {
                     Log.e("Error making call", errorMessage + "(" + errorCode + ")");
                 }
 
                 @Override
-                public void onRinging(SipAudioCall call, SipProfile caller) {
-                    Log.e("Ringing", "");
+                public void onRinging(CallInfo call, String caller) {
+                    Log.e("Ringing", caller + "");
                 }
 
                 @Override
-                public void onCallEstablished(SipAudioCall call) {
+                public void onCallEstablished(CallInfo call) {
                     Log.e("Starting call", "");
-                    call.startAudio();
-                    call.setSpeakerMode(false);
+                    mService.startAudio();
+                    mService.setSpeakerMode(false);
                 }
                 @Override
-                public void onCallEnded(SipAudioCall call) {
+                public void onCallEnded(CallInfo call) {
                     Log.e("Call Ended", "");
                     finish();
                 }
             });
-        } catch (SipException e) {
+        } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
 
@@ -118,7 +118,7 @@ public class IncomingCallActivity extends AppCompatActivity {
 
             mService.endCall();
             finish();
-        } catch (SipException e) {
+        } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
     }
