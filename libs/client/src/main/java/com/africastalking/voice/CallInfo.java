@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class CallInfo {
 
     private final Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sip:(.*?)>$");
-    private final Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>$");
+    private final Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>?$");
 
     private static final String UNKNOWN = "Unknown";
 

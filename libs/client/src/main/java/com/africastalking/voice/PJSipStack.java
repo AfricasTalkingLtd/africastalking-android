@@ -25,6 +25,7 @@ import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
 import org.pjsip.pjsua2.OnRegStartedParam;
 import org.pjsip.pjsua2.OnRegStateParam;
+import org.pjsip.pjsua2.SipEvent;
 import org.pjsip.pjsua2.SipTxOption;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.pj_qos_type;
@@ -187,6 +188,8 @@ class PJSipStack extends BaseSipStack {
     @Override
     public void pickCall(int timeout, CallListener listener) throws AfricasTalkingException {
 
+        if (isCallInProgress()) throw new AfricasTalkingException("A call is already in progress");
+
         setCallListener(listener);
         SipCall call = SipCall.getCurrentCall();
 
@@ -321,24 +324,44 @@ class PJSipStack extends BaseSipStack {
         public void onCallState(OnCallStateParam prm) {
 
             try {
+                SipEvent evt = prm.getE();
+                Log.d(TAG + " -> Event", evt.getType().toString());
+
                 org.pjsip.pjsua2.CallInfo callInfo = getInfo();
                 pjsip_inv_state callState = callInfo.getState();
+                pjsip_status_code code = null;
+                try {
+                    code = callInfo.getLastStatusCode();
+                } catch (Exception ex) { }
 
                 if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING || callState == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
 
-                    Log.d(TAG, "Calling/Connecting: " + callInfo.getLastStatusCode().toString());
+                    Log.d(TAG + " -> Session", "Calling/Connecting: " + code);
 
                     if (mCallListener != null) {
                         mCallListener.onReadyToCall(makeCallInfo(callInfo));
                     }
                 }
+                else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY) {
+                    Log.d(TAG + " -> Session", "Early: " + code);
+
+                    if (code == pjsip_status_code.PJSIP_SC_RINGING) {
+                        if (mCallListener != null) {
+                            mCallListener.onRinging(makeCallInfo(callInfo));
+                        }
+                    }
+                }
+                else if (callState == pjsip_inv_state.PJSIP_INV_STATE_NULL) {
+                    Log.d(TAG + " -> Session", "Null: " + code);
+                }
+                else if (callState == pjsip_inv_state.PJSIP_INV_STATE_INCOMING) {
+                    Log.d(TAG + " -> Session", "Incoming: " + code);
+                }
                 else if(callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
                     // TODO: RingBack, Hold?
 
-                    pjsip_status_code code = callInfo.getLastStatusCode();
 
-
-                    Log.d(TAG, "Confirmed: " + code.toString());
+                    Log.d(TAG + " -> Session", "Confirmed: " + code);
 
                     if (code == pjsip_status_code.PJSIP_SC_OK) {
                         if (mCallListener != null) {
@@ -362,9 +385,8 @@ class PJSipStack extends BaseSipStack {
                 else if(callState == pjsip_inv_state.PJSIP_INV_STATE_DISCONNECTED) {
 
                     try {
-                        pjsip_status_code code = callInfo.getLastStatusCode();
 
-                        Log.d(TAG, "Disconnected: " + code.toString());
+                        Log.d(TAG + " -> Session", "Disconnected: " + code);
 
                         if (code == pjsip_status_code.PJSIP_SC_BUSY_HERE || code == pjsip_status_code.PJSIP_SC_BUSY_EVERYWHERE){
                             if (mCallListener != null) {
@@ -395,7 +417,7 @@ class PJSipStack extends BaseSipStack {
             }
             catch(Exception e) {
                 if (mCallListener != null) {
-                    mCallListener.onError(makeCallInfo(null), 0, e.getMessage() + "");
+                    mCallListener.onError(new CallInfo("unknown"), 0, e.getMessage() + "");
                 }
                 this.delete();
                 activeCall = null;
