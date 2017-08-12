@@ -23,6 +23,8 @@ interface CallController {
     void resumeCall(int timeout) throws AfricasTalkingException;
     void endCall() throws AfricasTalkingException;
     void sendDtmf(char character);
+
+    CallInfo getCallInfo();
     boolean isCallInProgress();
 
     void startAudio();

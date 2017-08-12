@@ -119,7 +119,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
             mService.makeCall(display.getText().toString(), new CallListener() {
                 @Override
                 public void onCallBusy(CallInfo call) {
-                    Log.e("Callee Busy", "");
+                    Log.e("Callee Busy", call.getDisplayName());
                 }
 
                 @Override
@@ -140,7 +140,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
 
                 @Override
                 public void onCallEstablished(CallInfo call) {
-                    Log.e("Starting call", "");
+                    Log.e("Starting call", call.getRemoteUri());
 
                     mService.startAudio();
                     mService.setSpeakerMode(false);

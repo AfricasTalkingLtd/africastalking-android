@@ -56,7 +56,7 @@ class AndroidSipStack extends BaseSipStack {
         public void onRinging(SipAudioCall call, SipProfile caller) {
             Log.d(TAG, "Call Ringing");
             if (mCallListener != null) {
-                mCallListener.onRinging(makeCallInfo(call), caller.getAuthUserName());
+                mCallListener.onRinging(makeCallInfo(call));
             }
         }
 
@@ -207,7 +207,7 @@ class AndroidSipStack extends BaseSipStack {
     }
 
     private CallInfo makeCallInfo(SipAudioCall call) {
-        CallInfo info = new CallInfo();
+        CallInfo info = new CallInfo(call);
         return info;
     }
 
@@ -351,6 +351,14 @@ class AndroidSipStack extends BaseSipStack {
         if (mCall != null) {
             mCall.startAudio();
         }
+    }
+
+    @Override
+    public CallInfo getCallInfo() {
+        if (mCall != null) {
+            return new CallInfo(mCall);
+        }
+        return new CallInfo("unknown");
     }
 
     @Override

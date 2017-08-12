@@ -22,7 +22,7 @@ public class CallListener {
         /* no op */
     }
 
-    public void onRinging(CallInfo callInfo, String caller) {
+    public void onRinging(CallInfo callInfo) {
         /* no op */
     }
 

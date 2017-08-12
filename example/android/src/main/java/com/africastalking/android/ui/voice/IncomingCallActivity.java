@@ -39,8 +39,9 @@ public class IncomingCallActivity extends AppCompatActivity {
             VoiceServiceBinder binder = (VoiceServiceBinder) service;
             mService = binder.getService();
 
+            CallInfo info = mService.getCallInfo();
             if (mService.isCallInProgress()) {
-                title.setText("Call In Progress");
+                title.setText(info.getDisplayName());
                 pickUp.setVisibility(View.GONE);
                 mService.setCallListener(new CallListener() {
                     @Override
@@ -49,7 +50,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                title.setText("Incoming Call");
+                title.setText(info.getDisplayName() + " Calling...");
                 pickUp.setVisibility(View.VISIBLE);
             }
         }
@@ -85,13 +86,25 @@ public class IncomingCallActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onRinging(CallInfo call, String caller) {
-                    Log.e("Ringing", caller + "");
+                public void onRinging(final CallInfo call) {
+                    Log.e("Ringing", call.getDisplayName());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            title.setText("Ringing " + call.getDisplayName() + "...");
+                        }
+                    });
                 }
 
                 @Override
-                public void onCallEstablished(CallInfo call) {
+                public void onCallEstablished(final CallInfo call) {
                     Log.e("Starting call", "");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            title.setText(call.getDisplayName());
+                        }
+                    });
                     mService.startAudio();
                     mService.setSpeakerMode(false);
                 }

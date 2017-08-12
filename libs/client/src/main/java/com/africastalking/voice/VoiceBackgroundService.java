@@ -1,7 +1,9 @@
 package com.africastalking.voice;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.net.sip.SipManager;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -234,7 +236,8 @@ public final class VoiceBackgroundService extends Service implements CallControl
      */
     @Override
     public void setSpeakerMode(boolean speaker) {
-        mSipStack.setSpeakerMode(speaker);
+        AudioManager am = ((AudioManager) getSystemService(Context.AUDIO_SERVICE));
+        am.setSpeakerphoneOn(speaker);
     }
 
 
@@ -289,5 +292,13 @@ public final class VoiceBackgroundService extends Service implements CallControl
     @Override
     public boolean isCallInProgress() {
         return mSipStack.isCallInProgress();
+    }
+
+    @Override
+    public CallInfo getCallInfo() {
+        if (mSipStack != null) {
+            return mSipStack.getCallInfo();
+        }
+        return new CallInfo("unknown");
     }
 }
