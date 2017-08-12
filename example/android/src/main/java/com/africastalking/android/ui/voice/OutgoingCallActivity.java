@@ -11,17 +11,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.africastalking.AfricasTalking;
+import com.africastalking.android.R;
+import com.africastalking.voice.CallInfo;
+import com.africastalking.voice.CallListener;
+import com.africastalking.voice.RegistrationListener;
+import com.africastalking.voice.VoiceBackgroundService;
+import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.africastalking.AfricasTalking;
-import com.africastalking.AfricasTalkingException;
-import com.africastalking.voice.CallInfo;
-import com.africastalking.voice.CallListener;
-import com.africastalking.voice.VoiceBackgroundService;
-import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
-import com.africastalking.android.R;
-import com.africastalking.voice.RegistrationListener;
 
 public class OutgoingCallActivity extends AppCompatActivity {
 
@@ -155,7 +156,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
                     Log.e("Call Ended", "");
                 }
             });
-        } catch (AfricasTalkingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

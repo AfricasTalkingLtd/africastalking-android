@@ -1,10 +1,9 @@
 package com.africastalking.voice;
 
-import android.net.sip.SipAudioCall;
 import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
-import com.africastalking.proto.SdkServerServiceOuterClass.*;
+import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.AccountConfig;
@@ -138,11 +137,12 @@ class PJSipStack extends BaseSipStack {
 
     @Override
     public void makeCall(String destination, int timeout, CallListener listener) throws AfricasTalkingException {
-        SipCall call = new SipCall(mAccount, -1);
-        CallOpParam prm = new CallOpParam();
-        String recipient = "sip:" + destination + "@" + mCredentials.getHost() + ":" + mCredentials.getPort();
         try {
-            call.makeCall(recipient, prm);
+            SipCall call = new SipCall(mAccount, -1);
+            CallOpParam prm = new CallOpParam();
+            String recipient = "sip:" + destination + "@" + mCredentials.getHost();
+            Log.d(TAG, "Calling " + recipient);
+             call.makeCall(recipient, prm);
         } catch(Exception e) {
             throw new AfricasTalkingException(e.getCause());
         }
