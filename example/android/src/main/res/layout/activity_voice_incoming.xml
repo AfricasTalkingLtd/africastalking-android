@@ -30,15 +30,24 @@
             android:id="@+id/btnPickUp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Pick Up"
+            android:text="Pick Up Call"
             android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btnHold"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Hold / Resume" />
 
         <Button
             android:id="@+id/btnHangUp"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Hang Up" />
+            android:text="Hang Up Call" />
+
+
 
     </LinearLayout>
 

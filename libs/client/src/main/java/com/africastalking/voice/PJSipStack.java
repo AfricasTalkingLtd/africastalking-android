@@ -177,8 +177,8 @@ class PJSipStack extends BaseSipStack {
         try {
             setCallListener(listener);
             SipCall call = new SipCall(mAccount);
-            String recipient = "sip:" + destination + "@" + mCredentials.getHost();
-            Log.d(TAG, "Calling " + recipient);
+            String recipient = ("sip:" + destination + "@" + mCredentials.getHost());
+            // isSipUri(destination)
             call.makeCall(recipient, new CallOpParam());
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
@@ -531,18 +531,21 @@ class PJSipStack extends BaseSipStack {
 
             try {
                 if (hold) {
-                    Log.d(TAG, "holding call with ID " + getId());
                     setHold(param);
                     localHold = true;
+                    if (mCallListener != null) {
+                        mCallListener.onCallHeld(makeCallInfo(getInfo()));
+                    }
                 } else {
-                    // http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2015-March/018246.html
-                    Log.d(TAG, "un-holding call with ID " + getId());
                     CallSetting opt = param.getOpt();
                     opt.setAudioCount(1);
                     opt.setVideoCount(0);
                     opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                     reinvite(param);
                     localHold = false;
+                    if (mCallListener != null) {
+                        mCallListener.onCallEstablished(makeCallInfo(getInfo()));
+                    }
                 }
             } catch (Exception exc) {
                 String operation = hold ? "hold" : "unhold";

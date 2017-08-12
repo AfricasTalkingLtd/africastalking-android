@@ -31,6 +31,11 @@ public class IncomingCallActivity extends AppCompatActivity {
     @BindView(R.id.btnPickUp)
     Button pickUp;
 
+    @BindView(R.id.btnHold)
+    Button hold;
+
+    private boolean held = false;
+
     private VoiceBackgroundService mService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -43,6 +48,7 @@ public class IncomingCallActivity extends AppCompatActivity {
             if (mService.isCallInProgress()) {
                 title.setText(info.getDisplayName());
                 pickUp.setVisibility(View.GONE);
+                hold.setVisibility(View.VISIBLE);
                 mService.setCallListener(new CallListener() {
                     @Override
                     public void onCallEnded(CallInfo callInfo) {
@@ -103,6 +109,9 @@ public class IncomingCallActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             title.setText(call.getDisplayName());
+
+                            hold.setVisibility(View.VISIBLE);
+                            pickUp.setVisibility(View.GONE);
                         }
                     });
                     mService.startAudio();
@@ -131,6 +140,26 @@ public class IncomingCallActivity extends AppCompatActivity {
 
             mService.endCall();
             finish();
+        } catch (AfricasTalkingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @OnClick(R.id.btnHold)
+    public void onHold() {
+        try {
+
+            if (mService == null) {
+                Log.e("Service Not Bound!", "");
+                return;
+            }
+            if (held) {
+                mService.resumeCall();
+                held = false;
+            } else {
+                mService.holdCall();
+                held = true;
+            }
         } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
