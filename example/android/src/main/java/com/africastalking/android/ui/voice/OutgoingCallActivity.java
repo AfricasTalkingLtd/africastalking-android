@@ -21,7 +21,7 @@ import com.africastalking.voice.CallListener;
 import com.africastalking.voice.VoiceBackgroundService;
 import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
-import com.africastalking.voice.VoiceListener;
+import com.africastalking.voice.RegistrationListener;
 
 public class OutgoingCallActivity extends AppCompatActivity {
 
@@ -40,7 +40,7 @@ public class OutgoingCallActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             VoiceServiceBinder binder = (VoiceServiceBinder) service;
             mService = binder.getService();
-            mService.setRegistrationListener(new VoiceListener() {
+            mService.setRegistrationListener(new RegistrationListener() {
                 @Override
                 public void onFailedRegistration(Throwable error) {
                     Log.e("onError", error.getMessage() + "");

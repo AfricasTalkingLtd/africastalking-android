@@ -30,7 +30,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
 
     public static final String INCOMING_CALL = "com.africastalking.voice.INCOMING_CALL";
 
-    static VoiceListener mRegistrationListener;
+    static RegistrationListener mRegistrationListener;
 
     private static SipStack mSipStack;
     private VoiceServiceBinder mBinder = new VoiceServiceBinder();
@@ -156,7 +156,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
      * Set the registration listener
      * @param listener
      */
-    public void setRegistrationListener(VoiceListener listener) {
+    public void setRegistrationListener(RegistrationListener listener) {
         if (listener != null) {
             mRegistrationListener = listener;
             if (mSipStack != null && mSipStack.isReady()) {

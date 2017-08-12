@@ -11,7 +11,7 @@ package com.africastalking.voice;
  * Date : 8/12/17 10:57 AM
  * Description :
  */
-public interface VoiceListener {
+public interface RegistrationListener {
     void onFailedRegistration(Throwable error);
     void onStartRegistration();
     void onCompleteRegistration();
