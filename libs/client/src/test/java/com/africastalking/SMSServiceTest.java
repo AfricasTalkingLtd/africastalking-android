@@ -1,31 +1,19 @@
 package com.africastalking;
 
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.test.InstrumentationTestCase;
 import android.text.TextUtils;
-
-import com.africastalking.models.Recipient;
-import com.africastalking.models.SendMessageResponse;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
-import retrofit2.Response;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by jay on 7/13/17.
@@ -39,38 +27,8 @@ public class SMSServiceTest {
 
     @Before
     public void setup() throws IOException {
-        AfricasTalking.CALLSERVICE = CallService.SMS;
-        sms = new SMSService("testuser", Format.JSON, Currency.KES);
-        PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(TextUtils.join(any(CharSequence.class), any(List.class))).thenAnswer(new Answer<String>() {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable {
-                CharSequence delimiter = (CharSequence) invocation.getArguments()[0];
-                List<String> inputList = (List<String>) invocation.getArguments()[1];
-
-                String output = "";
-                for (CharSequence cs : inputList) {
-                    output += "," + cs;
-                }
-                return output.substring(1, output.length());
-            }
-        });
-    }
-
-    @Test
-    public void testFormatRecipients() throws Exception {
-        String actual = new SMSService().formatRecipients(new String[]{"john", "jean", "juan"});
-        String expected = "john,jean,juan";
-        assertEquals("Failed formatRecipients", expected, actual);
-        assertEquals("Failed formatRecipients", null, new SMSService().formatRecipients(null));
-        assertEquals("Failed formatRecipients", "john", new SMSService().formatRecipients(new String[]{"john"}));
-    }
-
-    @Test
-    public void testFormatOneRecipients() throws Exception {
-        String actual = new SMSService().formatRecipients(new String[]{"john"});
-        String expected = "john";
-        assertEquals("Failed formatRecipients", expected, actual);
+        AfricasTalking.initialize("sandbox", "localhost");
+        sms = AfricasTalking.getSmsService();
     }
 
     @Test

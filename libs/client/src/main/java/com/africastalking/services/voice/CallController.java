@@ -1,4 +1,4 @@
-package com.africastalking.voice;
+package com.africastalking.services.voice;
 
 import com.africastalking.AfricasTalkingException;
 

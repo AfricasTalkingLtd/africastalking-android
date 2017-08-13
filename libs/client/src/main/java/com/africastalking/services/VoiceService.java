@@ -1,7 +1,9 @@
-package com.africastalking;
+package com.africastalking.services;
 
 
-import com.africastalking.interfaces.IVoice;
+import com.africastalking.AfricasTalking;
+import com.africastalking.Callback;
+import com.africastalking.Environment;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
@@ -11,13 +13,11 @@ import java.util.List;
 
 public final class VoiceService extends Service {
 
-    private static final String TAG = VoiceService.class.getName();
-
     private static VoiceService sInstance;
-    private IVoice voice;
+    private VoiceServiceInterface voice;
 
 
-    VoiceService() throws IOException {
+    public VoiceService() throws IOException {
         super();
         initService();
     }
@@ -45,8 +45,8 @@ public final class VoiceService extends Service {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://voice."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN) + "/";
-        voice =  retrofitBuilder.baseUrl(baseUrl).build().create(IVoice.class) ;
+        String baseUrl = "https://voice."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        voice =  retrofitBuilder.baseUrl(baseUrl).build().create(VoiceServiceInterface.class) ;
     }
 
     @Override
@@ -63,12 +63,12 @@ public final class VoiceService extends Service {
      * @throws IOException
      */
     public String mediaUpload(String url) throws IOException {
-        Response<String> response = voice.mediaUpload(username, url).execute();
+        Response<String> response = voice.mediaUpload(USERNAME, url).execute();
         return response.body();
     }
 
     public void mediaUpload(String url, Callback<String> callback) {
-        voice.mediaUpload(username, url).enqueue(makeCallback(callback));
+        voice.mediaUpload(USERNAME, url).enqueue(makeCallback(callback));
     }
 
     /**
@@ -78,11 +78,11 @@ public final class VoiceService extends Service {
      * @throws IOException
      */
     public List<QueueStatus> queueStatus(String phoneNumbers) throws IOException {
-        Response<List<QueueStatus>> response = voice.queueStatus(username, phoneNumbers).execute();
+        Response<List<QueueStatus>> response = voice.queueStatus(USERNAME, phoneNumbers).execute();
         return response.body();
     }
 
     public void queueStatus(String phoneNumbers, Callback<List<QueueStatus>> callback) {
-        voice.queueStatus(username, phoneNumbers).enqueue(makeCallback(callback));
+        voice.queueStatus(USERNAME, phoneNumbers).enqueue(makeCallback(callback));
     }
 }

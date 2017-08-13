@@ -1,4 +1,4 @@
-package com.africastalking.interfaces;
+package com.africastalking.services;
 
 
 import com.africastalking.models.B2BResponse;
@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 
 import java.util.HashMap;
 
-public interface IPayments {
+public interface PaymentServiceInterface {
 
     @POST("mobile/checkout/request")
     Call<CheckoutResponse> checkout(@Body HashMap<String, Object> body);

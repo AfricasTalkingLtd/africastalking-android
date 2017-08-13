@@ -1,4 +1,4 @@
-package com.africastalking.voice;
+package com.africastalking.services.voice;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -18,7 +18,7 @@ import com.africastalking.proto.SdkServerServiceOuterClass.*;
 import java.text.ParseException;
 import java.util.Locale;
 
-import static com.africastalking.voice.VoiceBackgroundService.INCOMING_CALL;
+import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_CALL;
 
 /**
  * Copyright (c) 2017 Salama AB

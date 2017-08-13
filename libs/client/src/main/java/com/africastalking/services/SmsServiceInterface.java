@@ -1,4 +1,4 @@
-package com.africastalking.interfaces;
+package com.africastalking.services;
 
 import com.africastalking.models.FetchMessageResponse;
 import com.africastalking.models.Message;
@@ -17,7 +17,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface ISMS {
+public interface SmsServiceInterface {
 
     @FormUrlEncoded
     @POST("messaging")

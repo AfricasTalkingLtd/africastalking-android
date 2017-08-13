@@ -1,4 +1,4 @@
-package com.africastalking.voice;
+package com.africastalking.services.voice;
 
 import android.app.Service;
 import android.content.Context;
@@ -125,7 +125,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
                     @Override
                     protected List<SipCredentials> doInBackground(Void[] objects) {
                         try {
-                            ManagedChannel channel = com.africastalking.Service.getChannel(hostname, portNumber);
+                            ManagedChannel channel = com.africastalking.services.Service.getChannel(hostname, portNumber);
                             SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
                             SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
                             return stub.getSipCredentials(req).getCredentialsList();

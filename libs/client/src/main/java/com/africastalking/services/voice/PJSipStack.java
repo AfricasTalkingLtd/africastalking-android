@@ -1,4 +1,4 @@
-package com.africastalking.voice;
+package com.africastalking.services.voice;
 
 import android.content.Intent;
 import android.util.Log;
@@ -37,7 +37,7 @@ import org.pjsip.pjsua2.pjsua2;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
 
-import static com.africastalking.voice.VoiceBackgroundService.INCOMING_CALL;
+import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_CALL;
 
 /**
  * Copyright (c) 2017 Salama AB

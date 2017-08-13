@@ -8,7 +8,14 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.africastalking.voice.VoiceBackgroundService;
+
+import com.africastalking.services.Service;
+import com.africastalking.services.AccountService;
+import com.africastalking.services.AirtimeService;
+import com.africastalking.services.PaymentService;
+import com.africastalking.services.SmsService;
+import com.africastalking.services.VoiceService;
+import com.africastalking.services.voice.VoiceBackgroundService;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -26,10 +33,6 @@ public final class AfricasTalking {
 
     private static final String TAG = AfricasTalking.class.getName();
 
-    static String USERNAME;
-    static String HOST;
-    static int PORT = 35897;
-
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
             Manifest.permission.USE_SIP,
@@ -41,19 +44,15 @@ public final class AfricasTalking {
 
     private static AccountService account;
     private static AirtimeService airtime;
-    private static PaymentsService payments;
-    private static SMSService sms;
+    private static PaymentService payments;
+    private static SmsService sms;
     private static VoiceService voice;
 
-    static Environment ENV = Environment.PRODUCTION;
-    static Boolean LOGGING = false;
-    static Logger LOGGER = new BaseLogger();
-
     public static void initialize(String username, String host, int port, Environment environment) throws IOException {
-        HOST = host;
-        PORT = port;
-        USERNAME = username;
-        ENV = environment;
+        Service.HOST = host;
+        Service.PORT = port;
+        Service.USERNAME = username;
+        Service.ENV = environment;
     }
 
     public static void initialize(String username, String host, int port) throws IOException {
@@ -61,31 +60,31 @@ public final class AfricasTalking {
     }
 
     public static void initialize(String username, String host, Environment environment) throws IOException {
-        initialize(username, host, PORT, environment);
+        initialize(username, host, Service.PORT, environment);
     }
 
     public static void initialize(String username, String host) throws IOException {
-        initialize(username, host, PORT, Environment.PRODUCTION);
+        initialize(username, host, Service.PORT, Environment.PRODUCTION);
     }
 
     public static void setEnvironment(Environment env) {
-        ENV = env;
+        Service.ENV = env;
     }
 
     private static void enableLogging(boolean enable) {
-        LOGGING = enable;
+        Service.LOGGING = enable;
     }
 
     public static void setLogger(Logger logger) {
         if (logger != null) {
             enableLogging(true);
         }
-        LOGGER = logger;
+        Service.LOGGER = logger;
     }
 
-    public static SMSService getSmsService() throws IOException {
+    public static SmsService getSmsService() throws IOException {
         if (sms == null) {
-            sms = new SMSService();
+            sms = new SmsService();
             return sms;
         }
         return sms;
@@ -98,9 +97,9 @@ public final class AfricasTalking {
         return airtime;
     }
 
-    public static PaymentsService getPaymentsService() throws IOException {
+    public static PaymentService getPaymentsService() throws IOException {
         if (payments == null) {
-            payments = new PaymentsService();
+            payments = new PaymentService();
         }
         return payments;
     }
@@ -142,8 +141,8 @@ public final class AfricasTalking {
 
                         Intent intent = new Intent(context, VoiceBackgroundService.class);
                         intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, AfricasTalking.HOST);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, AfricasTalking.PORT);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, Service.HOST);
+                        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, Service.PORT);
                         intent.putExtra(VoiceBackgroundService.EXTRA_SIP_STACK, sipStack);
 
                         // (re)-start

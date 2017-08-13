@@ -1,4 +1,4 @@
-package com.africastalking.interfaces;
+package com.africastalking.services;
 
 import com.africastalking.models.QueueStatus;
 import retrofit2.Call;
@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 
 import java.util.List;
 
-public interface IVoice {
+public interface VoiceServiceInterface {
 
     @FormUrlEncoded
     @POST("mediaUpload")

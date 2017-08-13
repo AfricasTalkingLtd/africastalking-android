@@ -18,8 +18,8 @@ public class PaymentsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        AfricasTalking.CALLSERVICE = CallService.PAYMENT;
-        payment = new PaymentsService("testuser", Format.JSON, Currency.KES);
+        AfricasTalking.initialize("sandbox", "localhost");
+        payment = AfricasTalking.getPaymentsService();
     }
 
     @After
@@ -29,20 +29,20 @@ public class PaymentsServiceTest {
 
     @Test
     public void checkout() throws Exception {
-        assertNotNull("Response response is null", payment.checkout("","", 0.00f, payment.currency));
-        assertEquals("Status not correct", "PendingConfirmation", payment.checkout("","", 0.00f, payment.currency).getStatus());
+        assertNotNull("Response response is null", payment.checkout("","", "KES", 0.00f));
+        assertEquals("Status not correct", "PendingConfirmation", payment.checkout("","", "KES", 0.00f).getStatus());
     }
 
     @Test
     public void payConsumer() throws Exception {
-        assertNotNull("Pay Consummer response is null", payment.payConsumer("", new Consumer("+254792424735", payment.currency, 0.00f)));
-        assertEquals("Total value is not accurate", "KES 100", payment.payConsumer("", new Consumer("+254792424735", payment.currency, 0.00f)).getTotalValue());
+        assertNotNull("Pay Consummer response is null", payment.payConsumer("", new Consumer("+254792424735", "KES", 0.00f)));
+        assertEquals("Total value is not accurate", "KES 100", payment.payConsumer("", new Consumer("+254792424735", "KES", 0.00f)).getTotalValue());
     }
 
     @Test
     public void payBusiness() throws Exception {
-        assertNotNull("Pay Business response is null", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, payment.currency, 0.00f)));
-        assertEquals("Status not correct", "Queued", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, payment.currency, 0.00f)).getStatus());
+        assertNotNull("Pay Business response is null", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, "KES", 0.00f)));
+        assertEquals("Status not correct", "Queued", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, "KES", 0.00f)).getStatus());
     }
 
 }

@@ -1,6 +1,7 @@
-package com.africastalking;
+package com.africastalking.services;
 
-import com.africastalking.interfaces.IPayments;
+import com.africastalking.Callback;
+import com.africastalking.Environment;
 import com.africastalking.models.B2BResponse;
 import com.africastalking.models.B2CResponse;
 import com.africastalking.models.Business;
@@ -18,13 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PaymentsService extends Service {
+public class PaymentService extends Service {
 
-    private PaymentsService sInstance;
-    private IPayments payment;
+    private PaymentService sInstance;
+    private PaymentServiceInterface payment;
 
 
-    PaymentsService() throws IOException {
+    public PaymentService() throws IOException {
         super();
     }
 
@@ -36,9 +37,9 @@ public class PaymentsService extends Service {
     }
 
     @Override
-    protected PaymentsService getInstance() throws IOException {
+    protected PaymentService getInstance() throws IOException {
         if(sInstance == null) {
-            sInstance = new PaymentsService();
+            sInstance = new PaymentService();
         }
         return sInstance;
     }
@@ -50,12 +51,12 @@ public class PaymentsService extends Service {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://payments."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN) + "/";
+        String baseUrl = "https://payments."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         payment = retrofitBuilder
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(baseUrl)
                 .build()
-                .create(IPayments.class);
+                .create(PaymentServiceInterface.class);
     }
 
     @Override
@@ -66,21 +67,20 @@ public class PaymentsService extends Service {
     }
 
 
-    private HashMap<String, Object> makeCheckoutRequest(String product, String phone, String currenciedAmount, Map metadata) {
-        String[] amount = currenciedAmount.split(" ");
+    private HashMap<String, Object> makeCheckoutRequest(String product, String phone, String currency, float amount, Map metadata) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", username);
+        body.put("username", USERNAME);
         body.put("productName", product);
         body.put("phoneNumber", phone);
-        body.put("amount", Float.parseFloat(amount[1]));
-        body.put("currencyCode", amount[0]);
+        body.put("amount", amount);
+        body.put("currencyCode", currency);
         body.put("metadata", metadata);
         return body;
     }
 
     private HashMap<String, Object> makeB2CRequest(String product, List<Consumer> recipients) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", username);
+        body.put("username", USERNAME);
         body.put("productName", product);
         body.put("recipients", recipients);
 
@@ -89,7 +89,7 @@ public class PaymentsService extends Service {
 
     private HashMap<String, Object> makeB2BRequest(String product, Business recipient) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", username);
+        body.put("username", USERNAME);
         body.put("productName", product);
 
         //
@@ -105,13 +105,14 @@ public class PaymentsService extends Service {
      *
      * @param productName
      * @param phoneNumber
-     * @param amount String in the format "KES XXXX"
+     * @param currency
+     * @param amount
      * @param metadata
      * @return
      * @throws IOException
      */
-    public CheckoutResponse checkout(String productName, String phoneNumber, String amount, Map metadata) throws IOException {
-        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, amount, metadata);
+    public CheckoutResponse checkout(String productName, String phoneNumber, String currency, float amount, Map metadata) throws IOException {
+        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, currency, amount, metadata);
 
         Call<CheckoutResponse> call = payment.checkout(body);
         Response<CheckoutResponse> res = call.execute();
@@ -123,30 +124,32 @@ public class PaymentsService extends Service {
      *
      * @param productName
      * @param phoneNumber
-     * @param amount String in the format "KES XXXX"
+     * @param currency
+     * @param amount
      * @return
      * @throws IOException
      */
-    public CheckoutResponse checkout(String productName, String phoneNumber, String amount) throws IOException {
-        return this.checkout(productName, phoneNumber, amount, new HashMap());
+    public CheckoutResponse checkout(String productName, String phoneNumber, String currency, float amount) throws IOException {
+        return this.checkout(productName, phoneNumber, currency, amount, new HashMap());
     }
 
     /**
      *
      * @param productName
      * @param phoneNumber
-     * @param amount String in the format "KES XXXX"
+     * @param amount
+     * @param currency
      * @param metadata
      * @param callback
      */
-    public void checkout(String productName, String phoneNumber, String amount, Map metadata, Callback<CheckoutResponse> callback) {
-        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, amount, metadata);
+    public void checkout(String productName, String phoneNumber, String currency, float amount, Map metadata, Callback<CheckoutResponse> callback) {
+        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, currency, amount, metadata);
         Call<CheckoutResponse> call = payment.checkout(body);
         call.enqueue(makeCallback(callback));
     }
 
-    public void checkout(String productName, String phoneNumber, String amount, Callback<CheckoutResponse> callback) {
-        this.checkout(productName, phoneNumber, amount, new HashMap(), callback);
+    public void checkout(String productName, String phoneNumber, String currency, float amount, Callback<CheckoutResponse> callback) {
+        this.checkout(productName, phoneNumber, currency, amount, new HashMap(), callback);
     }
 
 
@@ -199,7 +202,4 @@ public class PaymentsService extends Service {
         Call<B2BResponse> call = payment.requestB2B(body);
         call.enqueue(makeCallback(callback));
     }
-
-
-
 }

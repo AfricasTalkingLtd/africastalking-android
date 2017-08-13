@@ -1,31 +1,28 @@
-package com.africastalking;
+package com.africastalking.services;
 
 import android.text.TextUtils;
 
-import com.africastalking.interfaces.ISMS;
+import com.africastalking.AfricasTalking;
+import com.africastalking.Callback;
+import com.africastalking.Environment;
 import com.africastalking.models.FetchMessageResponse;
-import com.africastalking.models.Message;
-import com.africastalking.models.Recipient;
 import com.africastalking.models.SendMessageResponse;
-import com.africastalking.models.Subscription;
 import com.africastalking.models.SubscriptionResponse;
 import com.africastalking.models.Subscriptions;
+import com.africastalking.proto.SdkServerServiceOuterClass;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-//import java.util.StringJoiner;
 
-import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
 
 
-public final class SMSService extends Service {
+public final class SmsService extends Service {
 
-    private static SMSService smsService;
-    private ISMS sms;
+    private static SmsService smsService;
+    private SmsServiceInterface sms;
 
-    SMSService() throws IOException {
+    public SmsService() throws IOException {
         super();
     }
 
@@ -35,10 +32,10 @@ public final class SMSService extends Service {
     }
 
     @Override
-    protected SMSService getInstance() throws IOException {
+    protected SmsService getInstance() throws IOException {
 
         if(smsService == null){
-            smsService = new SMSService();
+            smsService = new SmsService();
         }
 
         return smsService;
@@ -51,8 +48,8 @@ public final class SMSService extends Service {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://api."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN) + "/version1/";
-        sms =  retrofitBuilder.baseUrl(baseUrl).build().create(ISMS.class) ;
+        String baseUrl = "https://api."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/version1/";
+        sms =  retrofitBuilder.baseUrl(baseUrl).build().create(SmsServiceInterface.class) ;
     }
 
     @Override
@@ -62,7 +59,7 @@ public final class SMSService extends Service {
         }
     }
 
-    public String formatRecipients(String[] recipients) {
+    private String formatRecipients(String[] recipients) {
 
         if (recipients == null){
             return null;
@@ -85,7 +82,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public SendMessageResponse send(String message, String from, String[] recipients) throws IOException {
-        Response<SendMessageResponse> resp = sms.send(username, formatRecipients(recipients), from, message).execute();
+        Response<SendMessageResponse> resp = sms.send(USERNAME, formatRecipients(recipients), from, message).execute();
         return resp.body();
     }
 
@@ -97,7 +94,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public void send(String message, String from, String[] recipients, Callback<SendMessageResponse> callback) {
-        sms.send(username, formatRecipients(recipients), from, message).enqueue(makeCallback(callback));
+        sms.send(USERNAME, formatRecipients(recipients), from, message).enqueue(makeCallback(callback));
     }
 
     /**
@@ -132,9 +129,13 @@ public final class SMSService extends Service {
      * </p>
      */
     public SendMessageResponse sendBulk(String message, String from, boolean enqueue, String[] recipients) throws IOException {
-        Response<SendMessageResponse> resp = sms.sendBulk(username,
-                formatRecipients(recipients), from, message,
-                1, enqueue ? "1":null).execute();
+        Response<SendMessageResponse> resp = sms.sendBulk(
+                USERNAME,
+                formatRecipients(recipients),
+                from,
+                message,
+                1,
+                enqueue ? "1" : null).execute();
         return resp.body();
     }
 
@@ -146,9 +147,12 @@ public final class SMSService extends Service {
      * </p>
      */
     public void sendBulk(String message, String from, boolean enqueue, String[] recipients, Callback<SendMessageResponse> callback) {
-        sms.sendBulk(username,
-                formatRecipients(recipients), from, message,
-                1, enqueue ? "1":null).enqueue(makeCallback(callback));
+        sms.sendBulk(USERNAME,
+                formatRecipients(recipients),
+                from,
+                message,
+                1,
+                enqueue ? "1" : null).enqueue(makeCallback(callback));
     }
 
     /**
@@ -225,7 +229,7 @@ public final class SMSService extends Service {
      */
     public SendMessageResponse sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
-        Response<SendMessageResponse> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration).execute();
+        Response<SendMessageResponse> resp = sms.sendPremium(USERNAME, formatRecipients(recipients), from, message, keyword, linkId, retryDuration).execute();
         return resp.body();
     }
 
@@ -238,7 +242,7 @@ public final class SMSService extends Service {
      */
     public void sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<SendMessageResponse> callback) {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
-        sms.sendPremium(username, formatRecipients(recipients),
+        sms.sendPremium(USERNAME, formatRecipients(recipients),
                 from, message, keyword, linkId, retryDuration)
                 .enqueue(makeCallback(callback));
     }
@@ -315,7 +319,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public FetchMessageResponse fetchMessage(String lastReceivedId) throws IOException {
-        Response<FetchMessageResponse> resp = sms.fetchMessage(username, lastReceivedId).execute();
+        Response<FetchMessageResponse> resp = sms.fetchMessage(USERNAME, lastReceivedId).execute();
         return resp.body();
     }
 
@@ -337,7 +341,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public void fetchMessage(String lastReceivedId, Callback<FetchMessageResponse> callback) {
-        sms.fetchMessage(username, lastReceivedId).enqueue(makeCallback(callback));
+        sms.fetchMessage(USERNAME, lastReceivedId).enqueue(makeCallback(callback));
     }
 
     /**
@@ -360,7 +364,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public Subscriptions fetchSubscription(String shortCode, String keyword, String lastReceivedId) throws IOException {
-        Response<Subscriptions> resp = sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).execute();
+        Response<Subscriptions> resp = sms.fetchSubsciption(USERNAME, shortCode, keyword, lastReceivedId).execute();
         return resp.body();
     }
 
@@ -372,7 +376,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public void fetchSubscription(String shortCode, String keyword, String lastReceivedId, Callback<Subscriptions> callback) {
-        sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).enqueue(makeCallback(callback));
+        sms.fetchSubsciption(USERNAME, shortCode, keyword, lastReceivedId).enqueue(makeCallback(callback));
 
     }
 
@@ -407,7 +411,7 @@ public final class SMSService extends Service {
      * </p>
      */
     public SubscriptionResponse createSubscription(String shortCode, String keyword, String phoneNumber) throws IOException {
-        Response<SubscriptionResponse> resp = sms.createSubscription(username, shortCode, keyword, phoneNumber).execute();
+        Response<SubscriptionResponse> resp = sms.createSubscription(USERNAME, shortCode, keyword, phoneNumber).execute();
         return resp.body();
     }
 
@@ -419,6 +423,6 @@ public final class SMSService extends Service {
      * </p>
      */
     public void createSubscription(String shortCode, String keyword, String phoneNumber, Callback<SubscriptionResponse> callback) {
-        sms.createSubscription(username, shortCode, keyword, phoneNumber).enqueue(makeCallback(callback));
+        sms.createSubscription(USERNAME, shortCode, keyword, phoneNumber).enqueue(makeCallback(callback));
     }
 }

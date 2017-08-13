@@ -1,7 +1,8 @@
-package com.africastalking;
+package com.africastalking.services;
 
 
-import com.africastalking.interfaces.IAccount;
+import com.africastalking.Callback;
+import com.africastalking.Environment;
 import com.africastalking.models.AccountResponse;
 
 import com.africastalking.proto.SdkServerServiceOuterClass;
@@ -16,9 +17,9 @@ import java.io.IOException;
 public class AccountService extends Service {
 
     private static AccountService sInstance;
-    private IAccount service;
+    private AccountServiceInterface service;
 
-    AccountService() throws IOException {
+    public AccountService() throws IOException {
         super();
     }
 
@@ -39,13 +40,13 @@ public class AccountService extends Service {
 
     @Override
     protected void initService() {
-        String url = "https://api."+ (AfricasTalking.ENV == Environment.SANDBOX ? Const.SANDBOX_DOMAIN : Const.PRODUCTION_DOMAIN);
+        String url = "https://api."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN);
         url += "/version1/";
         Retrofit retrofit = retrofitBuilder
                 .baseUrl(url)
                 .build();
 
-        service = retrofit.create(IAccount.class);
+        service = retrofit.create(AccountServiceInterface.class);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class AccountService extends Service {
      * @throws IOException
      */
     public AccountResponse getUser() throws IOException {
-        Response<AccountResponse> resp = service.getUser(username).execute();
+        Response<AccountResponse> resp = service.getUser(USERNAME).execute();
         return resp.body();
     }
 
@@ -85,6 +86,6 @@ public class AccountService extends Service {
      * @param callback
      */
     public void getUser(final Callback<AccountResponse> callback) {
-        service.getUser(username).enqueue(makeCallback(callback));
+        service.getUser(USERNAME).enqueue(makeCallback(callback));
     }
 }

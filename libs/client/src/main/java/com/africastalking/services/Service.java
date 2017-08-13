@@ -1,5 +1,8 @@
-package com.africastalking;
+package com.africastalking.services;
 
+import com.africastalking.Callback;
+import com.africastalking.Environment;
+import com.africastalking.Logger;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.google.gson.GsonBuilder;
 
@@ -22,27 +25,40 @@ import java.io.IOException;
  */
 public abstract class Service {
 
+    static final String PRODUCTION_DOMAIN = "africastalking.com";
+    static final String SANDBOX_DOMAIN = "sandbox.africastalking.com";
+
+
+    public static String USERNAME;
+    public static String HOST;
+    public static int PORT = 35897;
+
+    public static Environment ENV = Environment.PRODUCTION;
+    public static Boolean LOGGING = false;
+    public static Logger LOGGER = new Logger() {
+        @Override
+        public void log(String message, Object... args) {
+            System.out.println(String.format(message, args));
+        }
+    };
+
+
     Retrofit.Builder retrofitBuilder;
-
     ClientTokenResponse token;
-
-    String username;
 
     Service() throws IOException {
 
-        this.username = AfricasTalking.USERNAME;
-
         if(token == null || token.getExpiration() < System.currentTimeMillis()) {
-            fetchToken(AfricasTalking.HOST, AfricasTalking.PORT);
+            fetchToken(HOST, PORT);
         }
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-        if (AfricasTalking.LOGGING) {
+        if (LOGGING) {
             HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
                 @Override
                 public void log(String message) {
-                    AfricasTalking.LOGGER.log(message);
+                    LOGGER.log(message);
                 }
             });
             logger.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -82,7 +98,8 @@ public abstract class Service {
         SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
         ClientTokenRequest req = ClientTokenRequest.newBuilder()
                 .setCapability(capability)
-                .setEnvironment(AfricasTalking.ENV.toString())
+
+                .setEnvironment(ENV.toString())
                 .build();
         return stub.getToken(req);
     }

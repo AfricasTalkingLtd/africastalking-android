@@ -3,6 +3,6 @@
 *TODO*
 
 - [ ] Documentation
-- [ ] Server
-- [ ] Client
+- [x] Server
+- [x] Client
 

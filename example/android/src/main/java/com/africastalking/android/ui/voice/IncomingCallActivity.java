@@ -16,10 +16,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.africastalking.AfricasTalking;
 import com.africastalking.AfricasTalkingException;
-import com.africastalking.voice.CallInfo;
-import com.africastalking.voice.CallListener;
-import com.africastalking.voice.VoiceBackgroundService;
-import com.africastalking.voice.VoiceBackgroundService.VoiceServiceBinder;
+import com.africastalking.services.voice.CallInfo;
+import com.africastalking.services.voice.CallListener;
+import com.africastalking.services.voice.VoiceBackgroundService;
+import com.africastalking.services.voice.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
 
 public class IncomingCallActivity extends AppCompatActivity {

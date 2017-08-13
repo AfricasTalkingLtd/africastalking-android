@@ -1,4 +1,4 @@
-package com.africastalking.interfaces;
+package com.africastalking.services;
 
 
 import com.africastalking.models.AirtimeResponses;
@@ -6,7 +6,7 @@ import com.africastalking.models.AirtimeResponses;
 import retrofit2.Call;
 import retrofit2.http.*;
 
-public interface IAirtime {
+public interface AirtimeServiceInterface {
 
     @FormUrlEncoded
     @POST("send")

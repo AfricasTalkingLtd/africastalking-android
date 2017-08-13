@@ -11,12 +11,12 @@ import static org.junit.Assert.*;
  */
 public class AccountServiceTest {
 
-    AccountService account;
+    private AccountService account;
 
     @Before
     public void setUp() throws Exception {
-        AfricasTalking.CALLSERVICE = CallService.ACCOUNT;
-        account = new AccountService("testuser", Format.JSON, Currency.KES);
+        AfricasTalking.initialize("sandbox", "localhost");
+        account = AfricasTalking.getAccount();
     }
 
     @After
