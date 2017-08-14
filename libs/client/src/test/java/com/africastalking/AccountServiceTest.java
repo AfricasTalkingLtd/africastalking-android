@@ -1,5 +1,7 @@
 package com.africastalking;
 
+import com.africastalking.services.AccountService;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +18,7 @@ public class AccountServiceTest {
     @Before
     public void setUp() throws Exception {
         AfricasTalking.initialize("sandbox", "localhost");
-        account = AfricasTalking.getAccount();
+        account = AfricasTalking.getAccountService();
     }
 
     @After

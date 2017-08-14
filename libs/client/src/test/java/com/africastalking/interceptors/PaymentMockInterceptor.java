@@ -2,9 +2,6 @@ package com.africastalking.interceptors;
 
 import android.content.Context;
 
-import com.africastalking.AfricasTalking;
-import com.africastalking.CallService;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -59,12 +56,6 @@ public class PaymentMockInterceptor implements Interceptor {
 
         String json = "";
 
-        if(AfricasTalking.CALLSERVICE == CallService.CHECKOUT)
-            json = checkoutjson;
-        if(AfricasTalking.CALLSERVICE == CallService.B2C)
-            json = b2cjson;
-        if(AfricasTalking.CALLSERVICE == CallService.B2B)
-            json = b2bjson;
 
         okhttp3.Response response = new okhttp3.Response.Builder()
                 .body(ResponseBody.create(MEDIA_JSON, json))

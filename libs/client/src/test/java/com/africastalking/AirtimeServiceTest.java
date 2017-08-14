@@ -29,8 +29,8 @@ public class AirtimeServiceTest {
 
     @Test
     public void send() throws Exception {
-        assertNotNull("AirtimeService: Response null", airtime.send("+254792424735", "KES 0"));
-        assertEquals("AirtimeService: No responses", false, airtime.send("+254792424735", "KES 0").getResponses().isEmpty());
-        assertEquals("AirtimeService: Response is not successful" + airtime.send("+254792424735", "KES 0").getErrorMessage(), "sent", airtime.send("+254792424735", "KES 0").getResponses().get(0).getStatus());
+        assertNotNull("AirtimeService: Response null", airtime.send("+254792424735", "KES", 0));
+        assertEquals("AirtimeService: No responses", false, airtime.send("+254792424735", "KES", 0).getResponses().isEmpty());
+        assertEquals("AirtimeService: Response is not successful" + airtime.send("+254792424735", "KES", 0).getErrorMessage(), "sent", airtime.send("+254792424735", "KES", 0).getResponses().get(0).getStatus());
     }
 }

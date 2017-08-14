@@ -93,7 +93,7 @@ public final class AfricasTalking {
         return Service.newInstance("account");
     }
 
-    public static VoiceService getVoiceService() throws Exception {
+    public static VoiceService getVoiceService() throws IOException {
         return Service.newInstance("voice");
     }
 

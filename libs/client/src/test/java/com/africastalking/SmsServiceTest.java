@@ -3,6 +3,8 @@ package com.africastalking;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
+import com.africastalking.services.SmsService;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,9 +23,9 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({TextUtils.class, Resources.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class SMSServiceTest {
+public class SmsServiceTest {
 
-    private SMSService sms;
+    private SmsService sms;
 
     @Before
     public void setup() throws IOException {

@@ -2,6 +2,7 @@ package com.africastalking;
 
 import com.africastalking.models.Business;
 import com.africastalking.models.Consumer;
+import com.africastalking.services.PaymentService;
 
 import org.junit.After;
 import org.junit.Before;
@@ -12,9 +13,9 @@ import static org.junit.Assert.*;
 /**
  * Created by jay on 7/26/17.
  */
-public class PaymentsServiceTest {
+public class PaymentServiceTest {
 
-    private PaymentsService payment;
+    private PaymentService payment;
 
     @Before
     public void setUp() throws Exception {
