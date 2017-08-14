@@ -2,7 +2,6 @@ package com.africastalking.services;
 
 import android.text.TextUtils;
 
-import com.africastalking.AfricasTalking;
 import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.models.FetchMessageResponse;
@@ -19,10 +18,10 @@ import retrofit2.Response;
 
 public final class SmsService extends Service {
 
-    private static SmsService smsService;
+    static SmsService sInstance;
     private SmsServiceInterface sms;
 
-    public SmsService() throws IOException {
+    SmsService() throws IOException {
         super();
     }
 
@@ -34,16 +33,16 @@ public final class SmsService extends Service {
     @Override
     protected SmsService getInstance() throws IOException {
 
-        if(smsService == null){
-            smsService = new SmsService();
+        if(sInstance == null){
+            sInstance = new SmsService();
         }
 
-        return smsService;
+        return sInstance;
     }
 
     @Override
     protected boolean isInitialized() {
-        return smsService != null;
+        return sInstance != null;
     }
 
     @Override
@@ -54,8 +53,8 @@ public final class SmsService extends Service {
 
     @Override
     protected void destroyService() {
-        if(smsService != null){
-            smsService = null;
+        if(sInstance != null){
+            sInstance = null;
         }
     }
 

@@ -21,11 +21,11 @@ import java.util.Map;
 
 public class PaymentService extends Service {
 
-    private PaymentService sInstance;
+    static PaymentService sInstance;
     private PaymentServiceInterface payment;
 
 
-    public PaymentService() throws IOException {
+    PaymentService() throws IOException {
         super();
     }
 

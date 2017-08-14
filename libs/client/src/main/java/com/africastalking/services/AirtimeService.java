@@ -19,10 +19,10 @@ import retrofit2.Retrofit;
 public final class AirtimeService extends Service {
 
 
-    private static AirtimeService sInstance;
+    static AirtimeService sInstance;
     private AirtimeServiceInterface service;
 
-    public AirtimeService() throws IOException {
+    AirtimeService() throws IOException {
         super();
     }
 

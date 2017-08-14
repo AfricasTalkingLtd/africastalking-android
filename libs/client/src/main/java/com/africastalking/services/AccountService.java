@@ -16,10 +16,10 @@ import java.io.IOException;
  */
 public class AccountService extends Service {
 
-    private static AccountService sInstance;
+    static AccountService sInstance;
     private AccountServiceInterface service;
 
-    public AccountService() throws IOException {
+    AccountService() throws IOException {
         super();
     }
 

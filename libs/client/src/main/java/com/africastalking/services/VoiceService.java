@@ -1,7 +1,6 @@
 package com.africastalking.services;
 
 
-import com.africastalking.AfricasTalking;
 import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.models.QueueStatus;
@@ -13,11 +12,11 @@ import java.util.List;
 
 public final class VoiceService extends Service {
 
-    private static VoiceService sInstance;
+    static VoiceService sInstance;
     private VoiceServiceInterface voice;
 
 
-    public VoiceService() throws IOException {
+    VoiceService() throws IOException {
         super();
         initService();
     }

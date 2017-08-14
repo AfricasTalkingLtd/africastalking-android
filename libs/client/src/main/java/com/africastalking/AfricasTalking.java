@@ -42,11 +42,6 @@ public final class AfricasTalking {
             Manifest.permission.ACCESS_WIFI_STATE
     );
 
-    private static AccountService account;
-    private static AirtimeService airtime;
-    private static PaymentService payments;
-    private static SmsService sms;
-    private static VoiceService voice;
 
     public static void initialize(String username, String host, int port, Environment environment) throws IOException {
         Service.HOST = host;
@@ -83,39 +78,23 @@ public final class AfricasTalking {
     }
 
     public static SmsService getSmsService() throws IOException {
-        if (sms == null) {
-            sms = new SmsService();
-            return sms;
-        }
-        return sms;
+        return Service.newInstance("sms");
     }
 
     public static AirtimeService getAirtimeService() throws IOException {
-        if (airtime == null) {
-            airtime = new AirtimeService();
-        }
-        return airtime;
+        return Service.newInstance("airtime");
     }
 
     public static PaymentService getPaymentsService() throws IOException {
-        if (payments == null) {
-            payments = new PaymentService();
-        }
-        return payments;
+        return Service.newInstance("payment");
     }
 
-    public static AccountService getAccount() throws IOException {
-        if (account == null) {
-            account = new AccountService();
-        }
-        return account;
+    public static AccountService getAccountService() throws IOException {
+        return Service.newInstance("account");
     }
 
     public static VoiceService getVoiceService() throws Exception {
-        if (voice == null) {
-            voice = new VoiceService();
-        }
-        return voice;
+        return Service.newInstance("voice");
     }
 
     /**

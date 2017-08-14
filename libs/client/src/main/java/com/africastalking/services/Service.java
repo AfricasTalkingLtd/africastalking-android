@@ -10,6 +10,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.africastalking.proto.SdkServerServiceGrpc.*;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;
+
+import org.pjsip.pjsua2.Account;
+
 import okhttp3.*;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -102,6 +105,50 @@ public abstract class Service {
                 .setEnvironment(ENV.toString())
                 .build();
         return stub.getToken(req);
+    }
+
+
+    public static <T extends Service> T newInstance(String service) throws IOException {
+
+        if (service.contentEquals("account")) {
+            if (AccountService.sInstance == null) {
+                AccountService.sInstance = new AccountService();
+            }
+            return (T) AccountService.sInstance;
+        }
+
+
+        if (service.contentEquals("airtime")) {
+            if (AirtimeService.sInstance == null) {
+                AirtimeService.sInstance = new AirtimeService();
+            }
+            return (T) AirtimeService.sInstance;
+        }
+
+
+        if (service.contentEquals("payment")) {
+            if (PaymentService.sInstance == null) {
+                PaymentService.sInstance = new PaymentService();
+            }
+            return (T) PaymentService.sInstance;
+        }
+
+
+        if (service.contentEquals("sms")) {
+            if (SmsService.sInstance == null) {
+                SmsService.sInstance = new SmsService();
+            }
+            return (T) SmsService.sInstance;
+        }
+
+        if (service.contentEquals("voice")) {
+            if (VoiceService.sInstance == null) {
+                VoiceService.sInstance = new VoiceService();
+            }
+            return (T) VoiceService.sInstance;
+        }
+
+        throw new IOException("Invalid service");
     }
 
 
