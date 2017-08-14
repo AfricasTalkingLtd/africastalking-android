@@ -8,9 +8,6 @@ import com.africastalking.services.SmsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
 
@@ -20,9 +17,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by jay on 7/13/17.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({TextUtils.class, Resources.class})
-@PowerMockIgnore("javax.net.ssl.*")
 public class SmsServiceTest {
 
     private SmsService sms;
