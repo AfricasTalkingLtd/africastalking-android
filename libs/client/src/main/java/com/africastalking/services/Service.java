@@ -47,15 +47,12 @@ public abstract class Service {
 
 
     Retrofit.Builder retrofitBuilder;
-    ClientTokenResponse token;
+    private ClientTokenResponse token;
 
     Service() throws IOException {
 
-        if(token == null || token.getExpiration() < System.currentTimeMillis()) {
-            fetchToken(HOST, PORT);
-        }
-
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
 
         if (LOGGING) {
             HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
@@ -64,16 +61,24 @@ public abstract class Service {
                     LOGGER.log(message);
                 }
             });
-            logger.setLevel(HttpLoggingInterceptor.Level.BODY);
+            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
             httpClient.addInterceptor(logger);
         }
 
         httpClient.addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
+
+                if (token == null || token.getExpiration() < System.currentTimeMillis()) {
+                    fetchToken(HOST, PORT);
+                    if (token == null) {
+                        throw new IOException("Failed to fetch token");
+                    }
+                }
+
                 Request original = chain.request();
                 Request request = original.newBuilder()
-                        .addHeader("Token", token.getToken())
+                        .addHeader("ApiKey", token.getToken()) // FIXME: Token
                         .addHeader("Accept", "application/json")
                         .build();
 
@@ -96,15 +101,24 @@ public abstract class Service {
         return channelBuilder.build();
     }
 
-    ClientTokenResponse fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
+    void fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
+
+        if (LOGGING) { LOGGER.log("Fetching token..."); }
+
         ManagedChannel channel = getChannel(host, port);
         SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
         ClientTokenRequest req = ClientTokenRequest.newBuilder()
                 .setCapability(capability)
-
                 .setEnvironment(ENV.toString())
                 .build();
-        return stub.getToken(req);
+        token = stub.getToken(req);
+
+        if (LOGGING) {
+            LOGGER.log(
+                "\n\nToken: %s\nExpires: %s\n",
+                token.getToken(),
+                String.valueOf(token.getExpiration()));
+        }
     }
 
 

@@ -40,6 +40,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.jakewharton:butterknife:8.7.0'
+    compile 'com.jraska:console:0.4.3'
+    compile 'com.jraska:console-timber-tree:0.4.3'
     compile project(':libs:client')
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'

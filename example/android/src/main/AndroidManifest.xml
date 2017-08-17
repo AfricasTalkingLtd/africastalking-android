@@ -29,11 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.airtime.AirtimeActivity" />
-        <activity android:name=".ui.payment.PaymentActivity" />
-        <activity android:name=".ui.sms.SmsActivity" />
-        <activity android:name=".ui.voice.OutgoingCallActivity"/>
-        <activity android:name=".ui.voice.IncomingCallActivity" android:launchMode="singleInstance"/>
+        <activity android:name=".ui.airtime.AirtimeActivity" android:label="Airtime" />
+        <activity android:name=".ui.payment.PaymentActivity" android:label="Payment" />
+        <activity android:name=".ui.sms.SmsActivity" android:label="SMS" />
+        <activity android:name=".ui.voice.OutgoingCallActivity" android:label="Voice"/>
+        <activity android:name=".ui.voice.IncomingCallActivity" android:launchMode="singleInstance" android:label="Voice"/>
 
         <receiver android:name=".services.IncomingCallReceiver">
             <intent-filter>

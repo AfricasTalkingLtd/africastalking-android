@@ -85,7 +85,7 @@ public final class AfricasTalking {
         return Service.newInstance("airtime");
     }
 
-    public static PaymentService getPaymentsService() throws IOException {
+    public static PaymentService getPaymentService() throws IOException {
         return Service.newInstance("payment");
     }
 
