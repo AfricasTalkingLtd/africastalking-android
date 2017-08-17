@@ -22,6 +22,8 @@ import com.africastalking.services.voice.VoiceBackgroundService;
 import com.africastalking.services.voice.VoiceBackgroundService.VoiceServiceBinder;
 import com.africastalking.android.R;
 
+import java.util.Random;
+
 public class IncomingCallActivity extends AppCompatActivity {
 
 
@@ -35,8 +37,11 @@ public class IncomingCallActivity extends AppCompatActivity {
     Button hold;
 
     private boolean held = false;
+    private boolean speaker = false;
 
     private VoiceBackgroundService mService;
+
+    private Random random = new Random();
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -163,6 +168,22 @@ public class IncomingCallActivity extends AppCompatActivity {
         } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
+    }
+
+    @OnClick(R.id.btnDtmf)
+    public void onDtmf() {
+        final String digits = "0123456789";
+        mService.sendDtmf(digits.charAt(random.nextInt(digits.length())));
+    }
+
+    @OnClick(R.id.btnSpeaker)
+    public void onSpeaker() {
+        mService.setSpeakerMode(!speaker);
+    }
+
+    @OnClick(R.id.btnMute)
+    public void onToggleMute() {
+        mService.toggleMute();
     }
 
     @Override

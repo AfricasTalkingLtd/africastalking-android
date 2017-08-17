@@ -134,8 +134,24 @@ public class OutgoingCallActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onRingingBack(CallInfo call) {
+                public void onRinging(final CallInfo callInfo) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(OutgoingCallActivity.this, "Ringing " + callInfo.getDisplayName(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onRingingBack(final CallInfo call) {
                     Log.e("Ringing", "Ring back");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(OutgoingCallActivity.this, "Ringing Back " + call.getDisplayName(), Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
 
                 @Override
