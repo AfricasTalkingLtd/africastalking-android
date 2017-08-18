@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.africastalking.AfricasTalking;
 import com.africastalking.Environment;
 import com.africastalking.Logger;
+import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.models.CheckoutResponse;
 import com.africastalking.models.SendMessageResponse;
@@ -31,7 +32,11 @@ public class SmsActivity extends AppCompatActivity {
 
                 try {
                     Timber.i("Initializing SDK...");
-                    AfricasTalking.initialize("sandbox", "192.168.0.2", Environment.SANDBOX);
+                    AfricasTalking.initialize(
+                            BuildConfig.RPC_USERNAME,
+                            BuildConfig.RPC_HOST,
+                            BuildConfig.RPC_PORT,
+                            Environment.SANDBOX);
                     AfricasTalking.setLogger(new Logger() {
                         @Override
                         public void log(String message, Object... args) {

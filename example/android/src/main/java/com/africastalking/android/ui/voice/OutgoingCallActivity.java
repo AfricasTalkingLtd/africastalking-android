@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.Environment;
+import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.services.voice.CallInfo;
 import com.africastalking.services.voice.CallListener;
@@ -97,7 +99,11 @@ public class OutgoingCallActivity extends AppCompatActivity {
         callBtn.setEnabled(false);
 
         try {
-            AfricasTalking.initialize("aksalj", "192.168.0.2"); // blocking
+            AfricasTalking.initialize(
+                    BuildConfig.RPC_USERNAME,
+                    BuildConfig.RPC_HOST,
+                    BuildConfig.RPC_PORT,
+                    Environment.SANDBOX); // blocking
             AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "pjsip");
         } catch (Exception ex) {
             ex.printStackTrace();

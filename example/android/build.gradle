@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdkVersion 25
     buildToolsVersion "26.0.1"
@@ -10,6 +14,10 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+
+        buildConfigField 'String', 'RPC_USERNAME', "\"" + properties.getProperty("rpcUsername") + "\""
+        buildConfigField 'String', 'RPC_HOST', "\"" + properties.getProperty("rpcHost") + "\""
+        buildConfigField 'int', 'RPC_PORT', properties.getProperty("rpcPort")
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
