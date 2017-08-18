@@ -9,6 +9,7 @@ import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
+import com.africastalking.android.ui.ServiceActivity;
 import com.africastalking.models.CheckoutResponse;
 import com.africastalking.models.SendMessageResponse;
 import com.africastalking.services.PaymentService;
@@ -17,7 +18,7 @@ import com.jraska.console.timber.ConsoleTree;
 
 import timber.log.Timber;
 
-public class SmsActivity extends AppCompatActivity {
+public class SmsActivity extends ServiceActivity {
 
 
     @Override

@@ -48,24 +48,20 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.airtime_layout)
     void airtime() {
         startActivity(new Intent(this, AirtimeActivity.class));
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @OnClick(R.id.payment_layout)
     void payment() {
         startActivity(new Intent(this, PaymentActivity.class));
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @OnClick(R.id.sms_layout)
     void sms() {
         startActivity(new Intent(this, SmsActivity.class));
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     @OnClick(R.id.voice_layout)
     void voice() {
         startActivity(new Intent(this, OutgoingCallActivity.class));
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

@@ -16,6 +16,7 @@ import com.africastalking.AfricasTalking;
 import com.africastalking.Environment;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
+import com.africastalking.android.ui.ServiceActivity;
 import com.africastalking.services.voice.CallInfo;
 import com.africastalking.services.voice.CallListener;
 import com.africastalking.services.voice.RegistrationListener;
@@ -26,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class OutgoingCallActivity extends AppCompatActivity {
+public class OutgoingCallActivity extends ServiceActivity {
 
     private VoiceBackgroundService mService;
 

@@ -10,6 +10,7 @@ import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
+import com.africastalking.android.ui.ServiceActivity;
 import com.africastalking.models.AirtimeResponses;
 import com.africastalking.services.AirtimeService;
 import com.jraska.console.timber.ConsoleTree;
@@ -18,7 +19,7 @@ import java.io.IOException;
 
 import timber.log.Timber;
 
-public class AirtimeActivity extends AppCompatActivity {
+public class AirtimeActivity extends ServiceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
