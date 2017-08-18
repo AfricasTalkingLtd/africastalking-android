@@ -98,18 +98,6 @@ public class OutgoingCallActivity extends ServiceActivity {
 
         ButterKnife.bind(this);
         callBtn.setEnabled(false);
-
-        try {
-            AfricasTalking.initialize(
-                    BuildConfig.RPC_USERNAME,
-                    BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT,
-                    Environment.SANDBOX); // blocking
-            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "pjsip");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
     }
 
     public void onDigit(View sender) {
@@ -184,6 +172,36 @@ public class OutgoingCallActivity extends ServiceActivity {
         }
     }
 
+
+    public void onAndroidSip(View view) {
+        try {
+            view.setEnabled(false);
+            Toast.makeText(OutgoingCallActivity.this, "Setting up Android SIP", Toast.LENGTH_SHORT).show();
+            AfricasTalking.initialize(
+                    BuildConfig.RPC_USERNAME,
+                    BuildConfig.RPC_HOST,
+                    BuildConfig.RPC_PORT,
+                    Environment.SANDBOX); // blocking
+            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "android");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void onPJSip(View view) {
+        try {
+            view.setEnabled(false);
+            Toast.makeText(OutgoingCallActivity.this, "Setting up PJSIP", Toast.LENGTH_SHORT).show();
+            AfricasTalking.initialize(
+                    BuildConfig.RPC_USERNAME,
+                    BuildConfig.RPC_HOST,
+                    BuildConfig.RPC_PORT,
+                    Environment.SANDBOX); // blocking
+            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "pjsip");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     @Override
     protected void onDestroy() {

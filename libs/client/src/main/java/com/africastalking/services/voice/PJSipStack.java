@@ -8,6 +8,7 @@ import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 
 import org.pjsip.pjsua2.Account;
 import org.pjsip.pjsua2.AccountConfig;
+import org.pjsip.pjsua2.AccountNatConfig;
 import org.pjsip.pjsua2.AudDevManager;
 import org.pjsip.pjsua2.AudioMedia;
 import org.pjsip.pjsua2.AuthCredInfo;
@@ -36,6 +37,7 @@ import org.pjsip.pjsua2.pjsip_transport_type_e;
 import org.pjsip.pjsua2.pjsua2;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
+import org.pjsip.pjsua2.pjsua_stun_use;
 
 import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_CALL;
 
@@ -64,13 +66,13 @@ class PJSipStack extends BaseSipStack {
     PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
         super(credentials);
 
-
         Log.d(TAG, "Initializing PJSIP...");
 
         System.loadLibrary("pjsua2");
-        sEndPoint = new Endpoint();
+
 
         // Register
+        sEndPoint = new Endpoint();
         sEndPoint.libCreate();
         EpConfig config = new EpConfig();
         config.getUaConfig().setUserAgent(AGENT_NAME);
@@ -95,7 +97,12 @@ class PJSipStack extends BaseSipStack {
 
         sEndPoint.libStart();
 
-        AccountConfig accfg = new AccountConfig();
+        final AccountConfig accfg = new AccountConfig();
+
+        // TODO: FIX NAT issues
+        AccountNatConfig natcfg = new AccountNatConfig();
+        accfg.setNatConfig(natcfg);
+
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
 
@@ -155,6 +162,22 @@ class PJSipStack extends BaseSipStack {
             }
         };
         mAccount.create(accfg);
+
+
+        // Check NAT.....
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    boolean natDetected = isBehindNAT();
+                    if (natDetected) {
+                        Log.w(TAG, "Is behind NAT :(");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
     }
 
@@ -336,7 +359,7 @@ class PJSipStack extends BaseSipStack {
 
                 if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING || callState == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
 
-                    Log.d(TAG + " -> Session", "Calling/Connecting: " + code);
+                    Log.d(TAG + " -> Session", callState.toString() + ": " + callInfo.getRemoteUri());
 
                     if (mCallListener != null) {
                         mCallListener.onReadyToCall(makeCallInfo(callInfo));
@@ -396,8 +419,10 @@ class PJSipStack extends BaseSipStack {
                         // ... more error status codes
 
                         if (code == pjsip_status_code.PJSIP_SC_NOT_FOUND ||
-                                code == pjsip_status_code.PJSIP_SC_TEMPORARILY_UNAVAILABLE ||
-                                code == pjsip_status_code.PJSIP_SC_FORBIDDEN) {
+                            code == pjsip_status_code.PJSIP_SC_TEMPORARILY_UNAVAILABLE ||
+                            code == pjsip_status_code.PJSIP_SC_FORBIDDEN ||
+                            code == pjsip_status_code.PJSIP_SC_SERVICE_UNAVAILABLE ||
+                            code == pjsip_status_code.PJSIP_SC_REQUEST_TIMEOUT) {
                             if (mCallListener != null) {
                                 mCallListener.onError(makeCallInfo(callInfo), code.swigValue(), callInfo.getLastReason());
                             }
