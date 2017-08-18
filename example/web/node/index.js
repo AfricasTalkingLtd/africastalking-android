@@ -22,8 +22,8 @@ server.listen(3001, "0.0.0.0", function() {
         format: "json",
         sandbox:true
     });
-    atServer.addSipCredentials("test.aksalj", "DOPx_9bf185d689", "ke.sip.africastalking.com", 5060, "udp");
-//    atServer.addSipCredentials("android", "salama", "192.168.1.252", 5060, "udp");
+//    atServer.addSipCredentials("test.aksalj", "DOPx_9bf185d689", "ke.sip.africastalking.com", 5060, "udp");
+    atServer.addSipCredentials("android", "salama", "192.168.1.252", 5060, "udp");
     atServer.start({
         port,
         insecure: true

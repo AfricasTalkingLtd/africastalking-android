@@ -54,21 +54,57 @@ public class IncomingCallActivity extends AppCompatActivity {
                 title.setText(info.getDisplayName());
                 pickUp.setVisibility(View.GONE);
                 hold.setVisibility(View.VISIBLE);
-                mService.setCallListener(new CallListener() {
-                    @Override
-                    public void onCallEnded(CallInfo callInfo) {
-                        finish();
-                    }
-                });
             } else {
                 title.setText(info.getDisplayName() + " Calling...");
                 pickUp.setVisibility(View.VISIBLE);
             }
+
+            mService.setCallListener(mCallListener);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mService = null;
+        }
+    };
+
+
+    CallListener mCallListener = new CallListener() {
+        @Override
+        public void onError(CallInfo call, int errorCode, String errorMessage) {
+            Log.e("Error making call", errorMessage + "(" + errorCode + ")");
+        }
+
+        @Override
+        public void onRinging(final CallInfo call) {
+            Log.e("Ringing", call.getDisplayName());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText("Ringing " + call.getDisplayName() + "...");
+                }
+            });
+        }
+
+        @Override
+        public void onCallEstablished(final CallInfo call) {
+            Log.e("Starting call", "");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText(call.getDisplayName());
+
+                    hold.setVisibility(View.VISIBLE);
+                    pickUp.setVisibility(View.GONE);
+                }
+            });
+            mService.startAudio();
+            mService.setSpeakerMode(false);
+        }
+        @Override
+        public void onCallEnded(CallInfo call) {
+            Log.e("Call Ended", "");
+            finish();
         }
     };
 
@@ -90,44 +126,7 @@ public class IncomingCallActivity extends AppCompatActivity {
         }
 
         try {
-            mService.pickCall(new CallListener() {
-                @Override
-                public void onError(CallInfo call, int errorCode, String errorMessage) {
-                    Log.e("Error making call", errorMessage + "(" + errorCode + ")");
-                }
-
-                @Override
-                public void onRinging(final CallInfo call) {
-                    Log.e("Ringing", call.getDisplayName());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            title.setText("Ringing " + call.getDisplayName() + "...");
-                        }
-                    });
-                }
-
-                @Override
-                public void onCallEstablished(final CallInfo call) {
-                    Log.e("Starting call", "");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            title.setText(call.getDisplayName());
-
-                            hold.setVisibility(View.VISIBLE);
-                            pickUp.setVisibility(View.GONE);
-                        }
-                    });
-                    mService.startAudio();
-                    mService.setSpeakerMode(false);
-                }
-                @Override
-                public void onCallEnded(CallInfo call) {
-                    Log.e("Call Ended", "");
-                    finish();
-                }
-            });
+            mService.pickCall(mCallListener);
         } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }

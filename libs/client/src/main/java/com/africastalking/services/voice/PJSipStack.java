@@ -28,6 +28,7 @@ import org.pjsip.pjsua2.OnRegStartedParam;
 import org.pjsip.pjsua2.OnRegStateParam;
 import org.pjsip.pjsua2.SipEvent;
 import org.pjsip.pjsua2.SipTxOption;
+import org.pjsip.pjsua2.StringVector;
 import org.pjsip.pjsua2.TransportConfig;
 import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_type;
@@ -76,6 +77,13 @@ class PJSipStack extends BaseSipStack {
         sEndPoint.libCreate();
         EpConfig config = new EpConfig();
         config.getUaConfig().setUserAgent(AGENT_NAME);
+
+        // Stun server
+        StringVector servers = new StringVector();
+        servers.add("stun:media4-angani-ke-host.africastalking.com:443");
+        config.getUaConfig().setStunServer(servers);
+//        config.getUaConfig().setStunIgnoreFailure(true);
+
         config.getMedConfig().setHasIoqueue(true);
         config.getMedConfig().setClockRate(16000);
         config.getMedConfig().setQuality(10);
@@ -89,19 +97,20 @@ class PJSipStack extends BaseSipStack {
 
         TransportConfig udpTransport = new TransportConfig();
         udpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        TransportConfig tcpTransport = new TransportConfig();
-        tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        /*TransportConfig tcpTransport = new TransportConfig();
+        tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);*/
 
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
 
         sEndPoint.libStart();
 
         final AccountConfig accfg = new AccountConfig();
 
         // TODO: FIX NAT issues
-        AccountNatConfig natcfg = new AccountNatConfig();
-        accfg.setNatConfig(natcfg);
+//        AccountNatConfig natcfg = new AccountNatConfig();
+//        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+//        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+//        accfg.setNatConfig(natcfg);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
@@ -286,7 +295,7 @@ class PJSipStack extends BaseSipStack {
     public boolean isCallInProgress() {
         SipCall call = SipCall.getCurrentCall();
         try {
-            return call != null && call.getInfo().getLastStatusCode() == pjsip_status_code.PJSIP_SC_OK;
+            return call != null && call.getInfo().getLastStatusCode() == pjsip_status_code.PJSIP_SC_OK; // FIXME!
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -357,12 +366,19 @@ class PJSipStack extends BaseSipStack {
                     code = callInfo.getLastStatusCode();
                 } catch (Exception ex) { }
 
-                if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING || callState == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
+                if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING) {
 
-                    Log.d(TAG + " -> Session", callState.toString() + ": " + callInfo.getRemoteUri());
+                    Log.d(TAG + " -> Session", "Calling: " + callInfo.getRemoteUri());
 
                     if (mCallListener != null) {
-                        mCallListener.onReadyToCall(makeCallInfo(callInfo));
+                        mCallListener.onCalling(makeCallInfo(callInfo));
+                    }
+                }
+                else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
+                    Log.d(TAG + " -> Session", "Connecting: " + callInfo.getRemoteUri());
+
+                    if (mCallListener != null) {
+                        mCallListener.onCalling(makeCallInfo(callInfo));
                     }
                 }
                 else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY) {
@@ -411,6 +427,10 @@ class PJSipStack extends BaseSipStack {
 
                         Log.d(TAG + " -> Session", "Disconnected: " + code);
 
+                        if (mCallListener == null) {
+                            Log.e(TAG + " -> Session", "Disconnected: " + "No call listener!");
+                        }
+
                         if (code == pjsip_status_code.PJSIP_SC_BUSY_HERE || code == pjsip_status_code.PJSIP_SC_BUSY_EVERYWHERE){
                             if (mCallListener != null) {
                                 mCallListener.onCallBusy(makeCallInfo(callInfo));
@@ -422,7 +442,8 @@ class PJSipStack extends BaseSipStack {
                             code == pjsip_status_code.PJSIP_SC_TEMPORARILY_UNAVAILABLE ||
                             code == pjsip_status_code.PJSIP_SC_FORBIDDEN ||
                             code == pjsip_status_code.PJSIP_SC_SERVICE_UNAVAILABLE ||
-                            code == pjsip_status_code.PJSIP_SC_REQUEST_TIMEOUT) {
+                            code == pjsip_status_code.PJSIP_SC_REQUEST_TIMEOUT ||
+                            code == pjsip_status_code.PJSIP_SC_BAD_REQUEST) {
                             if (mCallListener != null) {
                                 mCallListener.onError(makeCallInfo(callInfo), code.swigValue(), callInfo.getLastReason());
                             }
