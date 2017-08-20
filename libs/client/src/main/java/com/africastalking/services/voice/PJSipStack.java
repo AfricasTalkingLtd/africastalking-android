@@ -31,7 +31,6 @@ import org.pjsip.pjsua2.OnRegStartedParam;
 import org.pjsip.pjsua2.OnRegStateParam;
 import org.pjsip.pjsua2.OnSelectAccountParam;
 import org.pjsip.pjsua2.OnTransportStateParam;
-import org.pjsip.pjsua2.SWIGTYPE_p_void;
 import org.pjsip.pjsua2.SipEvent;
 import org.pjsip.pjsua2.SipTxOption;
 import org.pjsip.pjsua2.StringVector;
@@ -114,11 +113,8 @@ class PJSipStack extends BaseSipStack {
 
         // Stun server
         StringVector stunServer = new StringVector();
+        stunServer.add("media4-angani-ke-host.africastalking.com:443");
         stunServer.add("stun.l.google.com:19302");
-        stunServer.add("stun1.l.google.com:19302");
-        stunServer.add("stun2.l.google.com:19302");
-        stunServer.add("stun3.l.google.com:19302");
-        stunServer.add("stun4.l.google.com:19302");
         uaConfig.setStunServer(stunServer);
         config.setUaConfig(uaConfig);
 
