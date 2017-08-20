@@ -21,15 +21,22 @@ import org.pjsip.pjsua2.CallSetting;
 import org.pjsip.pjsua2.Endpoint;
 import org.pjsip.pjsua2.EpConfig;
 import org.pjsip.pjsua2.Media;
+import org.pjsip.pjsua2.MediaConfig;
 import org.pjsip.pjsua2.OnCallMediaStateParam;
 import org.pjsip.pjsua2.OnCallStateParam;
 import org.pjsip.pjsua2.OnIncomingCallParam;
+import org.pjsip.pjsua2.OnNatCheckStunServersCompleteParam;
+import org.pjsip.pjsua2.OnNatDetectionCompleteParam;
 import org.pjsip.pjsua2.OnRegStartedParam;
 import org.pjsip.pjsua2.OnRegStateParam;
+import org.pjsip.pjsua2.OnSelectAccountParam;
+import org.pjsip.pjsua2.OnTransportStateParam;
+import org.pjsip.pjsua2.SWIGTYPE_p_void;
 import org.pjsip.pjsua2.SipEvent;
 import org.pjsip.pjsua2.SipTxOption;
 import org.pjsip.pjsua2.StringVector;
 import org.pjsip.pjsua2.TransportConfig;
+import org.pjsip.pjsua2.UaConfig;
 import org.pjsip.pjsua2.pj_qos_type;
 import org.pjsip.pjsua2.pjmedia_type;
 import org.pjsip.pjsua2.pjsip_inv_state;
@@ -58,7 +65,6 @@ class PJSipStack extends BaseSipStack {
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "AfricasTalking";
 
-
     private static CallListener mCallListener;
 
     private static Endpoint sEndPoint = null;
@@ -73,44 +79,82 @@ class PJSipStack extends BaseSipStack {
 
 
         // Register
-        sEndPoint = new Endpoint();
+        sEndPoint = new Endpoint() {
+
+            @Override
+            public void onSelectAccount(OnSelectAccountParam prm) {
+                super.onSelectAccount(prm);
+                Log.wtf(TAG, "onSelectAccount: " + prm.getRdata().getWholeMsg());
+
+            }
+
+            @Override
+            public void onNatCheckStunServersComplete(OnNatCheckStunServersCompleteParam prm) {
+                super.onNatCheckStunServersComplete(prm);
+                Log.wtf(TAG, "onNatCheckStunServersComplete: " + prm.getAddr() + " -> " + prm.getName() + " -> " + prm.getStatus());
+            }
+
+            @Override
+            public void onNatDetectionComplete(OnNatDetectionCompleteParam prm) {
+                super.onNatDetectionComplete(prm);
+                Log.wtf(TAG, "onNatDetectionComplete: " + prm.getNatTypeName() + " -> " + prm.getReason() + " -> " + prm.getStatus());
+            }
+
+            @Override
+            public void onTransportState(OnTransportStateParam prm) {
+                super.onTransportState(prm);
+                Log.wtf(TAG, "onTransportState: " + prm.getState().toString());
+            }
+
+        };
         sEndPoint.libCreate();
         EpConfig config = new EpConfig();
-        config.getUaConfig().setUserAgent(AGENT_NAME);
+        UaConfig uaConfig = new UaConfig();
+        uaConfig.setUserAgent(AGENT_NAME);
 
         // Stun server
-        StringVector servers = new StringVector();
-        servers.add("stun:media4-angani-ke-host.africastalking.com:443");
-        config.getUaConfig().setStunServer(servers);
-//        config.getUaConfig().setStunIgnoreFailure(true);
+        StringVector stunServer = new StringVector();
+        stunServer.add("stun.l.google.com:19302");
+        stunServer.add("stun1.l.google.com:19302");
+        stunServer.add("stun2.l.google.com:19302");
+        stunServer.add("stun3.l.google.com:19302");
+        stunServer.add("stun4.l.google.com:19302");
+        uaConfig.setStunServer(stunServer);
+        config.setUaConfig(uaConfig);
 
-        config.getMedConfig().setHasIoqueue(true);
-        config.getMedConfig().setClockRate(16000);
-        config.getMedConfig().setQuality(10);
-        config.getMedConfig().setEcOptions(1);
-        config.getMedConfig().setEcTailLen(200);
-        config.getMedConfig().setThreadCnt(2);
+        MediaConfig medConfig = new MediaConfig();
+        medConfig.setHasIoqueue(true);
+        medConfig.setClockRate(16000);
+        medConfig.setQuality(10);
+        medConfig.setEcOptions(1);
+        medConfig.setEcTailLen(200);
+        medConfig.setThreadCnt(2);
+        config.setMedConfig(medConfig);
+
         sEndPoint.libInit(config);
 
         TransportConfig transport = new TransportConfig();
         transport.setPort(credentials.getPort());
 
-        TransportConfig udpTransport = new TransportConfig();
-        udpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        /*TransportConfig tcpTransport = new TransportConfig();
-        tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);*/
-
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
+        TransportConfig transportConfig = new TransportConfig();
+        transportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        if (credentials.getTransport().contentEquals("tcp")) {
+            sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, transportConfig);
+        } else {
+            sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, transportConfig);
+        }
 
         sEndPoint.libStart();
 
         final AccountConfig accfg = new AccountConfig();
 
         // TODO: FIX NAT issues
-//        AccountNatConfig natcfg = new AccountNatConfig();
-//        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
-//        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
-//        accfg.setNatConfig(natcfg);
+        AccountNatConfig natcfg = new AccountNatConfig();
+        natcfg.setIceEnabled(true);
+        natcfg.setTurnEnabled(false);
+        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+        accfg.setNatConfig(natcfg);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
@@ -171,23 +215,6 @@ class PJSipStack extends BaseSipStack {
             }
         };
         mAccount.create(accfg);
-
-
-        // Check NAT.....
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    boolean natDetected = isBehindNAT();
-                    if (natDetected) {
-                        Log.w(TAG, "Is behind NAT :(");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
     }
 
     public static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
