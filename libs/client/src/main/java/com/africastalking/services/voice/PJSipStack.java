@@ -99,14 +99,6 @@ class PJSipStack extends BaseSipStack {
         stunServer.add("media4-angani-ke-host.africastalking.com:443");
         stunServer.add("stun.l.google.com:19302");
         uaConfig.setStunServer(stunServer);
-        
-        MediaConfig medConfig = config.getMediaConfig();
-        medConfig.setHasIoqueue(true);
-        medConfig.setClockRate(16000);
-        medConfig.setQuality(10);
-        medConfig.setEcOptions(1);
-        medConfig.setEcTailLen(200);
-        medConfig.setThreadCnt(2);
 
         sEndPoint.libInit(config);
 
@@ -117,7 +109,7 @@ class PJSipStack extends BaseSipStack {
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
         // tls
-        mSipTransportConfig.setPort(credentials.getPort() + 1)
+        mSipTransportConfig.setPort(credentials.getPort() + 1);
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, mSipTransportConfig);
         mSipTransportConfig.setPort(credentials.getPort()); // reset port
 
@@ -182,7 +174,7 @@ class PJSipStack extends BaseSipStack {
                         VoiceBackgroundService.mRegistrationListener.onCompleteRegistration();
                     } else {
                         Log.d(TAG, "Registration Failed");
-                        VoiceBackgroundService.mRegistrationListener.onFailedRegistration(new Error(prm.getReason()));
+                        VoiceBackgroundService.mRegistrationListener.onFailedRegistration(new Exception(prm.getReason()));
                     }
                 }
             }
