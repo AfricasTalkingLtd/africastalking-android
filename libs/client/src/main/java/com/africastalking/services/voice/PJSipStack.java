@@ -7,50 +7,7 @@ import android.util.Log;
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 
-import org.pjsip.pjsua2.Account;
-import org.pjsip.pjsua2.AccountConfig;
-import org.pjsip.pjsua2.AccountNatConfig;
-import org.pjsip.pjsua2.AudDevManager;
-import org.pjsip.pjsua2.AudioMedia;
-import org.pjsip.pjsua2.AuthCredInfo;
-import org.pjsip.pjsua2.Call;
-import org.pjsip.pjsua2.CallMediaInfo;
-import org.pjsip.pjsua2.CallMediaInfoVector;
-import org.pjsip.pjsua2.CallOpParam;
-import org.pjsip.pjsua2.CallSendRequestParam;
-import org.pjsip.pjsua2.CallSetting;
-import org.pjsip.pjsua2.Endpoint;
-import org.pjsip.pjsua2.EpConfig;
-import org.pjsip.pjsua2.LogConfig;
-import org.pjsip.pjsua2.LogEntry;
-import org.pjsip.pjsua2.LogWriter;
-import org.pjsip.pjsua2.Media;
-import org.pjsip.pjsua2.MediaConfig;
-import org.pjsip.pjsua2.OnCallMediaStateParam;
-import org.pjsip.pjsua2.OnCallStateParam;
-import org.pjsip.pjsua2.OnIncomingCallParam;
-import org.pjsip.pjsua2.OnMwiInfoParam;
-import org.pjsip.pjsua2.OnNatCheckStunServersCompleteParam;
-import org.pjsip.pjsua2.OnNatDetectionCompleteParam;
-import org.pjsip.pjsua2.OnRegStartedParam;
-import org.pjsip.pjsua2.OnRegStateParam;
-import org.pjsip.pjsua2.OnSelectAccountParam;
-import org.pjsip.pjsua2.OnTransportStateParam;
-import org.pjsip.pjsua2.SipEvent;
-import org.pjsip.pjsua2.SipTxOption;
-import org.pjsip.pjsua2.StringVector;
-import org.pjsip.pjsua2.TransportConfig;
-import org.pjsip.pjsua2.UaConfig;
-import org.pjsip.pjsua2.pj_constants_;
-import org.pjsip.pjsua2.pj_qos_type;
-import org.pjsip.pjsua2.pjmedia_type;
-import org.pjsip.pjsua2.pjsip_inv_state;
-import org.pjsip.pjsua2.pjsip_status_code;
-import org.pjsip.pjsua2.pjsip_transport_type_e;
-import org.pjsip.pjsua2.pjsua2;
-import org.pjsip.pjsua2.pjsua_call_flag;
-import org.pjsip.pjsua2.pjsua_call_media_status;
-import org.pjsip.pjsua2.pjsua_stun_use;
+import org.pjsip.pjsua2.*;
 
 import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_CALL;
 
@@ -69,18 +26,16 @@ class PJSipStack extends BaseSipStack {
 
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "AfricasTalking";
+    private static final int LOG_LEVEL = 4;
 
     private static PJSipStack sInstance = null;
 
     private static CallListener mCallListener;
 
     private static Endpoint sEndPoint = null;
+
+    private TransportConfig mSipTransportConfig = new TransportConfig();
     private Account mAccount = null;
-
-
-    private LogConfig logConf;
-    private UaConfig uaConfig;
-    private MediaConfig medConfig;
 
     PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
         super(credentials);
@@ -123,53 +78,52 @@ class PJSipStack extends BaseSipStack {
         EpConfig config = new EpConfig();
 
         // logging
-        logConf = new LogConfig();
-        logConf.setMsgLogging(2);
-        logConf.setConsoleLevel(2);
-        logConf.setLevel(2);
-        logConf.setWriter(new LogWriter(){
+        config.getLogConfig().setMsgLogging(LOG_LEVEL);
+        config.getLogConfig().setLevel(LOG_LEVEL);
+        config.getLogConfig().setConsoleLevel(LOG_LEVEL);
+        config.getLogConfig().setWriter(new LogWriter(){
             @Override
             public void write(LogEntry entry) {
                 Log.d(TAG, entry.getMsg() + "");
             }
         });
-        config.setLogConfig(logConf);
+        config.getLogConfig().setDecor(config.getLogConfig().getDecor() & 
+             ~(pj_log_decoration.PJ_LOG_HAS_CR.swigValue() | 
+             pj_log_decoration.PJ_LOG_HAS_NEWLINE.swigValue()));
 
-        uaConfig = new UaConfig();
+
+        // user-agent
+        UaConfig uaConfig = config.getUaConfig();
         uaConfig.setUserAgent(AGENT_NAME);
-
-
-        // Stun server
         StringVector stunServer = new StringVector();
         stunServer.add("media4-angani-ke-host.africastalking.com:443");
         stunServer.add("stun.l.google.com:19302");
         uaConfig.setStunServer(stunServer);
-        config.setUaConfig(uaConfig);
-
-        medConfig = new MediaConfig();
+        
+        MediaConfig medConfig = config.getMediaConfig();
         medConfig.setHasIoqueue(true);
         medConfig.setClockRate(16000);
         medConfig.setQuality(10);
         medConfig.setEcOptions(1);
         medConfig.setEcTailLen(200);
         medConfig.setThreadCnt(2);
-        config.setMedConfig(medConfig);
 
         sEndPoint.libInit(config);
 
-        TransportConfig udpTransport = new TransportConfig();
-        udpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        udpTransport.setPort(credentials.getPort());
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, udpTransport);
-
-        TransportConfig tcpTransport = new TransportConfig();
-        tcpTransport.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        tcpTransport.setPort(credentials.getPort());
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, tcpTransport);
-
-        sEndPoint.libStart();
+        
+        mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        mSipTransportConfig.setPort(credentials.getPort());
+        
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
+        // tls
+        mSipTransportConfig.setPort(credentials.getPort() + 1)
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, mSipTransportConfig);
+        mSipTransportConfig.setPort(credentials.getPort()); // reset port
 
         loadAccount(context, credentials);
+
+        sEndPoint.libStart();
 
         sInstance = this;
     }
@@ -187,14 +141,9 @@ class PJSipStack extends BaseSipStack {
         final AccountConfig accfg = new AccountConfig();
 
         // TODO: FIX NAT issues
-        AccountNatConfig natcfg = new AccountNatConfig();
-        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
-        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+        AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
         natcfg.setIceAlwaysUpdate(true);
-        natcfg.setIceAggressiveNomination(true);
-        natcfg.setContactRewriteUse(1);
-        accfg.setNatConfig(natcfg);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
@@ -265,7 +214,6 @@ class PJSipStack extends BaseSipStack {
             @Override
             public void onMwiInfo(OnMwiInfoParam prm) {
                 super.onMwiInfo(prm);
-
                 Log.d(TAG, "onMwiInfo: \n" + prm.getRdata().getWholeMsg());
             }
         };
