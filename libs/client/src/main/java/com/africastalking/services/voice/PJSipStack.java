@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
+import com.africastalking.BuildConfig;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 
 import org.pjsip.pjsua2.*;
@@ -25,8 +26,10 @@ import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_
 class PJSipStack extends BaseSipStack {
 
     private static final String TAG = PJSipStack.class.getName();
-    private static final String AGENT_NAME = "AfricasTalking";
-    private static final int LOG_LEVEL = 4;
+    private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
+    private static final String STUN_SERVER = "stun.l.google.com:19302";
+    private static final String PJSUA_LIBRARY = "pjsua2";
+    private static final int LOG_LEVEL = 1;
 
     private static PJSipStack sInstance = null;
 
@@ -34,7 +37,6 @@ class PJSipStack extends BaseSipStack {
 
     private static Endpoint sEndPoint = null;
 
-    private TransportConfig mSipTransportConfig = null;
     private Account mAccount = null;
 
     PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
@@ -42,7 +44,7 @@ class PJSipStack extends BaseSipStack {
 
         Log.d(TAG, "Initializing PJSIP...");
 
-        System.loadLibrary("pjsua2");
+        System.loadLibrary(PJSUA_LIBRARY);
 
 
         // Register
@@ -51,7 +53,7 @@ class PJSipStack extends BaseSipStack {
             @Override
             public void onSelectAccount(OnSelectAccountParam prm) {
                 super.onSelectAccount(prm);
-                Log.wtf(TAG, "onSelectAccount: " + prm.getRdata().getWholeMsg());
+                Log.d(TAG, "onSelectAccount: \n" + prm.getRdata().getWholeMsg());
 
             }
 
@@ -96,23 +98,20 @@ class PJSipStack extends BaseSipStack {
         UaConfig uaConfig = config.getUaConfig();
         uaConfig.setUserAgent(AGENT_NAME);
         StringVector stunServer = new StringVector();
-        stunServer.add("media4-angani-ke-host.africastalking.com:443");
-        stunServer.add("stun.l.google.com:19302");
+        stunServer.add(STUN_SERVER);
         uaConfig.setStunServer(stunServer);
 
         sEndPoint.libInit(config);
 
-        mSipTransportConfig = new TransportConfig();
+        TransportConfig sipTransportConfig = new TransportConfig();
+        sipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         
-        mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        mSipTransportConfig.setPort(credentials.getPort());
-        
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
-        // tls
-//        mSipTransportConfig.setPort(credentials.getPort() + 1);
-//        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, mSipTransportConfig);
-//        mSipTransportConfig.setPort(credentials.getPort()); // reset port
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, sipTransportConfig);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, sipTransportConfig);
+        // tls, TODO: build pjsip with openssl
+        // sipTransportConfig.setPort(credentials.getPort() + 1);
+        // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, sipTransportConfig);
+        // sipTransportConfig.setPort(credentials.getPort()); // reset port
 
         loadAccount(context, credentials);
 
@@ -121,7 +120,7 @@ class PJSipStack extends BaseSipStack {
         sInstance = this;
     }
 
-    public static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+    static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
         if (sInstance != null) {
             sInstance.loadAccount(context, credentials);
             return sInstance;
@@ -129,24 +128,22 @@ class PJSipStack extends BaseSipStack {
         return new PJSipStack(context, credentials);
     }
 
-    protected void loadAccount(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+    private void loadAccount(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
 
         final AccountConfig accfg = new AccountConfig();
 
-        // TODO: FIX NAT issues
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
-        natcfg.setIceAlwaysUpdate(true);
+        natcfg.setTurnEnabled(false);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
-        accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
+        accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
 
         AuthCredInfo credInfo = new AuthCredInfo("digest", "*", credentials.getUsername(), 0, credentials.getPassword());
         accfg.getSipConfig().getAuthCreds().add(credInfo);
 
         if (mAccount != null) {
-            // TODO: Deregister account
-            Log.e(TAG, "Need to deregister account");
+            mAccount.delete();
         }
 
         mAccount = new Account() {
@@ -217,6 +214,7 @@ class PJSipStack extends BaseSipStack {
     public void destroy(VoiceBackgroundService context) {
         try {
             SipCall.destroy();
+            mAccount.delete();
             sEndPoint.libDestroy();
         } catch(Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
