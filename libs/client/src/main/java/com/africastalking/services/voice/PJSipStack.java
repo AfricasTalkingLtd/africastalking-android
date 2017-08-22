@@ -34,7 +34,7 @@ class PJSipStack extends BaseSipStack {
 
     private static Endpoint sEndPoint = null;
 
-    private TransportConfig mSipTransportConfig = new TransportConfig();
+    private TransportConfig mSipTransportConfig = null;
     private Account mAccount = null;
 
     PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
@@ -102,6 +102,7 @@ class PJSipStack extends BaseSipStack {
 
         sEndPoint.libInit(config);
 
+        mSipTransportConfig = new TransportConfig();
         
         mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         mSipTransportConfig.setPort(credentials.getPort());
@@ -109,9 +110,9 @@ class PJSipStack extends BaseSipStack {
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
         // tls
-        mSipTransportConfig.setPort(credentials.getPort() + 1);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, mSipTransportConfig);
-        mSipTransportConfig.setPort(credentials.getPort()); // reset port
+//        mSipTransportConfig.setPort(credentials.getPort() + 1);
+//        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, mSipTransportConfig);
+//        mSipTransportConfig.setPort(credentials.getPort()); // reset port
 
         loadAccount(context, credentials);
 
