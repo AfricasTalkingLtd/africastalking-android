@@ -70,6 +70,8 @@ class PJSipStack extends BaseSipStack {
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "AfricasTalking";
 
+    private static PJSipStack sInstance = null;
+
     private static CallListener mCallListener;
 
     private static Endpoint sEndPoint = null;
@@ -79,8 +81,6 @@ class PJSipStack extends BaseSipStack {
     private LogConfig logConf;
     private UaConfig uaConfig;
     private MediaConfig medConfig;
-
-    Handler handler;
 
     PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
         super(credentials);
@@ -123,7 +123,6 @@ class PJSipStack extends BaseSipStack {
         EpConfig config = new EpConfig();
 
         // logging
-        handler = new Handler();
         logConf = new LogConfig();
         logConf.setMsgLogging(2);
         logConf.setConsoleLevel(2);
@@ -142,8 +141,8 @@ class PJSipStack extends BaseSipStack {
 
         // Stun server
         StringVector stunServer = new StringVector();
-        stunServer.add("stun.l.google.com:19302");
         stunServer.add("media4-angani-ke-host.africastalking.com:443");
+        stunServer.add("stun.l.google.com:19302");
         uaConfig.setStunServer(stunServer);
         config.setUaConfig(uaConfig);
 
@@ -170,22 +169,43 @@ class PJSipStack extends BaseSipStack {
 
         sEndPoint.libStart();
 
+        loadAccount(context, credentials);
+
+        sInstance = this;
+    }
+
+    public static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+        if (sInstance != null) {
+            sInstance.loadAccount(context, credentials);
+            return sInstance;
+        }
+        return new PJSipStack(context, credentials);
+    }
+
+    protected void loadAccount(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+
         final AccountConfig accfg = new AccountConfig();
 
         // TODO: FIX NAT issues
-//        AccountNatConfig natcfg = new AccountNatConfig();
-//        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
-//        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
-//        natcfg.setIceEnabled(true);
-//        natcfg.setIceAlwaysUpdate(true);
-//        natcfg.setIceAggressiveNomination(true);
-//        accfg.setNatConfig(natcfg);
+        AccountNatConfig natcfg = new AccountNatConfig();
+        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_USE_DEFAULT);
+        natcfg.setIceEnabled(true);
+        natcfg.setIceAlwaysUpdate(true);
+        natcfg.setIceAggressiveNomination(true);
+        natcfg.setContactRewriteUse(1);
+        accfg.setNatConfig(natcfg);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost());
 
         AuthCredInfo credInfo = new AuthCredInfo("digest", "*", credentials.getUsername(), 0, credentials.getPassword());
         accfg.getSipConfig().getAuthCreds().add(credInfo);
+
+        if (mAccount != null) {
+            // TODO: Deregister account
+            Log.e(TAG, "Need to deregister account");
+        }
 
         mAccount = new Account() {
             @Override
@@ -221,7 +241,7 @@ class PJSipStack extends BaseSipStack {
             @Override
             public void onIncomingCall(OnIncomingCallParam prm) {
                 try {
-                    SipCall call = new SipCall(mAccount, prm.getCallId());
+                    SipCall call = SipCall.newInstance(mAccount, prm.getCallId());
                     CallOpParam callOpParam = new CallOpParam();
                     callOpParam.setStatusCode(pjsip_status_code.PJSIP_SC_RINGING);
                     call.answer(callOpParam);
@@ -235,6 +255,9 @@ class PJSipStack extends BaseSipStack {
 
                 } catch (Exception ex) {
                     Log.e(TAG, ex.getMessage() + "");
+                    if (mCallListener != null) {
+                        mCallListener.onError(null, 500, ex.getMessage());
+                    }
                 }
 
             }
@@ -243,14 +266,10 @@ class PJSipStack extends BaseSipStack {
             public void onMwiInfo(OnMwiInfoParam prm) {
                 super.onMwiInfo(prm);
 
-                Log.d(TAG, "onMwiInfo: " + prm.getRdata().getWholeMsg());
+                Log.d(TAG, "onMwiInfo: \n" + prm.getRdata().getWholeMsg());
             }
         };
         mAccount.create(accfg);
-    }
-
-    public static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
-        return new PJSipStack(context, credentials);
     }
 
     @Override
@@ -267,12 +286,15 @@ class PJSipStack extends BaseSipStack {
     public void makeCall(final String destination, final int timeout, final CallListener listener) {
         try {
             setCallListener(listener);
-            SipCall call = new SipCall(mAccount);
+            SipCall call = SipCall.newInstance(mAccount, -1);
             String recipient = ("sip:" + destination + "@" + mCredentials.getHost());
             // isSipUri(destination)
             call.makeCall(recipient, new CallOpParam());
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
+            if (mCallListener != null) {
+                mCallListener.onError(null, 500, ex.getMessage());
+            }
         }
     }
 
@@ -397,14 +419,24 @@ class PJSipStack extends BaseSipStack {
         boolean localHold = false;
         boolean localMute = false;
 
-        SipCall(Account account) {
+        private SipCall(Account account) {
             super(account);
-            activeCall = this;
         }
 
-        SipCall(Account account, int call_id) {
+        private SipCall(Account account, int call_id) {
             super(account, call_id);
-            activeCall = this;
+        }
+
+        static SipCall newInstance(Account account, int call_id) throws Exception {
+            if (activeCall != null) {
+                throw new Exception("An instance of SipCall already exists");
+            }
+            if (call_id != -1) {
+                activeCall = new SipCall(account, call_id);
+            } else {
+                activeCall = new SipCall(account);
+            }
+            return activeCall;
         }
 
         static SipCall getCurrentCall() {
