@@ -214,7 +214,12 @@ class PJSipStack extends BaseSipStack {
 
     @Override
     public void destroy(VoiceBackgroundService context) {
-        SipCall.destroy();
+        try {
+            SipCall.destroy();
+            sEndPoint.libDestroy();
+        } catch(Exception ex) {
+            Log.e(TAG, ex.getMessage() + "");
+        }
     }
 
     @Override
