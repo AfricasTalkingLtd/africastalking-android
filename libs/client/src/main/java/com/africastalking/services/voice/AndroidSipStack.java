@@ -176,7 +176,7 @@ class AndroidSipStack extends BaseSipStack {
                 Log.d(TAG, "Registration In Progress: " + localProfileUri);
                 setReady(false);
                 if (VoiceBackgroundService.mRegistrationListener != null) {
-                    VoiceBackgroundService.mRegistrationListener.onStartRegistration();
+                    VoiceBackgroundService.mRegistrationListener.onStarting();
                 }
             }
 
@@ -185,7 +185,7 @@ class AndroidSipStack extends BaseSipStack {
                 Log.d(TAG, "Registration Complete!");
                 setReady(true);
                 if (VoiceBackgroundService.mRegistrationListener != null) {
-                    VoiceBackgroundService.mRegistrationListener.onCompleteRegistration();
+                    VoiceBackgroundService.mRegistrationListener.onComplete();
                 }
             }
 
@@ -194,7 +194,7 @@ class AndroidSipStack extends BaseSipStack {
                 Log.e(TAG, "Registration Error (" + errorCode + "): " + errorMessage);
                 setReady(false);
                 if (VoiceBackgroundService.mRegistrationListener != null) {
-                    VoiceBackgroundService.mRegistrationListener.onFailedRegistration(
+                    VoiceBackgroundService.mRegistrationListener.onError(
                             new Exception(String.format(Locale.ENGLISH, "Failed to register (%d): %s", errorCode, localProfileUri)));
                 }
             }

@@ -169,7 +169,7 @@ public final class VoiceBackgroundService extends Service implements CallControl
         if (listener != null) {
             mRegistrationListener = listener;
             if (mSipStack != null && mSipStack.isReady()) {
-                mRegistrationListener.onCompleteRegistration();
+                mRegistrationListener.onComplete();
             }
         }
     }

@@ -12,7 +12,7 @@ package com.africastalking.services.voice;
  * Description :
  */
 public interface RegistrationListener {
-    void onFailedRegistration(Throwable error);
-    void onStartRegistration();
-    void onCompleteRegistration();
+    void onError(Throwable error);
+    void onStarting();
+    void onComplete();
 }

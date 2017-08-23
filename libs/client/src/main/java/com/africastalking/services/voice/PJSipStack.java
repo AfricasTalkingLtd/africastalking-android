@@ -1,12 +1,18 @@
 package com.africastalking.services.voice;
 
 import android.content.Intent;
-import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.BuildConfig;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
+import com.birbit.android.jobqueue.Job;
+import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.Params;
+import com.birbit.android.jobqueue.RetryConstraint;
+import com.birbit.android.jobqueue.config.Configuration;
 
 import org.pjsip.pjsua2.*;
 
@@ -27,7 +33,7 @@ class PJSipStack extends BaseSipStack {
 
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
-    private static final String STUN_SERVER = "stun.l.google.com:19302";
+    private static final String STUN_SERVER = "media4-angani-ke-host.africastalking.com:443";//"stun.l.google.com:19302";
     private static final String PJSUA_LIBRARY = "pjsua2";
     private static final int LOG_LEVEL = 4;
 
@@ -38,8 +44,39 @@ class PJSipStack extends BaseSipStack {
     private static Endpoint sEndPoint = null;
 
     private Account mAccount = null;
+    private TransportConfig mSipTransportConfig = null;
 
-    PJSipStack(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+
+    static class LogJob extends Job {
+
+        String text;
+        public LogJob(String text) {
+            super(new Params(0).delayInMs(500));
+            this.text = text;
+        }
+
+        @Override
+        public void onAdded() {
+
+        }
+
+        @Override
+        protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
+
+        }
+
+        @Override
+        protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
+            return null;
+        }
+
+        @Override
+        public void onRun() throws Throwable {
+            Log.d(TAG, text + "");
+        }
+    };
+
+    PJSipStack(final VoiceBackgroundService context, final SipCredentials credentials) throws Exception {
         super(credentials);
 
         Log.d(TAG, "Initializing PJSIP...");
@@ -80,6 +117,7 @@ class PJSipStack extends BaseSipStack {
         EpConfig config = new EpConfig();
 
         // logging
+        final JobManager jobManager = new JobManager(new Configuration.Builder(context).build());
         config.getLogConfig().setMsgLogging(LOG_LEVEL);
         config.getLogConfig().setLevel(LOG_LEVEL);
         config.getLogConfig().setConsoleLevel(LOG_LEVEL);
@@ -87,7 +125,7 @@ class PJSipStack extends BaseSipStack {
             @Override
             public void write(LogEntry entry) {
                 if (entry != null) {
-                    Log.d(TAG, entry.getMsg() + "");
+                    jobManager.addJobInBackground(new LogJob(entry.getMsg()));
                 }
             }
         });
@@ -102,19 +140,23 @@ class PJSipStack extends BaseSipStack {
         StringVector stunServer = new StringVector();
         stunServer.add(STUN_SERVER);
         uaConfig.setStunServer(stunServer);
+        uaConfig.setThreadCnt(1);
+        uaConfig.setMainThreadOnly(true);
 
         sEndPoint.libInit(config);
 
-        TransportConfig sipTransportConfig = new TransportConfig();
-        sipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        mSipTransportConfig = new TransportConfig();
+        mSipTransportConfig.setPort(credentials.getPort());
+        mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, sipTransportConfig);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, sipTransportConfig);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
         // tls, TODO: build pjsip with openssl
         // sipTransportConfig.setPort(credentials.getPort() + 1);
         // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, sipTransportConfig);
         // sipTransportConfig.setPort(credentials.getPort()); // reset port
 
+        Log.d(TAG,  "Loading account...");
         loadAccount(context, credentials);
 
         sEndPoint.libStart();
@@ -137,6 +179,9 @@ class PJSipStack extends BaseSipStack {
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
         natcfg.setTurnEnabled(false);
+        natcfg.setIceAlwaysUpdate(true);
+        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
+        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
@@ -155,7 +200,7 @@ class PJSipStack extends BaseSipStack {
                 Log.d(TAG, "Registration Started");
                 setReady(false);
                 if (VoiceBackgroundService.mRegistrationListener != null) {
-                    VoiceBackgroundService.mRegistrationListener.onStartRegistration();
+                    VoiceBackgroundService.mRegistrationListener.onStarting();
                 }
             }
 
@@ -171,10 +216,10 @@ class PJSipStack extends BaseSipStack {
                 if (VoiceBackgroundService.mRegistrationListener != null) {
                     if (registered) {
                         Log.d(TAG, "Registration Complete");
-                        VoiceBackgroundService.mRegistrationListener.onCompleteRegistration();
+                        VoiceBackgroundService.mRegistrationListener.onComplete();
                     } else {
                         Log.d(TAG, "Registration Failed");
-                        VoiceBackgroundService.mRegistrationListener.onFailedRegistration(new Exception(prm.getReason()));
+                        VoiceBackgroundService.mRegistrationListener.onError(new Exception(prm.getReason()));
                     }
                 }
             }
@@ -200,7 +245,30 @@ class PJSipStack extends BaseSipStack {
                         mCallListener.onError(null, 500, ex.getMessage());
                     }
                 }
+            }
 
+            @Override
+            public void onIncomingSubscribe(OnIncomingSubscribeParam prm) {
+                super.onIncomingSubscribe(prm);
+                Log.d(TAG, "onIncomingSubscribe: \n" + prm.getRdata().getWholeMsg());
+            }
+
+            @Override
+            public void onInstantMessage(OnInstantMessageParam prm) {
+                super.onInstantMessage(prm);
+                Log.d(TAG, "onInstantMessage: \n" + prm.getRdata().getWholeMsg());
+            }
+
+            @Override
+            public void onInstantMessageStatus(OnInstantMessageStatusParam prm) {
+                super.onInstantMessageStatus(prm);
+                Log.d(TAG, "onInstantMessageStatus: \n" + prm.getRdata().getWholeMsg());
+            }
+
+            @Override
+            public void onTypingIndication(OnTypingIndicationParam prm) {
+                super.onTypingIndication(prm);
+                Log.d(TAG, "onTypingIndication: \n" + prm.getRdata().getWholeMsg());
             }
 
             @Override

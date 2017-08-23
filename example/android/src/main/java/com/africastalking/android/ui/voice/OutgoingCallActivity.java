@@ -46,7 +46,7 @@ public class OutgoingCallActivity extends ServiceActivity {
             mService = binder.getService();
             mService.setRegistrationListener(new RegistrationListener() {
                 @Override
-                public void onFailedRegistration(Throwable error) {
+                public void onError(Throwable error) {
                     Log.e("onError", error.getMessage() + "");
                     runOnUiThread(new Runnable() {
                         @Override
@@ -58,8 +58,8 @@ public class OutgoingCallActivity extends ServiceActivity {
                 }
 
                 @Override
-                public void onStartRegistration() {
-                    Log.i("onRegistration", "Registration starting...");
+                public void onStarting() {
+                    Log.i("onStarting", "Registration starting... " + Thread.currentThread().getName());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -70,8 +70,8 @@ public class OutgoingCallActivity extends ServiceActivity {
                 }
 
                 @Override
-                public void onCompleteRegistration() {
-                    Log.i("onRegistration", "Registration complete!");
+                public void onComplete() {
+                    Log.i("onComplete", "Registration complete!");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
