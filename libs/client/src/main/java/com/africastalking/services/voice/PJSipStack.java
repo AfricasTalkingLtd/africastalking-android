@@ -29,7 +29,7 @@ class PJSipStack extends BaseSipStack {
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String STUN_SERVER = "stun.l.google.com:19302";
     private static final String PJSUA_LIBRARY = "pjsua2";
-    private static final int LOG_LEVEL = 1;
+    private static final int LOG_LEVEL = 4;
 
     private static PJSipStack sInstance = null;
 
@@ -86,7 +86,9 @@ class PJSipStack extends BaseSipStack {
         config.getLogConfig().setWriter(new LogWriter(){
             @Override
             public void write(LogEntry entry) {
-                Log.d(TAG, entry.getMsg() + "");
+                if (entry != null) {
+                    Log.d(TAG, entry.getMsg() + "");
+                }
             }
         });
         config.getLogConfig().setDecor(config.getLogConfig().getDecor() & 
