@@ -1,5 +1,7 @@
 package com.africastalking.services.voice;
 
+import android.content.Context;
+
 import com.africastalking.AfricasTalkingException;
 
 /**
@@ -13,7 +15,7 @@ import com.africastalking.AfricasTalkingException;
  * Date : 8/12/17 11:07 AM
  * Description :
  */
-interface CallController {
+public interface CallController {
 
     void setCallListener(CallListener listener);
 
@@ -29,5 +31,5 @@ interface CallController {
 
     void startAudio();
     void toggleMute();
-    void setSpeakerMode(boolean speaker);
+    void setSpeakerMode(Context context, boolean speaker);
 }

@@ -1,5 +1,7 @@
 package com.africastalking.services;
 
+import android.content.Context;
+
 import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.Logger;

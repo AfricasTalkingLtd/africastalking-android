@@ -3,12 +3,11 @@
 
 ### Requirements
 
-- SDK 19+
+- SDK 16+
 - Internet permission
 
 For voice:
 
-- add service `com.africastalking.VoiceBackgroundService`
 - add broadcast receiver for intent `com.africastalking.voice.INCOMING_CALL`
 - require the following permissions (and features) at install or runtime:
     

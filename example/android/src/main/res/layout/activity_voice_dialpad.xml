@@ -192,7 +192,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SIP Stack"
+                android:text="PJSUA"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
         </LinearLayout>
 
@@ -206,16 +206,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:onClick="onAndroidSip"
-                android:text="Android" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
                 android:onClick="onPJSip"
-                android:text="PJSIP" />
+                android:text="Initialize" />
 
         </LinearLayout>
     </LinearLayout>

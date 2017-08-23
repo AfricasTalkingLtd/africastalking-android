@@ -1,5 +1,6 @@
 package com.africastalking.services.voice;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +17,7 @@ import com.birbit.android.jobqueue.config.Configuration;
 
 import org.pjsip.pjsua2.*;
 
-import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_CALL;
+import static com.africastalking.services.VoiceService.INCOMING_CALL;
 
 /**
  * Copyright (c) 2017 Salama AB
@@ -29,13 +30,12 @@ import static com.africastalking.services.voice.VoiceBackgroundService.INCOMING_
  * Date : 8/12/17 10:35 AM
  * Description :
  */
-class PJSipStack extends BaseSipStack {
+public class PJSipStack extends SipStack {
 
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
-    private static final String STUN_SERVER = "media4-angani-ke-host.africastalking.com:443";//"stun.l.google.com:19302";
     private static final String PJSUA_LIBRARY = "pjsua2";
-    private static final int LOG_LEVEL = 4;
+    private static final int LOG_LEVEL = 1;
 
     private static PJSipStack sInstance = null;
 
@@ -76,13 +76,10 @@ class PJSipStack extends BaseSipStack {
         }
     };
 
-    PJSipStack(final VoiceBackgroundService context, final SipCredentials credentials) throws Exception {
+    PJSipStack(final Context context , RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
         super(credentials);
 
-        Log.d(TAG, "Initializing PJSIP...");
-
         System.loadLibrary(PJSUA_LIBRARY);
-
 
         // Register
         sEndPoint = new Endpoint() {
@@ -138,7 +135,9 @@ class PJSipStack extends BaseSipStack {
         UaConfig uaConfig = config.getUaConfig();
         uaConfig.setUserAgent(AGENT_NAME);
         StringVector stunServer = new StringVector();
-        stunServer.add(STUN_SERVER);
+        stunServer.add("stun.l.google.com:19302");
+        stunServer.add("media4-angani-ke-host.africastalking.com:443");
+        stunServer.add("stun.pjsip.org");
         uaConfig.setStunServer(stunServer);
         uaConfig.setThreadCnt(1);
         uaConfig.setMainThreadOnly(true);
@@ -157,31 +156,27 @@ class PJSipStack extends BaseSipStack {
         // sipTransportConfig.setPort(credentials.getPort()); // reset port
 
         Log.d(TAG,  "Loading account...");
-        loadAccount(context, credentials);
+        loadAccount(context, registrationListener, credentials);
 
         sEndPoint.libStart();
 
         sInstance = this;
     }
 
-    static PJSipStack newInstance(VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+    public static PJSipStack newInstance(Context context, RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
         if (sInstance != null) {
-            sInstance.loadAccount(context, credentials);
+            sInstance.loadAccount(context, registrationListener, credentials);
             return sInstance;
         }
-        return new PJSipStack(context, credentials);
+        return new PJSipStack(context, registrationListener, credentials);
     }
 
-    private void loadAccount(final VoiceBackgroundService context, SipCredentials credentials) throws Exception {
+    private void loadAccount(final Context context, final RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
 
         final AccountConfig accfg = new AccountConfig();
 
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
-        natcfg.setTurnEnabled(false);
-        natcfg.setIceAlwaysUpdate(true);
-        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
-        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
@@ -199,8 +194,8 @@ class PJSipStack extends BaseSipStack {
                 super.onRegStarted(prm);
                 Log.d(TAG, "Registration Started");
                 setReady(false);
-                if (VoiceBackgroundService.mRegistrationListener != null) {
-                    VoiceBackgroundService.mRegistrationListener.onStarting();
+                if (registrationListener != null) {
+                    registrationListener.onStarting();
                 }
             }
 
@@ -213,13 +208,13 @@ class PJSipStack extends BaseSipStack {
                 boolean registered =  code == pjsip_status_code.PJSIP_SC_OK;
                 setReady(registered);
 
-                if (VoiceBackgroundService.mRegistrationListener != null) {
+                if (registrationListener != null) {
                     if (registered) {
                         Log.d(TAG, "Registration Complete");
-                        VoiceBackgroundService.mRegistrationListener.onComplete();
+                        registrationListener.onComplete();
                     } else {
                         Log.d(TAG, "Registration Failed");
-                        VoiceBackgroundService.mRegistrationListener.onError(new Exception(prm.getReason()));
+                        registrationListener.onError(new Exception(prm.getReason()));
                     }
                 }
             }
@@ -281,9 +276,8 @@ class PJSipStack extends BaseSipStack {
     }
 
     @Override
-    public void destroy(VoiceBackgroundService context) {
+    public void destroy() {
         try {
-            SipCall.destroy();
             mAccount.delete();
             sEndPoint.libDestroy();
         } catch(Exception ex) {
@@ -361,7 +355,6 @@ class PJSipStack extends BaseSipStack {
                 } else { // decline incoming
                     call.answer(param);
                 }
-                SipCall.destroy();
             } catch (Exception e) {
                 throw new AfricasTalkingException(e);
             }
@@ -423,7 +416,7 @@ class PJSipStack extends BaseSipStack {
     }
 
     @Override
-    public void setSpeakerMode(boolean speaker) { }
+    public void setSpeakerMode(Context cxt, boolean speaker) { }
 
 
     private static class SipCall extends Call {
@@ -454,7 +447,10 @@ class PJSipStack extends BaseSipStack {
         }
 
         static SipCall getCurrentCall() {
-            return activeCall;
+            if (activeCall != null && activeCall.isActive()) {
+                return activeCall;
+            }
+            return null;
         }
 
         @Override
@@ -701,14 +697,6 @@ class PJSipStack extends BaseSipStack {
             } catch (Exception exc) {
                 String operation = hold ? "hold" : "unhold";
                 Log.e(TAG, "Error while trying to " + operation + " call", exc);
-            }
-        }
-
-
-        static void destroy() {
-            if (activeCall != null) {
-                activeCall.delete();
-                activeCall = null;
             }
         }
     }

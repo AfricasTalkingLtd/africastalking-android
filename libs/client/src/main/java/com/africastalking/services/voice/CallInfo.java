@@ -26,7 +26,7 @@ public class CallInfo {
     private String displayName;
     private String remoteUri;
 
-    CallInfo(String remoteUriString) {
+    public CallInfo(String remoteUriString) {
 
         if (remoteUriString == null || remoteUriString.isEmpty()) {
             displayName = remoteUri = UNKNOWN;

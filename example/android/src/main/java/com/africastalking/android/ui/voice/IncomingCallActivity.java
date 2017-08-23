@@ -1,28 +1,25 @@
 package com.africastalking.android.ui.voice;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.africastalking.AfricasTalking;
+import com.africastalking.AfricasTalkingException;
+import com.africastalking.android.R;
+import com.africastalking.services.VoiceService;
+import com.africastalking.services.voice.CallInfo;
+import com.africastalking.services.voice.CallListener;
+
+import java.io.IOException;
+import java.util.Random;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.africastalking.AfricasTalking;
-import com.africastalking.AfricasTalkingException;
-import com.africastalking.services.voice.CallInfo;
-import com.africastalking.services.voice.CallListener;
-import com.africastalking.services.voice.VoiceBackgroundService;
-import com.africastalking.services.voice.VoiceBackgroundService.VoiceServiceBinder;
-import com.africastalking.android.R;
-
-import java.util.Random;
 
 public class IncomingCallActivity extends AppCompatActivity {
 
@@ -39,34 +36,9 @@ public class IncomingCallActivity extends AppCompatActivity {
     private boolean held = false;
     private boolean speaker = false;
 
-    private VoiceBackgroundService mService;
+    private VoiceService mService;
 
     private Random random = new Random();
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            VoiceServiceBinder binder = (VoiceServiceBinder) service;
-            mService = binder.getService();
-
-            CallInfo info = mService.getCallInfo();
-            if (mService.isCallInProgress()) {
-                title.setText(info.getDisplayName());
-                pickUp.setVisibility(View.GONE);
-                hold.setVisibility(View.VISIBLE);
-            } else {
-                title.setText(info.getDisplayName() + " Calling...");
-                pickUp.setVisibility(View.VISIBLE);
-            }
-
-            mService.setCallListener(mCallListener);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mService = null;
-        }
-    };
 
 
     CallListener mCallListener = new CallListener() {
@@ -99,7 +71,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                 }
             });
             mService.startAudio();
-            mService.setSpeakerMode(false);
+            mService.setSpeakerMode(IncomingCallActivity.this, false);
         }
         @Override
         public void onCallEnded(CallInfo call) {
@@ -114,14 +86,31 @@ public class IncomingCallActivity extends AppCompatActivity {
         setContentView(R.layout.activity_voice_incoming);
         ButterKnife.bind(this);
 
-        bindService(new Intent(this, VoiceBackgroundService.class), mConnection, 0);
+        try {
+            mService = AfricasTalking.getVoiceService();
+            CallInfo info = mService.getCallInfo();
+            if (mService.isCallInProgress()) {
+                title.setText(info.getDisplayName());
+                pickUp.setVisibility(View.GONE);
+                hold.setVisibility(View.VISIBLE);
+            } else {
+                title.setText(info.getDisplayName() + " Calling...");
+                pickUp.setVisibility(View.VISIBLE);
+            }
+
+            mService.setCallListener(mCallListener);
+        } catch (IOException e) {
+            e.printStackTrace();
+            finish();
+        }
+
     }
 
     @OnClick(R.id.btnPickUp)
     public void onPickUp() {
 
         if (mService == null) {
-            Log.e("Service Not Bound!", "");
+            Log.e("onPickup", "Service Not Initialized!");
             return;
         }
 
@@ -143,7 +132,6 @@ public class IncomingCallActivity extends AppCompatActivity {
             }
 
             mService.endCall();
-            finish();
         } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
@@ -177,7 +165,7 @@ public class IncomingCallActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnSpeaker)
     public void onSpeaker() {
-        mService.setSpeakerMode(!speaker);
+        mService.setSpeakerMode(this, !speaker);
     }
 
     @OnClick(R.id.btnMute)
@@ -187,7 +175,6 @@ public class IncomingCallActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        AfricasTalking.unbindVoiceBackgroundService(this, mConnection);
         super.onDestroy();
     }
 }

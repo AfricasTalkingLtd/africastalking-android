@@ -1,11 +1,7 @@
 package com.africastalking.android.ui.voice;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,15 +9,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.ServiceActivity;
+import com.africastalking.services.VoiceService;
 import com.africastalking.services.voice.CallInfo;
 import com.africastalking.services.voice.CallListener;
 import com.africastalking.services.voice.RegistrationListener;
-import com.africastalking.services.voice.VoiceBackgroundService;
-import com.africastalking.services.voice.VoiceBackgroundService.VoiceServiceBinder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,7 +25,7 @@ import butterknife.OnClick;
 
 public class OutgoingCallActivity extends ServiceActivity {
 
-    private VoiceBackgroundService mService;
+    private VoiceService mService;
 
 
     @BindView(R.id.dialButton)
@@ -38,58 +34,43 @@ public class OutgoingCallActivity extends ServiceActivity {
     @BindView(R.id.phone_number)
     EditText display;
 
-
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private RegistrationListener mRegListener = new RegistrationListener() {
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            VoiceServiceBinder binder = (VoiceServiceBinder) service;
-            mService = binder.getService();
-            mService.setRegistrationListener(new RegistrationListener() {
+        public void onError(Throwable error) {
+            Log.e("onError", error.getMessage() + "");
+            runOnUiThread(new Runnable() {
                 @Override
-                public void onError(Throwable error) {
-                    Log.e("onError", error.getMessage() + "");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(OutgoingCallActivity.this, "Registration error!", Toast.LENGTH_SHORT).show();
-                            callBtn.setEnabled(false);
-                        }
-                    });
-                }
-
-                @Override
-                public void onStarting() {
-                    Log.i("onStarting", "Registration starting... " + Thread.currentThread().getName());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(OutgoingCallActivity.this, "Registration starting...", Toast.LENGTH_SHORT).show();
-                            callBtn.setEnabled(false);
-                        }
-                    });
-                }
-
-                @Override
-                public void onComplete() {
-                    Log.i("onComplete", "Registration complete!");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(OutgoingCallActivity.this, "Ready to make calls!", Toast.LENGTH_SHORT).show();
-                            callBtn.setEnabled(true);
-                        }
-                    });
+                public void run() {
+                    Toast.makeText(OutgoingCallActivity.this, "Registration error!", Toast.LENGTH_SHORT).show();
+                    callBtn.setEnabled(false);
                 }
             });
-
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mService = null;
+        public void onStarting() {
+            Log.i("onStarting", "Registration starting... " + Thread.currentThread().getName());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(OutgoingCallActivity.this, "Registration starting...", Toast.LENGTH_SHORT).show();
+                    callBtn.setEnabled(false);
+                }
+            });
+        }
+
+        @Override
+        public void onComplete() {
+            Log.i("onComplete", "Registration complete!");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(OutgoingCallActivity.this, "Ready to make calls!", Toast.LENGTH_SHORT).show();
+                    callBtn.setEnabled(true);
+                }
+            });
         }
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +135,7 @@ public class OutgoingCallActivity extends ServiceActivity {
                     Log.e("Starting call", call.getRemoteUri());
 
                     mService.startAudio();
-                    mService.setSpeakerMode(false);
+                    mService.setSpeakerMode(OutgoingCallActivity.this, false);
 
                     // show in-call ui
                     Intent i = new Intent(OutgoingCallActivity.this, IncomingCallActivity.class);
@@ -173,21 +154,6 @@ public class OutgoingCallActivity extends ServiceActivity {
     }
 
 
-    public void onAndroidSip(View view) {
-        try {
-            view.setEnabled(false);
-            Toast.makeText(OutgoingCallActivity.this, "Setting up Android SIP", Toast.LENGTH_SHORT).show();
-            AfricasTalking.initialize(
-                    BuildConfig.RPC_USERNAME,
-                    BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT,
-                    Environment.SANDBOX); // blocking
-            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "android");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
     public void onPJSip(View view) {
         try {
             view.setEnabled(false);
@@ -197,7 +163,17 @@ public class OutgoingCallActivity extends ServiceActivity {
                     BuildConfig.RPC_HOST,
                     BuildConfig.RPC_PORT,
                     Environment.SANDBOX); // blocking
-            AfricasTalking.bindVoiceBackgroundService(this, mConnection, null, "pjsip");
+            AfricasTalking.initializeVoiceService(this, mRegListener, new Callback<VoiceService>() {
+                @Override
+                public void onSuccess(VoiceService service) {
+                    mService = service;
+                }
+
+                @Override
+                public void onFailure(Throwable throwable) {
+                    Toast.makeText(OutgoingCallActivity.this, throwable.getMessage() + "", Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -205,7 +181,9 @@ public class OutgoingCallActivity extends ServiceActivity {
 
     @Override
     protected void onDestroy() {
-        AfricasTalking.unbindVoiceBackgroundService(this, mConnection);
+        if (mService != null) {
+            mService.destroyService();
+        }
         super.onDestroy();
     }
 }

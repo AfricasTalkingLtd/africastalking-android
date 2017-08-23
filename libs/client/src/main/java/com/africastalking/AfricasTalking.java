@@ -2,20 +2,15 @@ package com.africastalking;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 
-
-import com.africastalking.services.Service;
 import com.africastalking.services.AccountService;
 import com.africastalking.services.AirtimeService;
 import com.africastalking.services.PaymentService;
+import com.africastalking.services.Service;
 import com.africastalking.services.SmsService;
 import com.africastalking.services.VoiceService;
-import com.africastalking.services.voice.VoiceBackgroundService;
+import com.africastalking.services.voice.RegistrationListener;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -94,16 +89,30 @@ public final class AfricasTalking {
     }
 
     public static VoiceService getVoiceService() throws IOException {
-        return Service.newInstance("voice");
+        VoiceService service = VoiceService.getsInstance();
+        if (service == null){
+            throw new IOException("Voice service was not initialized; call AfircasTalking.initializeVoiceService() first");
+        }
+        return service;
     }
 
+
     /**
-     * Bind to voice SIP service, setting the preferred SIP username
+     * Initialize voice service
      * @param context
-     * @param connection
-     * @param sipUsername
+     * @param registrationListener
+     * @param callback
+     * @throws Exception
      */
-    public static void bindVoiceBackgroundService(final Activity context, final ServiceConnection connection, final String sipUsername, final String sipStack) {
+    public static void initializeVoiceService(final Activity context, final RegistrationListener registrationListener, final Callback<VoiceService> callback) throws Exception {
+
+        if (callback == null) {
+            throw new Exception("callback cannot be null");
+        }
+
+        if (registrationListener == null) {
+            throw new Exception("registrationListener cannot be null");
+        }
 
         // Permissions
         Dexter.withActivity(context)
@@ -113,30 +122,16 @@ public final class AfricasTalking {
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
 
                         if (!report.areAllPermissionsGranted()) {
-                            Log.e(TAG, "The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST));
-                            connection.onServiceDisconnected(context.getComponentName());
+                            callback.onFailure(new Exception("The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST)));
                             return;
                         }
 
-                        Intent intent = new Intent(context, VoiceBackgroundService.class);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_USERNAME, sipUsername);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_HOST, Service.HOST);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_PORT, Service.PORT);
-                        intent.putExtra(VoiceBackgroundService.EXTRA_SIP_STACK, sipStack);
-
-                        // (re)-start
-                        context.startService(intent);
-
-
-                        // then bind after a while
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                context.bindService(new Intent(context, VoiceBackgroundService.class), connection, 0);
-                            }
-                        }, 300);
-
+                        try {
+                            VoiceService service = VoiceService.newInstance(context.getApplicationContext(), registrationListener);
+                            callback.onSuccess(service);
+                        } catch (IOException e) {
+                            callback.onFailure(e);;
+                        }
                     }
 
                     @Override
@@ -147,35 +142,10 @@ public final class AfricasTalking {
                 .withErrorListener(new PermissionRequestErrorListener() {
                     @Override
                     public void onError(DexterError error) {
-                        Log.e(TAG, error.name());
-                        Log.e(TAG, "The following permissions are required: " + TextUtils.join("\n", PERMISSION_LIST));
-                        connection.onServiceDisconnected(context.getComponentName());
-                        return;
+                        callback.onFailure(new Exception("The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST)));
                     }
                 })
                 .onSameThread()
                 .check();
-    }
-
-    /**
-     * Bind to voice SIP service
-     * @param context
-     * @param connection
-     */
-    public static void bindVoiceBackgroundService(Activity context, ServiceConnection connection) {
-        bindVoiceBackgroundService(context, connection, null, null);
-    }
-
-    /**
-     * Unbind from voice SIP service
-     * @param context
-     * @param connection
-     */
-    public static void unbindVoiceBackgroundService(Activity context, ServiceConnection connection) {
-        try {
-            context.unbindService(connection);
-        } catch (Exception ex) {
-            Log.e(TAG, ex.getMessage() + "");
-        }
     }
 }
