@@ -46,6 +46,10 @@ public class CallListener {
         /* no op */
     }
 
+    public void onIncomingCall(CallInfo callInfo) {
+        /* no op */
+    }
+
     public void onError(CallInfo callInfo, int errorCode, String errorMessage) {
         /* no op */
     }

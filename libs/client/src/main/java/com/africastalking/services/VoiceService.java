@@ -29,7 +29,6 @@ public final class VoiceService extends Service implements CallController {
 
     private static final String TAG = VoiceService.class.getName();
 
-    public static final String INCOMING_CALL = "com.africastalking.mVoiceAPIInterface.INCOMING_CALL";
     static VoiceService sInstance;
     private VoiceServiceInterface mVoiceAPIInterface;
 
@@ -79,7 +78,7 @@ public final class VoiceService extends Service implements CallController {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://mVoiceAPIInterface."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        String baseUrl = "https://voice."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         mVoiceAPIInterface =  retrofitBuilder.baseUrl(baseUrl).build().create(VoiceServiceInterface.class) ;
     }
 
@@ -171,52 +170,45 @@ public final class VoiceService extends Service implements CallController {
     }
 
 
+    @Override
+    public void registerCallListener(CallListener listener) {
+        if (mSipStack != null) {
+            mSipStack.registerCallListener(listener);
+        }
+    }
 
     @Override
-    public void setCallListener(CallListener listener) {
+    public void unregisterCallListener(CallListener listener) {
         if (mSipStack != null) {
-            mSipStack.setCallListener(listener);
+            mSipStack.unregisterCallListener(listener);
         }
     }
 
     /**
      * Start a call
-     * @param listener
      * @param destination
-     * @param timeout
      * @throws AfricasTalkingException
      */
     @Override
-    public void makeCall(String destination, int timeout, CallListener listener) throws AfricasTalkingException {
+    public void makeCall(String destination) throws AfricasTalkingException {
         if (mSipStack != null && mSipStack.isReady()) {
-            mSipStack.makeCall(destination, timeout, listener);
+            mSipStack.makeCall(destination);
         } else {
             throw new AfricasTalkingException("Voice service NOT ready!");
         }
     }
-
-    public void makeCall(String destination, CallListener listener) throws AfricasTalkingException {
-        makeCall(destination, 30, listener);
-    }
-
 
     /**
      * Pick up an incoming call
-     * @param listener
-     * @param timeout
      * @throws AfricasTalkingException
      */
     @Override
-    public void pickCall(int timeout, CallListener listener) throws AfricasTalkingException {
+    public void pickCall() throws AfricasTalkingException {
         if (mSipStack != null && mSipStack.isReady()) {
-            mSipStack.pickCall(timeout, listener);
+            mSipStack.pickCall();
         } else {
             throw new AfricasTalkingException("Voice service NOT ready!");
         }
-    }
-
-    public void pickCall(CallListener listener) throws AfricasTalkingException {
-        pickCall(30, listener);
     }
 
     /**
@@ -241,16 +233,11 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Hold call
-     * @param timeout
      * @throws AfricasTalkingException
      */
     @Override
-    public void holdCall(int timeout) throws AfricasTalkingException {
-        mSipStack.holdCall(timeout);
-    }
-
     public void holdCall() throws AfricasTalkingException {
-        mSipStack.holdCall(30);
+        mSipStack.holdCall();
     }
 
 
@@ -264,16 +251,11 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Resume a held call
-     * @param timeout
      * @throws AfricasTalkingException
      */
     @Override
-    public void resumeCall(int timeout) throws AfricasTalkingException {
-        mSipStack.resumeCall(timeout);
-    }
-
     public void resumeCall() throws AfricasTalkingException {
-        mSipStack.resumeCall(30);
+        mSipStack.resumeCall();
     }
 
 

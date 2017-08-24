@@ -17,12 +17,13 @@ import com.africastalking.AfricasTalkingException;
  */
 public interface CallController {
 
-    void setCallListener(CallListener listener);
+    void registerCallListener(CallListener listener);
+    void unregisterCallListener(CallListener listener);
 
-    void makeCall(String destination, int timeout, CallListener listener) throws AfricasTalkingException;
-    void pickCall(int timeout, CallListener listener) throws AfricasTalkingException;
-    void holdCall(int timeout) throws AfricasTalkingException;
-    void resumeCall(int timeout) throws AfricasTalkingException;
+    void makeCall(String destination) throws AfricasTalkingException;
+    void pickCall() throws AfricasTalkingException;
+    void holdCall() throws AfricasTalkingException;
+    void resumeCall() throws AfricasTalkingException;
     void endCall() throws AfricasTalkingException;
     void sendDtmf(char character);
 

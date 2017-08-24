@@ -1,7 +1,6 @@
 package com.africastalking.services.voice;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -15,9 +14,54 @@ import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
 import com.birbit.android.jobqueue.config.Configuration;
 
-import org.pjsip.pjsua2.*;
+import org.pjsip.pjsua2.Account;
+import org.pjsip.pjsua2.AccountConfig;
+import org.pjsip.pjsua2.AccountNatConfig;
+import org.pjsip.pjsua2.AudDevManager;
+import org.pjsip.pjsua2.AudioMedia;
+import org.pjsip.pjsua2.AuthCredInfo;
+import org.pjsip.pjsua2.Call;
+import org.pjsip.pjsua2.CallMediaInfo;
+import org.pjsip.pjsua2.CallMediaInfoVector;
+import org.pjsip.pjsua2.CallOpParam;
+import org.pjsip.pjsua2.CallSendRequestParam;
+import org.pjsip.pjsua2.CallSetting;
+import org.pjsip.pjsua2.Endpoint;
+import org.pjsip.pjsua2.EpConfig;
+import org.pjsip.pjsua2.LogEntry;
+import org.pjsip.pjsua2.LogWriter;
+import org.pjsip.pjsua2.Media;
+import org.pjsip.pjsua2.OnCallMediaStateParam;
+import org.pjsip.pjsua2.OnCallStateParam;
+import org.pjsip.pjsua2.OnIncomingCallParam;
+import org.pjsip.pjsua2.OnIncomingSubscribeParam;
+import org.pjsip.pjsua2.OnInstantMessageParam;
+import org.pjsip.pjsua2.OnInstantMessageStatusParam;
+import org.pjsip.pjsua2.OnMwiInfoParam;
+import org.pjsip.pjsua2.OnNatCheckStunServersCompleteParam;
+import org.pjsip.pjsua2.OnNatDetectionCompleteParam;
+import org.pjsip.pjsua2.OnRegStartedParam;
+import org.pjsip.pjsua2.OnRegStateParam;
+import org.pjsip.pjsua2.OnSelectAccountParam;
+import org.pjsip.pjsua2.OnTransportStateParam;
+import org.pjsip.pjsua2.OnTypingIndicationParam;
+import org.pjsip.pjsua2.SipEvent;
+import org.pjsip.pjsua2.SipTxOption;
+import org.pjsip.pjsua2.StringVector;
+import org.pjsip.pjsua2.TransportConfig;
+import org.pjsip.pjsua2.UaConfig;
+import org.pjsip.pjsua2.pj_log_decoration;
+import org.pjsip.pjsua2.pj_qos_type;
+import org.pjsip.pjsua2.pjmedia_type;
+import org.pjsip.pjsua2.pjsip_inv_state;
+import org.pjsip.pjsua2.pjsip_status_code;
+import org.pjsip.pjsua2.pjsip_transport_type_e;
+import org.pjsip.pjsua2.pjsua2;
+import org.pjsip.pjsua2.pjsua_call_flag;
+import org.pjsip.pjsua2.pjsua_call_media_status;
 
-import static com.africastalking.services.VoiceService.INCOMING_CALL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Copyright (c) 2017 Salama AB
@@ -35,48 +79,22 @@ public class PJSipStack extends SipStack {
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String PJSUA_LIBRARY = "pjsua2";
-    private static final int LOG_LEVEL = 1;
+    private static final int LOG_LEVEL = 6;
 
     private static PJSipStack sInstance = null;
 
-    private static CallListener mCallListener;
+    private static Set<CallListener> mCallListeners = new HashSet<>();
 
     private static Endpoint sEndPoint = null;
 
     private Account mAccount = null;
     private TransportConfig mSipTransportConfig = null;
 
+    JobManager mJobManager;
+    LogWriter mLogWriter;
 
-    static class LogJob extends Job {
 
-        String text;
-        public LogJob(String text) {
-            super(new Params(0).delayInMs(500));
-            this.text = text;
-        }
-
-        @Override
-        public void onAdded() {
-
-        }
-
-        @Override
-        protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
-
-        }
-
-        @Override
-        protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
-            return null;
-        }
-
-        @Override
-        public void onRun() throws Throwable {
-            Log.d(TAG, text + "");
-        }
-    };
-
-    PJSipStack(final Context context , RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
+    PJSipStack(Context context, final RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
         super(credentials);
 
         System.loadLibrary(PJSUA_LIBRARY);
@@ -114,18 +132,19 @@ public class PJSipStack extends SipStack {
         EpConfig config = new EpConfig();
 
         // logging
-        final JobManager jobManager = new JobManager(new Configuration.Builder(context).build());
-        config.getLogConfig().setMsgLogging(LOG_LEVEL);
-        config.getLogConfig().setLevel(LOG_LEVEL);
-        config.getLogConfig().setConsoleLevel(LOG_LEVEL);
-        config.getLogConfig().setWriter(new LogWriter(){
+        mJobManager = new JobManager(new Configuration.Builder(context).build());
+        mLogWriter = new LogWriter(){
             @Override
             public void write(LogEntry entry) {
                 if (entry != null) {
-                    jobManager.addJobInBackground(new LogJob(entry.getMsg()));
+                    mJobManager.addJobInBackground(new LogJob(entry.getMsg()));
                 }
             }
-        });
+        };
+        config.getLogConfig().setMsgLogging(LOG_LEVEL);
+        config.getLogConfig().setLevel(LOG_LEVEL);
+        config.getLogConfig().setConsoleLevel(LOG_LEVEL);
+        config.getLogConfig().setWriter(mLogWriter);
         config.getLogConfig().setDecor(config.getLogConfig().getDecor() & 
              ~(pj_log_decoration.PJ_LOG_HAS_CR.swigValue() | 
              pj_log_decoration.PJ_LOG_HAS_NEWLINE.swigValue()));
@@ -136,8 +155,8 @@ public class PJSipStack extends SipStack {
         uaConfig.setUserAgent(AGENT_NAME);
         StringVector stunServer = new StringVector();
         stunServer.add("stun.l.google.com:19302");
-        stunServer.add("media4-angani-ke-host.africastalking.com:443");
         stunServer.add("stun.pjsip.org");
+        stunServer.add("media4-angani-ke-host.africastalking.com:443");
         uaConfig.setStunServer(stunServer);
         uaConfig.setThreadCnt(1);
         uaConfig.setMainThreadOnly(true);
@@ -145,33 +164,33 @@ public class PJSipStack extends SipStack {
         sEndPoint.libInit(config);
 
         mSipTransportConfig = new TransportConfig();
-        mSipTransportConfig.setPort(credentials.getPort());
+        // mSipTransportConfig.setPort(credentials.getPort());
         mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
+        // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
         // tls, TODO: build pjsip with openssl
         // sipTransportConfig.setPort(credentials.getPort() + 1);
         // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, sipTransportConfig);
         // sipTransportConfig.setPort(credentials.getPort()); // reset port
 
-        Log.d(TAG,  "Loading account...");
-        loadAccount(context, registrationListener, credentials);
-
         sEndPoint.libStart();
+
+        Log.d(TAG,  "Loading account...");
+        loadAccount(registrationListener, credentials);
 
         sInstance = this;
     }
 
     public static PJSipStack newInstance(Context context, RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
-        if (sInstance != null) {
-            sInstance.loadAccount(context, registrationListener, credentials);
+        if (sInstance != null && sInstance.isReady()) {
+            sInstance.loadAccount(registrationListener, credentials);
             return sInstance;
         }
         return new PJSipStack(context, registrationListener, credentials);
     }
 
-    private void loadAccount(final Context context, final RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
+    private void loadAccount(final RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
 
         final AccountConfig accfg = new AccountConfig();
 
@@ -227,17 +246,15 @@ public class PJSipStack extends SipStack {
                     callOpParam.setStatusCode(pjsip_status_code.PJSIP_SC_RINGING);
                     call.answer(callOpParam);
 
-                    if (mCallListener != null) {
-                        mCallListener.onRinging(new CallInfo(call.getInfo()));
+                    CallInfo callInfo = new CallInfo(call.getInfo());
+                    for (CallListener listener : mCallListeners) {
+                        listener.onIncomingCall(callInfo);
                     }
-
-                    // Notify UI
-                    context.sendBroadcast(new Intent(INCOMING_CALL)); // Slow?????
 
                 } catch (Exception ex) {
                     Log.e(TAG, ex.getMessage() + "");
-                    if (mCallListener != null) {
-                        mCallListener.onError(null, 500, ex.getMessage());
+                    for (CallListener listener : mCallListeners) {
+                        listener.onError(null, 500, ex.getMessage());
                     }
                 }
             }
@@ -278,40 +295,47 @@ public class PJSipStack extends SipStack {
     @Override
     public void destroy() {
         try {
-            mAccount.delete();
+            if (mAccount != null) {
+                mAccount.delete();
+            }
             sEndPoint.libDestroy();
+            sEndPoint.delete();
+            setReady(false);
         } catch(Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
         }
     }
 
     @Override
-    public void setCallListener(CallListener listener) {
-        mCallListener = listener;
+    public void registerCallListener(CallListener listener) {
+        mCallListeners.add(listener);
     }
 
     @Override
-    public void makeCall(final String destination, final int timeout, final CallListener listener) {
+    public void unregisterCallListener(CallListener listener) {
+        mCallListeners.remove(listener);
+    }
+
+    @Override
+    public void makeCall(final String destination) {
         try {
-            setCallListener(listener);
             SipCall call = SipCall.newInstance(mAccount, -1);
             String recipient = ("sip:" + destination + "@" + mCredentials.getHost());
             // isSipUri(destination)
             call.makeCall(recipient, new CallOpParam());
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
-            if (mCallListener != null) {
-                mCallListener.onError(null, 500, ex.getMessage());
+            for (CallListener listener : mCallListeners) {
+                listener.onError(null, 500, ex.getMessage());
             }
         }
     }
 
     @Override
-    public void pickCall(int timeout, CallListener listener) throws AfricasTalkingException {
+    public void pickCall() throws AfricasTalkingException {
 
         if (isCallInProgress()) throw new AfricasTalkingException("A call is already in progress");
 
-        setCallListener(listener);
         SipCall call = SipCall.getCurrentCall();
 
         if (call != null) {
@@ -320,13 +344,15 @@ public class PJSipStack extends SipStack {
                 param.setStatusCode(pjsip_status_code.PJSIP_SC_OK);
                 call.answer(param);
             } catch (Exception e) {
-                throw new AfricasTalkingException(e);
+                for (CallListener listener : mCallListeners) {
+                    listener.onError(null, 500, e.getMessage());
+                }
             }
         }
     }
 
     @Override
-    public void holdCall(int timeout) throws AfricasTalkingException {
+    public void holdCall() throws AfricasTalkingException {
         SipCall call = SipCall.getCurrentCall();
         if (call == null) {
             return;
@@ -335,7 +361,7 @@ public class PJSipStack extends SipStack {
     }
 
     @Override
-    public void resumeCall(int timeout) throws AfricasTalkingException {
+    public void resumeCall() throws AfricasTalkingException {
         SipCall call = SipCall.getCurrentCall();
         if (call == null) {
             return;
@@ -374,7 +400,10 @@ public class PJSipStack extends SipStack {
                 prm.setTxOption(txo);
                 call.sendRequest(prm);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.d(TAG, e.getMessage() + "");
+                for (CallListener listener : mCallListeners) {
+                    listener.onError(null, 500, e.getMessage());
+                }
             }
         }
     }
@@ -460,34 +489,36 @@ public class PJSipStack extends SipStack {
                 SipEvent evt = prm.getE();
                 Log.d(TAG + " -> Event", evt.getType().toString());
 
-                org.pjsip.pjsua2.CallInfo callInfo = getInfo();
-                pjsip_inv_state callState = callInfo.getState();
+                org.pjsip.pjsua2.CallInfo pjcallInfo = getInfo();
+                pjsip_inv_state callState = pjcallInfo.getState();
                 pjsip_status_code code = null;
+                CallInfo callInfo = new CallInfo("Unknown");
                 try {
-                    code = callInfo.getLastStatusCode();
+                    callInfo = makeCallInfo(pjcallInfo);
+                    code = pjcallInfo.getLastStatusCode();
                 } catch (Exception ex) { }
 
                 if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING) {
 
-                    Log.d(TAG + " -> Session", "Calling: " + callInfo.getRemoteUri());
+                    Log.d(TAG + " -> Session", "Calling: " + pjcallInfo.getRemoteUri());
 
-                    if (mCallListener != null) {
-                        mCallListener.onCalling(makeCallInfo(callInfo));
+                    for (CallListener listener : mCallListeners) {
+                        listener.onCalling(callInfo);
                     }
                 }
                 else if (callState == pjsip_inv_state.PJSIP_INV_STATE_CONNECTING) {
-                    Log.d(TAG + " -> Session", "Connecting: " + callInfo.getRemoteUri());
+                    Log.d(TAG + " -> Session", "Connecting: " + pjcallInfo.getRemoteUri());
 
-                    if (mCallListener != null) {
-                        mCallListener.onCalling(makeCallInfo(callInfo));
+                    for (CallListener listener : mCallListeners) {
+                        listener.onCalling(callInfo);
                     }
                 }
                 else if (callState == pjsip_inv_state.PJSIP_INV_STATE_EARLY) {
                     Log.d(TAG + " -> Session", "Early: " + code);
 
                     if (code == pjsip_status_code.PJSIP_SC_RINGING) {
-                        if (mCallListener != null) {
-                            mCallListener.onRinging(makeCallInfo(callInfo));
+                        for (CallListener listener : mCallListeners) {
+                            listener.onRinging(callInfo);
                         }
                     }
                 }
@@ -504,19 +535,21 @@ public class PJSipStack extends SipStack {
                     Log.d(TAG + " -> Session", "Confirmed: " + code);
 
                     if (code == pjsip_status_code.PJSIP_SC_OK) {
-                        if (mCallListener != null) {
-                            mCallListener.onCallEstablished(makeCallInfo(callInfo));
+                        for (CallListener listener : mCallListeners) {
+                            listener.onCallEstablished(callInfo);
                         }
                     }
 
                     if (code == pjsip_status_code.PJSIP_SC_RINGING) {
-                        if (mCallListener != null) {
-                            mCallListener.onRinging(makeCallInfo(callInfo));
+                        for (CallListener listener : mCallListeners) {
+                            listener.onRinging(callInfo);
                         }
                     }
 
                     if (code == pjsip_status_code.PJSIP_SC_NOT_FOUND) {
-                        mCallListener.onError(makeCallInfo(callInfo), 404, "Not Found");
+                        for (CallListener listener : mCallListeners) {
+                            listener.onError(callInfo, 404, "Not Found");
+                        }
                     }
 
                     // ... more statuses
@@ -528,30 +561,25 @@ public class PJSipStack extends SipStack {
 
                         Log.d(TAG + " -> Session", "Disconnected: " + code);
 
-                        if (mCallListener == null) {
-                            Log.e(TAG + " -> Session", "Disconnected: " + "No call listener!");
-                        }
-
                         if (code == pjsip_status_code.PJSIP_SC_BUSY_HERE || code == pjsip_status_code.PJSIP_SC_BUSY_EVERYWHERE){
-                            if (mCallListener != null) {
-                                mCallListener.onCallBusy(makeCallInfo(callInfo));
+                            for (CallListener listener : mCallListeners) {
+                                listener.onCallBusy(callInfo);
                             }
-                        }
-                        // ... more error status codes
-
-                        if (code == pjsip_status_code.PJSIP_SC_NOT_FOUND ||
+                        } // ... more error status codes
+                        else if (code == pjsip_status_code.PJSIP_SC_NOT_FOUND ||
                             code == pjsip_status_code.PJSIP_SC_TEMPORARILY_UNAVAILABLE ||
                             code == pjsip_status_code.PJSIP_SC_FORBIDDEN ||
                             code == pjsip_status_code.PJSIP_SC_SERVICE_UNAVAILABLE ||
                             code == pjsip_status_code.PJSIP_SC_REQUEST_TIMEOUT ||
                             code == pjsip_status_code.PJSIP_SC_BAD_REQUEST) {
-                            if (mCallListener != null) {
-                                mCallListener.onError(makeCallInfo(callInfo), code.swigValue(), callInfo.getLastReason());
+                            for (CallListener listener : mCallListeners) {
+                                listener.onError(callInfo, code.swigValue(), pjcallInfo.getLastReason());
                             }
-                        }
-
-                        if (mCallListener != null) {
-                            mCallListener.onCallEnded(makeCallInfo(callInfo));
+                        } else {
+                            // all else fail
+                            for (CallListener listener : mCallListeners) {
+                                listener.onCallEnded(callInfo);
+                            }
                         }
                     }catch (Exception ex) {
                         ex.printStackTrace();
@@ -559,12 +587,11 @@ public class PJSipStack extends SipStack {
 
                     activeCall = null;
                     this.delete();
-
                 }
             }
             catch(Exception e) {
-                if (mCallListener != null) {
-                    mCallListener.onError(new CallInfo("unknown"), 0, e.getMessage() + "");
+                for (CallListener listener : mCallListeners) {
+                    listener.onError(new CallInfo("unknown"), 0, e.getMessage() + "");
                 }
                 this.delete();
                 activeCall = null;
@@ -680,9 +707,6 @@ public class PJSipStack extends SipStack {
                 if (hold) {
                     setHold(param);
                     localHold = true;
-                    if (mCallListener != null) {
-                        mCallListener.onCallHeld(makeCallInfo(getInfo()));
-                    }
                 } else {
                     CallSetting opt = param.getOpt();
                     opt.setAudioCount(1);
@@ -690,14 +714,43 @@ public class PJSipStack extends SipStack {
                     opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                     reinvite(param);
                     localHold = false;
-                    if (mCallListener != null) {
-                        mCallListener.onCallEstablished(makeCallInfo(getInfo()));
-                    }
+                    // TODO: Notify of call re-established?
                 }
             } catch (Exception exc) {
                 String operation = hold ? "hold" : "unhold";
                 Log.e(TAG, "Error while trying to " + operation + " call", exc);
             }
+        }
+    }
+
+
+
+    static class LogJob extends Job {
+
+        String text;
+        public LogJob(String text) {
+            super(new Params(0).delayInMs(500));
+            this.text = text;
+        }
+
+        @Override
+        public void onAdded() {
+
+        }
+
+        @Override
+        protected void onCancel(int cancelReason, @Nullable Throwable throwable) {
+
+        }
+
+        @Override
+        protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
+            return null;
+        }
+
+        @Override
+        public void onRun() throws Throwable {
+            Log.d(TAG, text + "");
         }
     }
 

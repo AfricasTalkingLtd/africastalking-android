@@ -30,11 +30,8 @@ public final class AfricasTalking {
 
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
-            Manifest.permission.USE_SIP,
-            Manifest.permission.WAKE_LOCK,
             Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS,
-            Manifest.permission.ACCESS_WIFI_STATE
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
     );
 
 
@@ -130,7 +127,7 @@ public final class AfricasTalking {
                             VoiceService service = VoiceService.newInstance(context.getApplicationContext(), registrationListener);
                             callback.onSuccess(service);
                         } catch (IOException e) {
-                            callback.onFailure(e);;
+                            callback.onFailure(e);
                         }
                     }
 

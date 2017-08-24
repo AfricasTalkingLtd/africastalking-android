@@ -15,7 +15,7 @@ import timber.log.Timber;
 import com.africastalking.android.ui.airtime.AirtimeActivity;
 import com.africastalking.android.ui.payment.PaymentActivity;
 import com.africastalking.android.ui.sms.SmsActivity;
-import com.africastalking.android.ui.voice.OutgoingCallActivity;
+import com.africastalking.android.ui.voice.VoiceActivity;
 import com.jraska.console.timber.ConsoleTree;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,6 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.voice_layout)
     void voice() {
-        startActivity(new Intent(this, OutgoingCallActivity.class));
+        startActivity(new Intent(this, VoiceActivity.class));
     }
 }

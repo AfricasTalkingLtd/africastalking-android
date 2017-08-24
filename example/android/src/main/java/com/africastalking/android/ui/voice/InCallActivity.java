@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class IncomingCallActivity extends AppCompatActivity {
+public class InCallActivity extends AppCompatActivity {
 
 
     @BindView(R.id.title)
@@ -71,7 +71,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                 }
             });
             mService.startAudio();
-            mService.setSpeakerMode(IncomingCallActivity.this, false);
+            mService.setSpeakerMode(InCallActivity.this, false);
         }
         @Override
         public void onCallEnded(CallInfo call) {
@@ -98,7 +98,7 @@ public class IncomingCallActivity extends AppCompatActivity {
                 pickUp.setVisibility(View.VISIBLE);
             }
 
-            mService.setCallListener(mCallListener);
+            mService.registerCallListener(mCallListener);
         } catch (IOException e) {
             e.printStackTrace();
             finish();
@@ -115,7 +115,7 @@ public class IncomingCallActivity extends AppCompatActivity {
         }
 
         try {
-            mService.pickCall(mCallListener);
+            mService.pickCall();
         } catch (AfricasTalkingException e) {
             e.printStackTrace();
         }
@@ -175,6 +175,9 @@ public class IncomingCallActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (mService != null) {
+            mService.unregisterCallListener(mCallListener);
+        }
         super.onDestroy();
     }
 }

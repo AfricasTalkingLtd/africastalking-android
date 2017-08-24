@@ -3,16 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.africastalking.android">
 
-    <uses-permission android:name="android.permission.USE_SIP" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
-    <uses-feature android:name="android.hardware.sip.voip" android:required="true" />
-    <uses-feature android:name="android.hardware.microphone" android:required="true" />
-
 
 
     <application
@@ -32,14 +25,8 @@
         <activity android:name=".ui.airtime.AirtimeActivity" android:label="Airtime" />
         <activity android:name=".ui.payment.PaymentActivity" android:label="Payment" />
         <activity android:name=".ui.sms.SmsActivity" android:label="SMS" />
-        <activity android:name=".ui.voice.OutgoingCallActivity" android:label="Voice"/>
-        <activity android:name=".ui.voice.IncomingCallActivity" android:launchMode="singleInstance" android:label="Voice"/>
-
-        <receiver android:name=".services.IncomingCallReceiver">
-            <intent-filter>
-                <action android:name="com.africastalking.voice.INCOMING_CALL" />
-            </intent-filter>
-        </receiver>
+        <activity android:name=".ui.voice.VoiceActivity" android:label="Voice"/>
+        <activity android:name=".ui.voice.InCallActivity" android:launchMode="singleInstance" android:label="Voice"/>
 
     </application>
 
