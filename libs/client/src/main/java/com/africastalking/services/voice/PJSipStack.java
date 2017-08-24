@@ -81,7 +81,7 @@ public class PJSipStack extends SipStack {
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String PJSUA_LIBRARY = "pjsua2";
-    private static final int LOG_LEVEL = 2;
+    private static final int LOG_LEVEL = 3;
 
     private static PJSipStack sInstance = null;
 
@@ -93,14 +93,14 @@ public class PJSipStack extends SipStack {
     private TransportConfig mSipTransportConfig = null;
 
     private JobManager mJobManager;
-    private Logger mLogger = new Logger() {
+    private LogWriter mLogWriter;
+
+    private static Logger mLogger = new Logger() {
         @Override
         public void log(String message, Object... args) {
             Log.d(TAG, String.format(message, args));
         }
     };
-    private LogWriter mLogWriter;
-
 
     PJSipStack(Context context, final RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
         super(credentials);
@@ -318,9 +318,6 @@ public class PJSipStack extends SipStack {
     @Override
     public void registerLogger(Logger logger) {
         mLogger = logger;
-        if (mSipStack != null) {
-            mSipStack.registerLogger(mLogger);
-        }
     }
 
     @Override
@@ -331,9 +328,6 @@ public class PJSipStack extends SipStack {
                 Log.d(TAG, String.format(message, args));
             }
         };
-        if (mSipStack != null) {
-            mSipStack.unregisterLogger(mLogger);
-        }
     }
 
     @Override
@@ -783,7 +777,7 @@ public class PJSipStack extends SipStack {
 
         @Override
         public void onRun() throws Throwable {
-            Log.d(TAG, text + "");
+            mLogger.log(text);
         }
     }
 
