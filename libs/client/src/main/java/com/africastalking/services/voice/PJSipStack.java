@@ -81,7 +81,7 @@ public class PJSipStack extends SipStack {
     private static final String TAG = PJSipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String PJSUA_LIBRARY = "pjsua2";
-    private static final int LOG_LEVEL = 6;
+    private static final int LOG_LEVEL = 2;
 
     private static PJSipStack sInstance = null;
 
@@ -711,6 +711,9 @@ public class PJSipStack extends SipStack {
                 if (hold) {
                     setHold(param);
                     localHold = true;
+                    for(CallListener listener:mCallListeners) {
+                        listener.onCallHeld(makeCallInfo(getInfo()));
+                    }
                 } else {
                     CallSetting opt = param.getOpt();
                     opt.setAudioCount(1);
@@ -718,7 +721,9 @@ public class PJSipStack extends SipStack {
                     opt.setFlag(pjsua_call_flag.PJSUA_CALL_UNHOLD.swigValue());
                     reinvite(param);
                     localHold = false;
-                    // TODO: Notify of call re-established?
+                    for(CallListener listener:mCallListeners) {
+                        listener.onCallEstablished(makeCallInfo(getInfo()));
+                    }
                 }
             } catch (Exception exc) {
                 String operation = hold ? "hold" : "unhold";
