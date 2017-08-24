@@ -60,7 +60,6 @@ import org.pjsip.pjsua2.pjsua2;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
 import org.pjsip.pjsua2.pjsua_state;
-import org.pjsip.pjsua2.pjsua_stun_use;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -160,7 +159,6 @@ public class PJSipStack extends SipStack {
         stunServer.add("stun.pjsip.org");
         stunServer.add("media4-angani-ke-host.africastalking.com:443");
         uaConfig.setStunServer(stunServer);
-        // uaConfig.setThreadCnt(1);
 
         sEndPoint.libInit(config);
 
@@ -199,6 +197,7 @@ public class PJSipStack extends SipStack {
 
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
+        natcfg.setIceAlwaysUpdate(true);
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());

@@ -159,7 +159,7 @@ public class InCallActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnDtmf)
     public void onDtmf() {
-        final String digits = "01";
+        final String digits = "0123456789";
         mService.sendDtmf(digits.charAt(random.nextInt(digits.length())));
     }
 
