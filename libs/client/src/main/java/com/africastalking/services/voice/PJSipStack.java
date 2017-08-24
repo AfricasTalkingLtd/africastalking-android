@@ -82,6 +82,7 @@ public class PJSipStack extends SipStack {
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String PJSUA_LIBRARY = "pjsua2";
     private static final int LOG_LEVEL = 2;
+    private static boolean calling = false;
 
     private static PJSipStack sInstance = null;
 
@@ -491,7 +492,7 @@ public class PJSipStack extends SipStack {
 
             try {
                 SipEvent evt = prm.getE();
-                Log.d(TAG + " -> Event", evt.getType().toString());
+//                Log.d(TAG + " -> Event", evt.getType().toString());
 
                 org.pjsip.pjsua2.CallInfo pjcallInfo = getInfo();
                 pjsip_inv_state callState = pjcallInfo.getState();
@@ -505,6 +506,8 @@ public class PJSipStack extends SipStack {
                 if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING) {
 
                     Log.d(TAG + " -> Session", "Calling: " + pjcallInfo.getRemoteUri());
+
+                    calling = true;
 
                     for (CallListener listener : mCallListeners) {
                         listener.onCalling(callInfo);
@@ -521,8 +524,17 @@ public class PJSipStack extends SipStack {
                     Log.d(TAG + " -> Session", "Early: " + code);
 
                     if (code == pjsip_status_code.PJSIP_SC_RINGING) {
+                        Log.d(TAG + " -> Event", "" + code);
                         for (CallListener listener : mCallListeners) {
-                            listener.onRinging(callInfo);
+                            if (calling) {
+                                listener.onRingingBack(callInfo);
+                                Log.d(TAG + " -> Event", "Ringingback: " + code);
+                            }
+                            else {
+                                listener.onRinging(callInfo);
+                                Log.d(TAG + " -> Event", "Ringing: " + code);
+                            }
+                            calling = false;
                         }
                     }
                 }
@@ -533,26 +545,12 @@ public class PJSipStack extends SipStack {
                     Log.d(TAG + " -> Session", "Incoming: " + code);
                 }
                 else if(callState == pjsip_inv_state.PJSIP_INV_STATE_CONFIRMED) {
-                    // TODO: RingBack, Hold?
-
 
                     Log.d(TAG + " -> Session", "Confirmed: " + code);
 
                     if (code == pjsip_status_code.PJSIP_SC_OK) {
                         for (CallListener listener : mCallListeners) {
                             listener.onCallEstablished(callInfo);
-                        }
-                    }
-
-                    if (code == pjsip_status_code.PJSIP_SC_RINGING) {
-                        for (CallListener listener : mCallListeners) {
-                            listener.onRinging(callInfo);
-                        }
-                    }
-
-                    if (code == pjsip_status_code.PJSIP_SC_NOT_FOUND) {
-                        for (CallListener listener : mCallListeners) {
-                            listener.onError(callInfo, 404, "Not Found");
                         }
                     }
 
