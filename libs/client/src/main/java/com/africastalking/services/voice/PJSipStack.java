@@ -92,8 +92,8 @@ public class PJSipStack extends SipStack {
     private Account mAccount = null;
     private TransportConfig mSipTransportConfig = null;
 
-    JobManager mJobManager;
-    LogWriter mLogWriter;
+    private JobManager mJobManager;
+    private LogWriter mLogWriter;
 
 
     PJSipStack(Context context, final RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
@@ -199,13 +199,6 @@ public class PJSipStack extends SipStack {
 
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
-
-
-        /*natcfg.setIceAlwaysUpdate(true);
-        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
-        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
-        natcfg.setContactRewriteUse(1);
-        natcfg.setSdpNatRewriteUse(1);*/
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
@@ -330,8 +323,7 @@ public class PJSipStack extends SipStack {
     public void makeCall(final String destination) {
         try {
             SipCall call = SipCall.newInstance(mAccount, -1);
-            String recipient = ("sip:" + destination + "@" + mCredentials.getHost());
-            // isSipUri(destination)
+            String recipient = isSipUri(destination) ? destination : ("sip:" + destination + "@" + mCredentials.getHost());
             call.makeCall(recipient, new CallOpParam());
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage() + "");
