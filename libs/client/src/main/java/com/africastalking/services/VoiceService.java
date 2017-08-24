@@ -174,13 +174,16 @@ public final class VoiceService extends Service implements CallController {
     public void registerCallListener(CallListener listener) {
         if (mSipStack != null) {
             mSipStack.registerCallListener(listener);
+            return;
         }
+        Log.w(TAG, "Failed to register call listener");
     }
 
     @Override
     public void unregisterCallListener(CallListener listener) {
         if (mSipStack != null) {
             mSipStack.unregisterCallListener(listener);
+            Log.w(TAG, "Unregistered call listener");
         }
     }
 

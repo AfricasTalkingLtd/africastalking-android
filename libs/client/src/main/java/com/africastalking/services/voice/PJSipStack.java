@@ -168,7 +168,7 @@ public class PJSipStack extends SipStack {
         mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
-        // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
         // tls, TODO: build pjsip with openssl
         // sipTransportConfig.setPort(credentials.getPort() + 1);
         // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, sipTransportConfig);
@@ -229,7 +229,7 @@ public class PJSipStack extends SipStack {
 
                 if (registrationListener != null) {
                     if (registered) {
-                        Log.d(TAG, "Registration Complete");
+                        Log.d(TAG, "Registration complete; Ready to make calls!");
                         registrationListener.onComplete();
                     } else {
                         Log.d(TAG, "Registration Failed");

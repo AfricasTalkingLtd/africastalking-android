@@ -62,6 +62,9 @@ public class VoiceActivity extends ServiceActivity {
         @Override
         public void onComplete() {
             Log.i("onComplete", "Registration complete!");
+
+            mService.registerCallListener(mCallListener);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -80,13 +83,14 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onError(CallInfo call, final int errorCode, final String errorMessage) {
+
+            Log.e("Error making call", errorMessage + "(" + errorCode + ")");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Toast.makeText(VoiceActivity.this, errorMessage + "(" + errorCode + ")", Toast.LENGTH_LONG).show();
                 }
             });
-            Log.e("Error making call", errorMessage + "(" + errorCode + ")");
         }
 
         @Override
@@ -144,9 +148,6 @@ public class VoiceActivity extends ServiceActivity {
 
         ButterKnife.bind(this);
         callBtn.setEnabled(false);
-
-
-
     }
 
     public void onDigit(View sender) {
@@ -180,7 +181,6 @@ public class VoiceActivity extends ServiceActivity {
                 @Override
                 public void onSuccess(VoiceService service) {
                     mService = service;
-                    mService.registerCallListener(mCallListener);
                 }
 
                 @Override
