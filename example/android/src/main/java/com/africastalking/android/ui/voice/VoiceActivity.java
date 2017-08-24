@@ -49,7 +49,7 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onStarting() {
-            Log.i("onStarting", "Registration starting... " + Thread.currentThread().getName());
+            Log.i("onStarting", "Registration starting... ");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -62,6 +62,7 @@ public class VoiceActivity extends ServiceActivity {
         @Override
         public void onComplete() {
             Log.i("onComplete", "Registration complete!");
+            Log.e("Thread", Thread.currentThread().getName());
 
             mService.registerCallListener(mCallListener);
 

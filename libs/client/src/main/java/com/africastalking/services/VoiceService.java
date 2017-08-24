@@ -11,13 +11,12 @@ import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
-import com.africastalking.proto.SdkServerServiceOuterClass;
+import com.africastalking.proto.SdkServerServiceOuterClass.*;
 import com.africastalking.services.voice.CallController;
 import com.africastalking.services.voice.CallInfo;
 import com.africastalking.services.voice.CallListener;
 import com.africastalking.services.voice.PJSipStack;
 import com.africastalking.services.voice.RegistrationListener;
-import com.africastalking.services.voice.SipStack;
 
 import io.grpc.ManagedChannel;
 import retrofit2.Response;
@@ -32,8 +31,7 @@ public final class VoiceService extends Service implements CallController {
     static VoiceService sInstance;
     private VoiceServiceInterface mVoiceAPIInterface;
 
-    private static SipStack mSipStack;
-
+    private static PJSipStack mSipStack;
 
     VoiceService() throws IOException {
         super();
@@ -59,7 +57,7 @@ public final class VoiceService extends Service implements CallController {
 
     @Override
     protected void fetchToken(String host, int port) throws IOException {
-        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.VOICE);
+        fetchServiceToken(host, port, ClientTokenRequest.Capability.VOICE);
     }
 
     @Override
@@ -78,47 +76,46 @@ public final class VoiceService extends Service implements CallController {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://voice."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
-        mVoiceAPIInterface =  retrofitBuilder.baseUrl(baseUrl).build().create(VoiceServiceInterface.class) ;
+        String baseUrl = "https://voice." + (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        mVoiceAPIInterface = retrofitBuilder.baseUrl(baseUrl).build().create(VoiceServiceInterface.class);
     }
 
     private void initSipStack(final Context context, final RegistrationListener registrationListener) {
         try {
 
-            AsyncTask<Void, Void, List<SdkServerServiceOuterClass.SipCredentials>> task = new AsyncTask<Void, Void, List<SdkServerServiceOuterClass.SipCredentials>> () {
+            AsyncTask<Void, Void, List<SipCredentials>> task = new AsyncTask<Void, Void, List<SipCredentials>>() {
 
                 @Override
-                protected void onPostExecute(List<SdkServerServiceOuterClass.SipCredentials> sipCredentials) {
+                protected void onPostExecute(List<SipCredentials> sipCredentials) {
                     if (sipCredentials != null && sipCredentials.size() > 0) {
 
                         Log.d(TAG, "Initializing PJSIP...");
 
                         // TODO: Find a way to select credentials in case of many
-                        SdkServerServiceOuterClass.SipCredentials credentials = sipCredentials.get(0);
+                        final SipCredentials credentials = sipCredentials.get(0);
 
                         try {
                             mSipStack = PJSipStack.newInstance(context, registrationListener, credentials);
                         } catch (Exception e) {
-                            Log.e(TAG, e.getMessage() + "");
-                            e.printStackTrace();
+                            registrationListener.onError(e);
                         }
+
                     } else {
-                        Log.e(TAG, "Invalid SIP Credentials");
+                        registrationListener.onError(new Exception("Invalid SIP Credentials"));
                     }
 
                 }
 
                 @Override
-                protected List<SdkServerServiceOuterClass.SipCredentials> doInBackground(Void[] objects) {
+                protected List<SipCredentials> doInBackground(Void[] objects) {
                     try {
                         Log.d(TAG, "Fetching SIP credentials");
                         ManagedChannel channel = com.africastalking.services.Service.getChannel(HOST, PORT);
                         SdkServerServiceGrpc.SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
-                        SdkServerServiceOuterClass.SipCredentialsRequest req = SdkServerServiceOuterClass.SipCredentialsRequest.newBuilder().build();
+                        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
                         return stub.getSipCredentials(req).getCredentialsList();
                     } catch (Exception ex) {
                         Log.e(TAG, ex.getMessage() + "");
-                        ex.printStackTrace();
                     }
                     return null;
                 }
@@ -133,14 +130,16 @@ public final class VoiceService extends Service implements CallController {
 
     @Override
     public void destroyService() {
-        mSipStack.destroy();
+        if (mSipStack != null) {
+            mSipStack.destroy();
+        }
         sInstance = null;
     }
 
 
-
     /**
      * Upload media file. This media file will be played when called upon by one of our mVoiceAPIInterface actions.
+     *
      * @param url
      * @return
      * @throws IOException
@@ -156,6 +155,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Get queue status
+     *
      * @param phoneNumbers
      * @return
      * @throws IOException
@@ -189,6 +189,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Start a call
+     *
      * @param destination
      * @throws AfricasTalkingException
      */
@@ -203,6 +204,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Pick up an incoming call
+     *
      * @throws AfricasTalkingException
      */
     @Override
@@ -225,6 +227,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Set call in speaker or ear-peace mode
+     *
      * @param speaker
      */
     @Override
@@ -236,6 +239,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Hold call
+     *
      * @throws AfricasTalkingException
      */
     @Override
@@ -254,6 +258,7 @@ public final class VoiceService extends Service implements CallController {
 
     /**
      * Resume a held call
+     *
      * @throws AfricasTalkingException
      */
     @Override

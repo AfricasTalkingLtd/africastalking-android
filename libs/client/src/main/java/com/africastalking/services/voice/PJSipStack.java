@@ -59,6 +59,8 @@ import org.pjsip.pjsua2.pjsip_transport_type_e;
 import org.pjsip.pjsua2.pjsua2;
 import org.pjsip.pjsua2.pjsua_call_flag;
 import org.pjsip.pjsua2.pjsua_call_media_status;
+import org.pjsip.pjsua2.pjsua_state;
+import org.pjsip.pjsua2.pjsua_stun_use;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -158,8 +160,7 @@ public class PJSipStack extends SipStack {
         stunServer.add("stun.pjsip.org");
         stunServer.add("media4-angani-ke-host.africastalking.com:443");
         uaConfig.setStunServer(stunServer);
-        uaConfig.setThreadCnt(1);
-        uaConfig.setMainThreadOnly(true);
+        // uaConfig.setThreadCnt(1);
 
         sEndPoint.libInit(config);
 
@@ -168,11 +169,6 @@ public class PJSipStack extends SipStack {
         mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mSipTransportConfig);
-        // tls, TODO: build pjsip with openssl
-        // sipTransportConfig.setPort(credentials.getPort() + 1);
-        // sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TLS, sipTransportConfig);
-        // sipTransportConfig.setPort(credentials.getPort()); // reset port
 
         sEndPoint.libStart();
 
@@ -190,12 +186,26 @@ public class PJSipStack extends SipStack {
         return new PJSipStack(context, registrationListener, credentials);
     }
 
+    public void libRegisterThread(String threadName) throws Exception {
+        if (sEndPoint != null && sEndPoint.libGetState() == pjsua_state.PJSUA_STATE_RUNNING) {
+            sEndPoint.libRegisterThread(threadName);
+        }
+        throw new Exception("Failed to register thread: " + threadName);
+    }
+
     private void loadAccount(final RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
 
         final AccountConfig accfg = new AccountConfig();
 
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
+
+
+        /*natcfg.setIceAlwaysUpdate(true);
+        natcfg.setSipStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
+        natcfg.setMediaStunUse(pjsua_stun_use.PJSUA_STUN_RETRY_ON_FAILURE);
+        natcfg.setContactRewriteUse(1);
+        natcfg.setSdpNatRewriteUse(1);*/
 
         accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
         accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
@@ -395,8 +405,10 @@ public class PJSipStack extends SipStack {
                 CallSendRequestParam prm = new CallSendRequestParam();
                 prm.setMethod("INFO");
                 SipTxOption txo = new SipTxOption();
-                txo.setContentType(" application/dtmf-relay");
-                txo.setMsgBody("Signal=" + character + "\n" + "Duration=160");
+                /*txo.setContentType("application/dtmf-relay");
+                txo.setMsgBody("Signal=" + character + "\n" + "Duration=160");*/
+                txo.setContentType("application/dtmf");
+                txo.setMsgBody(String.valueOf(character));
                 prm.setTxOption(txo);
                 call.sendRequest(prm);
             } catch (Exception e) {
