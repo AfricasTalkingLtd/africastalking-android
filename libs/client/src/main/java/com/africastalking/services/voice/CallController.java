@@ -3,6 +3,7 @@ package com.africastalking.services.voice;
 import android.content.Context;
 
 import com.africastalking.AfricasTalkingException;
+import com.africastalking.Logger;
 
 /**
  * Copyright (c) 2017 Salama AB
@@ -19,6 +20,9 @@ public interface CallController {
 
     void registerCallListener(CallListener listener);
     void unregisterCallListener(CallListener listener);
+
+    void registerLogger(Logger logger);
+    void unregisterLogger(Logger logger);
 
     void makeCall(String destination) throws AfricasTalkingException;
     void pickCall() throws AfricasTalkingException;

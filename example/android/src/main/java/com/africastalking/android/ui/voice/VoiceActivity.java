@@ -2,8 +2,6 @@ package com.africastalking.android.ui.voice;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -11,6 +9,7 @@ import android.widget.Toast;
 import com.africastalking.AfricasTalking;
 import com.africastalking.Callback;
 import com.africastalking.Environment;
+import com.africastalking.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.ServiceActivity;
@@ -22,11 +21,11 @@ import com.africastalking.services.voice.RegistrationListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 public class VoiceActivity extends ServiceActivity {
 
     private VoiceService mService;
-
 
     @BindView(R.id.dialButton)
     Button callBtn;
@@ -34,10 +33,17 @@ public class VoiceActivity extends ServiceActivity {
     @BindView(R.id.phone_number)
     EditText display;
 
+    private Logger mLogger = new Logger() {
+        @Override
+        public void log(String message, Object... args) {
+            Timber.d(message, args);
+        }
+    };
+
     private RegistrationListener mRegListener = new RegistrationListener() {
         @Override
         public void onError(Throwable error) {
-            Log.e("onError", error.getMessage() + "");
+            Timber.e("Registration Error: " + error.getMessage());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -49,7 +55,7 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onStarting() {
-            Log.i("onStarting", "Registration starting... ");
+            Timber.i("(re)Starting Registration...");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -61,10 +67,10 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onComplete() {
-            Log.i("onComplete", "Registration complete!");
-            Log.e("Thread", Thread.currentThread().getName());
+            Timber.i("(re)Starting Complete!");
 
             mService.registerCallListener(mCallListener);
+            mService.registerLogger(mLogger);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -79,13 +85,14 @@ public class VoiceActivity extends ServiceActivity {
     private CallListener mCallListener = new CallListener() {
         @Override
         public void onCallBusy(CallInfo call) {
-            Log.e("Callee Busy", call.getDisplayName());
+            Timber.w("Callee Busy: " + call.getDisplayName());
         }
 
         @Override
         public void onError(CallInfo call, final int errorCode, final String errorMessage) {
 
-            Log.e("Error making call", errorMessage + "(" + errorCode + ")");
+            Timber.e("Call Error(" + errorCode + "): " + errorMessage);
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -96,6 +103,7 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onRinging(final CallInfo callInfo) {
+            Timber.i("Ringing: " + callInfo.getDisplayName());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -106,7 +114,7 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onRingingBack(final CallInfo call) {
-            Log.e("Ringing", "Ring back");
+            Timber.i("Ring Back: " + call.getDisplayName());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -117,7 +125,7 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onCallEstablished(CallInfo call) {
-            Log.e("Starting call", call.getRemoteUri());
+            Timber.i("Starting call: " + call.getDisplayName());
 
             mService.startAudio();
             mService.setSpeakerMode(VoiceActivity.this, false);
@@ -130,12 +138,12 @@ public class VoiceActivity extends ServiceActivity {
 
         @Override
         public void onCallEnded(CallInfo call) {
-            Log.e("Call Ended", "");
+            Timber.w("Call Ended: " + call.getDisplayName());
         }
 
         @Override
         public void onIncomingCall(CallInfo callInfo) {
-            Log.i("onIncomingCall", callInfo.getDisplayName() + " is calling...");
+            Timber.i("onIncomingCall: " + callInfo.getDisplayName());
             Intent i = new Intent(VoiceActivity.this, InCallActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
@@ -149,30 +157,9 @@ public class VoiceActivity extends ServiceActivity {
 
         ButterKnife.bind(this);
         callBtn.setEnabled(false);
-    }
 
-    public void onDigit(View sender) {
-        display.setText(display.getText().toString() + ((Button)sender).getText());
-    }
-
-    @OnClick(R.id.dialButton)
-    public void makeCall() {
         try {
-            if (mService == null) {
-                return;
-            }
-
-            mService.makeCall(display.getText().toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void onPJSip(View view) {
-        try {
-            view.setEnabled(false);
-            Toast.makeText(VoiceActivity.this, "Setting up PJSIP", Toast.LENGTH_SHORT).show();
+            Timber.i("Setting up pjsip....");
             AfricasTalking.initialize(
                     BuildConfig.RPC_USERNAME,
                     BuildConfig.RPC_HOST,
@@ -186,11 +173,26 @@ public class VoiceActivity extends ServiceActivity {
 
                 @Override
                 public void onFailure(Throwable throwable) {
-                    Toast.makeText(VoiceActivity.this, throwable.getMessage() + "", Toast.LENGTH_LONG).show();
+                    Timber.e(throwable.getMessage());
                 }
             });
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Timber.e(ex.getMessage());
+        }
+
+    }
+
+    @OnClick(R.id.dialButton)
+    public void makeCall() {
+        try {
+            if (mService == null) {
+                return;
+            }
+            String number = display.getText().toString();
+            Timber.i("Dialing " + number);
+            mService.makeCall(number);
+        } catch (Exception e) {
+            Timber.e(e.getMessage());
         }
     }
 
@@ -198,6 +200,7 @@ public class VoiceActivity extends ServiceActivity {
     protected void onDestroy() {
         if (mService != null) {
             mService.unregisterCallListener(mCallListener);
+            mService.unregisterLogger(mLogger);
             mService.destroyService();
         }
         super.onDestroy();

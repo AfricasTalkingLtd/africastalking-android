@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="15dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="0.3"
+        android:orientation="vertical"
+        android:layout_margin="15dp">
 
         <EditText
             android:id="@+id/phone_number"
@@ -20,146 +21,11 @@
             android:focusableInTouchMode="true"
             android:freezesText="true"
             android:gravity="center"
-            android:hint="xxx-xxx-xxx"
+            android:hint="@string/xxx_xxx_xxx"
+            android:inputType="phone"
             android:maxLines="1"
             android:scrollHorizontally="true"
-            android:textSize="33sp"></EditText>
-
-        <LinearLayout
-            android:id="@+id/linearLayout1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dip">
-
-            <Button
-                android:id="@+id/one"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="1" />
-
-            <Button
-                android:id="@+id/two"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="2" />
-
-            <Button
-                android:id="@+id/three"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="3" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dip">
-
-            <Button
-                android:id="@+id/four"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="4" />
-
-            <Button
-                android:id="@+id/five"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="5" />
-
-            <Button
-                android:id="@+id/six"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="6" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dip">
-
-            <Button
-                android:id="@+id/seven"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="7" />
-
-            <Button
-                android:id="@+id/eight"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="8" />
-
-            <Button
-                android:id="@+id/nine"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="9" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout4"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dip">
-
-            <Button
-                android:id="@+id/asterisk"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="*" />
-
-            <Button
-                android:id="@+id/zero"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="0" />
-
-            <Button
-                android:id="@+id/hash"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onDigit"
-                android:text="#" />
-        </LinearLayout>
+            android:textSize="33sp" />
 
         <LinearLayout
             android:id="@+id/linearLayout5"
@@ -182,33 +48,12 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dip"
-            android:layout_marginTop="10dip"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="PJSUA"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:onClick="onPJSip"
-                android:text="Initialize" />
-
-        </LinearLayout>
     </LinearLayout>
-</ScrollView>
+
+    <com.jraska.console.Console
+        android:id="@+id/console"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7"/>
+
+</LinearLayout>

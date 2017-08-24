@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.BuildConfig;
+import com.africastalking.Logger;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.JobManager;
@@ -92,6 +93,12 @@ public class PJSipStack extends SipStack {
     private TransportConfig mSipTransportConfig = null;
 
     private JobManager mJobManager;
+    private Logger mLogger = new Logger() {
+        @Override
+        public void log(String message, Object... args) {
+            Log.d(TAG, String.format(message, args));
+        }
+    };
     private LogWriter mLogWriter;
 
 
@@ -309,6 +316,27 @@ public class PJSipStack extends SipStack {
     }
 
     @Override
+    public void registerLogger(Logger logger) {
+        mLogger = logger;
+        if (mSipStack != null) {
+            mSipStack.registerLogger(mLogger);
+        }
+    }
+
+    @Override
+    public void unregisterLogger(Logger logger) {
+        mLogger = new Logger() {
+            @Override
+            public void log(String message, Object... args) {
+                Log.d(TAG, String.format(message, args));
+            }
+        };
+        if (mSipStack != null) {
+            mSipStack.unregisterLogger(mLogger);
+        }
+    }
+
+    @Override
     public void registerCallListener(CallListener listener) {
         mCallListeners.add(listener);
     }
@@ -500,7 +528,9 @@ public class PJSipStack extends SipStack {
                 try {
                     callInfo = makeCallInfo(pjcallInfo);
                     code = pjcallInfo.getLastStatusCode();
-                } catch (Exception ex) { }
+                } catch (Exception ex) {
+                    Log.w(TAG, ex.getMessage() + "");
+                }
 
                 if(callState == pjsip_inv_state.PJSIP_INV_STATE_CALLING) {
 

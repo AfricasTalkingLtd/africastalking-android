@@ -9,6 +9,7 @@ import android.util.Log;
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.Callback;
 import com.africastalking.Environment;
+import com.africastalking.Logger;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;
@@ -32,6 +33,13 @@ public final class VoiceService extends Service implements CallController {
     private VoiceServiceInterface mVoiceAPIInterface;
 
     private static PJSipStack mSipStack;
+
+    private Logger mLogger = new Logger() {
+        @Override
+        public void log(String message, Object... args) {
+            Log.d(TAG, String.format(message, args));
+        }
+    };
 
     VoiceService() throws IOException {
         super();
@@ -169,6 +177,27 @@ public final class VoiceService extends Service implements CallController {
         mVoiceAPIInterface.queueStatus(USERNAME, phoneNumbers).enqueue(makeCallback(callback));
     }
 
+
+    @Override
+    public void registerLogger(Logger logger) {
+        mLogger = logger;
+        if (mSipStack != null) {
+            mSipStack.registerLogger(mLogger);
+        }
+    }
+
+    @Override
+    public void unregisterLogger(Logger logger) {
+        mLogger = new Logger() {
+            @Override
+            public void log(String message, Object... args) {
+                Log.d(TAG, String.format(message, args));
+            }
+        };
+        if (mSipStack != null) {
+            mSipStack.unregisterLogger(mLogger);
+        }
+    }
 
     @Override
     public void registerCallListener(CallListener listener) {
