@@ -20,7 +20,7 @@ public class SomeJavaApplication {
     public static void main(String[] args) {
     
         // Initialize the server
-        ATServer server = AfricasTalking.initialize(USERNAME, API_KEY);
+        Server server = AfricasTalking.initialize(USERNAME, API_KEY);
         
         // Add SIP credentials (Voice Only)
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);

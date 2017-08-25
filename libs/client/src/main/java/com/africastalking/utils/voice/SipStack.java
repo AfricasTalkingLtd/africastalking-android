@@ -715,9 +715,7 @@ public final class SipStack implements CallController {
         }
     }
 
-
-
-    static class LogJob extends Job {
+    private static class LogJob extends Job {
 
         String text;
         public LogJob(String text) {
