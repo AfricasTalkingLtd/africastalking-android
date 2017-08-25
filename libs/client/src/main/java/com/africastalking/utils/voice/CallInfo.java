@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * Date : 8/12/17 11:35 AM
  * Description :
  */
-public class CallInfo {
+public final class CallInfo {
 
     private final Pattern displayNameAndRemoteUriPattern = Pattern.compile("^\"([^\"]+).*?sip:(.*?)>$");
     private final Pattern remoteUriPattern = Pattern.compile("^.*?sip:(.*?)>?$");

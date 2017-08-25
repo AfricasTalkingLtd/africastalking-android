@@ -3,7 +3,7 @@ package com.africastalking.utils.voice;
 import android.content.Context;
 
 import com.africastalking.AfricasTalkingException;
-import com.africastalking.Logger;
+import com.africastalking.utils.Logger;
 
 /**
  * Copyright (c) 2017 Salama AB

@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.BuildConfig;
-import com.africastalking.Logger;
+import com.africastalking.utils.Logger;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
 import com.africastalking.utils.NetworkUtils;
 import com.birbit.android.jobqueue.Job;
@@ -77,7 +77,7 @@ import java.util.Set;
  * Date : 8/12/17 10:35 AM
  * Description :
  */
-public class SipStack implements CallController {
+public final class SipStack implements CallController {
 
     private static final String TAG = SipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;

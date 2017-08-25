@@ -1,28 +1,18 @@
 package com.africastalking.services;
 
-import android.content.Context;
-
 import com.africastalking.AfricasTalking;
-import com.africastalking.Callback;
-import com.africastalking.Environment;
-import com.africastalking.Logger;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
+import com.africastalking.utils.Logger;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.google.gson.GsonBuilder;
 
-import io.grpc.CallOptions;
-import io.grpc.Channel;
-import io.grpc.ClientCall;
-import io.grpc.ClientInterceptor;
-import io.grpc.ForwardingClientCall;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.africastalking.proto.SdkServerServiceGrpc.*;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;
 
-import org.pjsip.pjsua2.Account;
-
 import io.grpc.Metadata;
-import io.grpc.MethodDescriptor;
 import io.grpc.stub.MetadataUtils;
 import okhttp3.*;
 import okhttp3.Response;

@@ -22,7 +22,7 @@ import com.jraska.console.timber.ConsoleTree;
 public class MainActivity extends AppCompatActivity {
 
     static {
-        AfricasTalking.setClientId("salama");
+        AfricasTalking.setClientId("zFTF4GTJS6n3bryppQRXP7zg"); // or some cookie or some token received after login?
         Timber.plant(new ConsoleTree.Builder().build());
     }
 

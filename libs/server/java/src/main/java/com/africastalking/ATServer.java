@@ -21,19 +21,22 @@ public final class ATServer {
     private static int DEFAULT_PORT = 35897;
 
     private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", ASCII_STRING_MARSHALLER);
-    static final Context.Key<String> CLIENT_ID_CONTEXT_KEY = Context.key("X-Client-Id");
+    private static final Context.Key<String> CLIENT_ID_CONTEXT_KEY = Context.key("X-Client-Id");
 
 
     private Server mGrpc;
     private SdkServerService mSdkService;
     private Authenticator mAuthenticator = null;
+
     ATServer(String username, String apiKey, String environment) {
         mSdkService = new SdkServerService(username, apiKey, environment);
     }
+
     ATServer(String username, String apiKey, String environment, Authenticator authenticator) {
         this(username, apiKey, environment);
         mAuthenticator = authenticator;
     }
+
     public void addSipCredentials(String username, String password, String host, int port, String transport) {
         mSdkService.addSipCredentials(username, password, host, port, transport);
     }
@@ -74,8 +77,8 @@ public final class ATServer {
         startInsecure(DEFAULT_PORT);
     }
 
-    static class AuthenticationInterceptor implements ServerInterceptor {
-        static final Listener NOOP_LISTENER = new Listener() {};
+    private class AuthenticationInterceptor implements ServerInterceptor {
+        final Listener NOOP_LISTENER = new Listener() {};
         
         Authenticator authenticator;
 

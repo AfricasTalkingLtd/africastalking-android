@@ -1,8 +1,8 @@
 package com.africastalking.services;
 
 
-import com.africastalking.Callback;
-import com.africastalking.Environment;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
 import com.africastalking.models.AccountResponse;
 
 import com.africastalking.proto.SdkServerServiceOuterClass;

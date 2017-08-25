@@ -7,9 +7,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
-import com.africastalking.Callback;
-import com.africastalking.Environment;
-import com.africastalking.Logger;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
+import com.africastalking.utils.Logger;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;

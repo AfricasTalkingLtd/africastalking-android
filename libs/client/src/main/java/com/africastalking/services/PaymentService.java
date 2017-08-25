@@ -1,7 +1,7 @@
 package com.africastalking.services;
 
-import com.africastalking.Callback;
-import com.africastalking.Environment;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
 import com.africastalking.models.B2BResponse;
 import com.africastalking.models.B2CResponse;
 import com.africastalking.models.Business;

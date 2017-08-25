@@ -3,8 +3,7 @@ package com.africastalking;
 public abstract class AfricasTalking {
 
   public static ATServer initialize(String username, String apiKey, String environment, Authenticator authenticator) {
-    ATServer server = new ATServer(username, apiKey, environment, authenticator);
-    return server;
+    return new ATServer(username, apiKey, environment, authenticator);
   }
 
   public static ATServer initialize(String username, String apiKey, String environment) {

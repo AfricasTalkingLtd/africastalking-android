@@ -2,8 +2,8 @@ package com.africastalking.services;
 
 import android.text.TextUtils;
 
-import com.africastalking.Callback;
-import com.africastalking.Environment;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
 import com.africastalking.models.FetchMessageResponse;
 import com.africastalking.models.SendMessageResponse;
 import com.africastalking.models.SubscriptionResponse;

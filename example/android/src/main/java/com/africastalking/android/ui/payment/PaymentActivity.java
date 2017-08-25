@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.Environment;
-import com.africastalking.Logger;
+import com.africastalking.utils.Environment;
+import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;

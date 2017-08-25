@@ -30,12 +30,18 @@ public class App {
     private static final int RPC_PORT = 35897;
     private static final String USERNAME = "sandbox";
     private static final String API_KEY = "3cb2185af3e13541cfc38047b463a39e2a255b9ca9e781e9d923ec668a21a07f";
-    private static final String SIP_USERNAME = "android";
-    private static final String SIP_PASSWORD = "salama";
-    private static final String SIP_HOST = "192.168.0.24";
+    private static final String SIP_USERNAME = "test.aksalj";
+    private static final String SIP_PASSWORD = "DOPx_9bf185d689";
+    private static final String SIP_HOST = "ke.sip.africastalking.com";
     private static final int SIP_PORT = 5060;
     private static final String SIP_TRANSPORT = "udp";
-    final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
+    private final static List<String> ALLOWED_CLIENTS = Arrays.asList(
+            "zFTF4GTJS6n3bryppQRXP7zg", // e.g. generated when a user logs into my application
+            "2k3KuYSdhsjSAJeQPMCz5kcG",
+            "mvyXTQ8sVChSryf3nRdn4EWh",
+            "fZgVEQNXB55Mt4VAAe3ExKRk",
+            "rsZBpDQSWfAHJHwkABbgH8cx"
+    );
 
 
     static ATServer server;
@@ -88,10 +94,9 @@ public class App {
 
     private static void setupAfricastalking() throws IOException {
         server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox", new Authenticator() {
-            List<String> allowedClients = Arrays.asList("salama", "jay");
             @Override
             public boolean authenticate(String client) {
-                return allowedClients.contains(client);
+                return ALLOWED_CLIENTS.contains(client);
             }
         });
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);

@@ -1,4 +1,4 @@
-package com.africastalking;
+package com.africastalking.utils;
 
 
 /**
