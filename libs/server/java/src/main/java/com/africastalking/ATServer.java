@@ -87,7 +87,7 @@ public final class ATServer {
         public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
             String clientId = headers.get(CLIENT_ID_HEADER_KEY);
             if (clientId == null || !authenticator.authenticate(clientId)) {
-                call.close(Status.UNAUTHENTICATED.withDescription("Invalid or unknown client"), headers);
+                call.close(Status.UNAUTHENTICATED.withDescription("Invalid or unknown client: " + clientId), headers);
                 return NOOP_LISTENER;
             }
             Context context = Context.current().withValue(CLIENT_ID_CONTEXT_KEY, clientId);

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.RelativeLayout;
 
+import com.africastalking.AfricasTalking;
 import com.africastalking.android.R;
 
 import butterknife.BindView;
@@ -21,6 +22,7 @@ import com.jraska.console.timber.ConsoleTree;
 public class MainActivity extends AppCompatActivity {
 
     static {
+        AfricasTalking.setClientId("salama");
         Timber.plant(new ConsoleTree.Builder().build());
     }
 

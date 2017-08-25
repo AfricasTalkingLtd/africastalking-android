@@ -12,18 +12,18 @@ import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
-import com.africastalking.android.ui.ServiceActivity;
+import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.services.VoiceService;
-import com.africastalking.services.voice.CallInfo;
-import com.africastalking.services.voice.CallListener;
-import com.africastalking.services.voice.RegistrationListener;
+import com.africastalking.utils.voice.CallInfo;
+import com.africastalking.utils.voice.CallListener;
+import com.africastalking.utils.voice.RegistrationListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-public class VoiceActivity extends ServiceActivity {
+public class VoiceActivity extends BaseActivity {
 
     private VoiceService mService;
 

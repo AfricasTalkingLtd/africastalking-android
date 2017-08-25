@@ -10,7 +10,7 @@ import com.africastalking.services.PaymentService;
 import com.africastalking.services.Service;
 import com.africastalking.services.SmsService;
 import com.africastalking.services.VoiceService;
-import com.africastalking.services.voice.RegistrationListener;
+import com.africastalking.utils.voice.RegistrationListener;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -27,6 +27,8 @@ import java.util.List;
 public final class AfricasTalking {
 
     private static final String TAG = AfricasTalking.class.getName();
+
+    private static String sClientId = null;
 
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
@@ -52,6 +54,14 @@ public final class AfricasTalking {
 
     public static void initialize(String username, String host) throws IOException {
         initialize(username, host, Service.PORT, Environment.PRODUCTION);
+    }
+
+    public static void setClientId(String clientId) {
+        sClientId = clientId;
+    }
+
+    public static String getClientId() {
+        return sClientId;
     }
 
     public static void setEnvironment(Environment env) {

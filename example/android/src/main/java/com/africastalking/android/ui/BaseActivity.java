@@ -16,7 +16,7 @@ import android.view.MenuItem;
  * Date : 8/18/17 9:16 AM
  * Description :
  */
-public class ServiceActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity {
 
 
     @Override

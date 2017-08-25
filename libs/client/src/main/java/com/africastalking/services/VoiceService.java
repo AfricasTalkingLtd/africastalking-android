@@ -12,12 +12,13 @@ import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
+import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;
-import com.africastalking.services.voice.CallController;
-import com.africastalking.services.voice.CallInfo;
-import com.africastalking.services.voice.CallListener;
-import com.africastalking.services.voice.PJSipStack;
-import com.africastalking.services.voice.RegistrationListener;
+import com.africastalking.utils.voice.CallController;
+import com.africastalking.utils.voice.CallInfo;
+import com.africastalking.utils.voice.CallListener;
+import com.africastalking.utils.voice.SipStack;
+import com.africastalking.utils.voice.RegistrationListener;
 
 import io.grpc.ManagedChannel;
 import retrofit2.Response;
@@ -32,7 +33,7 @@ public final class VoiceService extends Service implements CallController {
     static VoiceService sInstance;
     private VoiceServiceInterface mVoiceAPIInterface;
 
-    private static PJSipStack mSipStack;
+    private static SipStack mSipStack;
 
     private Logger mLogger = new Logger() {
         @Override
@@ -103,7 +104,7 @@ public final class VoiceService extends Service implements CallController {
                         final SipCredentials credentials = sipCredentials.get(0);
 
                         try {
-                            mSipStack = PJSipStack.newInstance(context, registrationListener, credentials);
+                            mSipStack = SipStack.newInstance(context, registrationListener, credentials);
                         } catch (Exception e) {
                             registrationListener.onError(e);
                         }
@@ -119,7 +120,7 @@ public final class VoiceService extends Service implements CallController {
                     try {
                         Log.d(TAG, "Fetching SIP credentials");
                         ManagedChannel channel = com.africastalking.services.Service.getChannel(HOST, PORT);
-                        SdkServerServiceGrpc.SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+                        SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
                         SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
                         return stub.getSipCredentials(req).getCredentialsList();
                     } catch (Exception ex) {

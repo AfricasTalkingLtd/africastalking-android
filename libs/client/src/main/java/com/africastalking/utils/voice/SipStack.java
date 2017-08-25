@@ -1,4 +1,4 @@
-package com.africastalking.services.voice;
+package com.africastalking.utils.voice;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,7 @@ import com.africastalking.AfricasTalkingException;
 import com.africastalking.BuildConfig;
 import com.africastalking.Logger;
 import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentials;
+import com.africastalking.utils.NetworkUtils;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.Params;
@@ -76,20 +77,22 @@ import java.util.Set;
  * Date : 8/12/17 10:35 AM
  * Description :
  */
-public class PJSipStack extends SipStack {
+public class SipStack implements CallController {
 
-    private static final String TAG = PJSipStack.class.getName();
+    private static final String TAG = SipStack.class.getName();
     private static final String AGENT_NAME = "Africa's Talking/" + BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE ;
     private static final String PJSUA_LIBRARY = "pjsua2";
     private static final int LOG_LEVEL = 3;
 
-    private static PJSipStack sInstance = null;
+    private static SipStack sInstance = null;
 
     private static Set<CallListener> mCallListeners = new HashSet<>();
 
     private static Endpoint sEndPoint = null;
 
+    private boolean mSipReady = false;
     private Account mAccount = null;
+    private SipCredentials mCredentials = null;
     private TransportConfig mSipTransportConfig = null;
 
     private JobManager mJobManager;
@@ -102,9 +105,7 @@ public class PJSipStack extends SipStack {
         }
     };
 
-    PJSipStack(Context context, final RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
-        super(credentials);
-
+    SipStack(Context context, final RegistrationListener registrationListener, final SipCredentials credentials) throws Exception {
         System.loadLibrary(PJSUA_LIBRARY);
 
         // Register
@@ -183,12 +184,12 @@ public class PJSipStack extends SipStack {
         sInstance = this;
     }
 
-    public static PJSipStack newInstance(Context context, RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
+    public static SipStack newInstance(Context context, RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
         if (sInstance != null && sInstance.isReady()) {
             sInstance.loadAccount(registrationListener, credentials);
             return sInstance;
         }
-        return new PJSipStack(context, registrationListener, credentials);
+        return new SipStack(context, registrationListener, credentials);
     }
 
     public void libRegisterThread(String threadName) throws Exception {
@@ -200,16 +201,19 @@ public class PJSipStack extends SipStack {
 
     private void loadAccount(final RegistrationListener registrationListener, SipCredentials credentials) throws Exception {
 
+        // Credentials
+        mCredentials = credentials;
+
         final AccountConfig accfg = new AccountConfig();
 
         AccountNatConfig natcfg = accfg.getNatConfig();
         natcfg.setIceEnabled(true);
         natcfg.setIceAlwaysUpdate(true);
 
-        accfg.setIdUri("sip:" + credentials.getUsername() + "@" + credentials.getHost());
-        accfg.getRegConfig().setRegistrarUri("sip:" + credentials.getHost() + ":" +credentials.getPort());
+        accfg.setIdUri("sip:" + mCredentials.getUsername() + "@" + mCredentials.getHost());
+        accfg.getRegConfig().setRegistrarUri("sip:" + mCredentials.getHost() + ":" + mCredentials.getPort());
 
-        AuthCredInfo credInfo = new AuthCredInfo("digest", "*", credentials.getUsername(), 0, credentials.getPassword());
+        AuthCredInfo credInfo = new AuthCredInfo("digest", "*", mCredentials.getUsername(), 0, mCredentials.getPassword());
         accfg.getSipConfig().getAuthCreds().add(credInfo);
 
         if (mAccount != null) {
@@ -301,7 +305,14 @@ public class PJSipStack extends SipStack {
         mAccount.create(accfg);
     }
 
-    @Override
+    public boolean isReady() {
+        return mSipReady;
+    }
+
+    void setReady(boolean isReady) {
+        mSipReady = isReady;
+    }
+
     public void destroy() {
         try {
             if (mAccount != null) {
@@ -344,7 +355,7 @@ public class PJSipStack extends SipStack {
     public void makeCall(final String destination) {
         try {
             SipCall call = SipCall.newInstance(mAccount, -1);
-            String recipient = isSipUri(destination) ? destination : ("sip:" + destination + "@" + mCredentials.getHost());
+            String recipient = NetworkUtils.isSipUri(destination) ? destination : ("sip:" + destination + "@" + mCredentials.getHost());
             call.makeCall(recipient, new CallOpParam());
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage() + "");

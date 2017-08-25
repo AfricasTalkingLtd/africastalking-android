@@ -1,7 +1,6 @@
 package com.africastalking.android.ui.sms;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
@@ -9,16 +8,13 @@ import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
-import com.africastalking.android.ui.ServiceActivity;
-import com.africastalking.models.CheckoutResponse;
+import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.SendMessageResponse;
-import com.africastalking.services.PaymentService;
 import com.africastalking.services.SmsService;
-import com.jraska.console.timber.ConsoleTree;
 
 import timber.log.Timber;
 
-public class SmsActivity extends ServiceActivity {
+public class SmsActivity extends BaseActivity {
 
 
     @Override

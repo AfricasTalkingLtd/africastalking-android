@@ -1,4 +1,4 @@
-package com.africastalking.services.voice;
+package com.africastalking.utils.voice;
 
 import android.net.sip.SipAudioCall;
 

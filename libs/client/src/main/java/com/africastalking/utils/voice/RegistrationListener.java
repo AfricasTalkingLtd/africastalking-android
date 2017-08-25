@@ -1,4 +1,4 @@
-package com.africastalking.services.voice;
+package com.africastalking.utils.voice;
 
 /**
  * Copyright (c) 2017 Salama AB

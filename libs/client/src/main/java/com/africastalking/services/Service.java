@@ -2,12 +2,18 @@ package com.africastalking.services;
 
 import android.content.Context;
 
+import com.africastalking.AfricasTalking;
 import com.africastalking.Callback;
 import com.africastalking.Environment;
 import com.africastalking.Logger;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.google.gson.GsonBuilder;
 
+import io.grpc.CallOptions;
+import io.grpc.Channel;
+import io.grpc.ClientCall;
+import io.grpc.ClientInterceptor;
+import io.grpc.ForwardingClientCall;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import com.africastalking.proto.SdkServerServiceGrpc.*;
@@ -15,6 +21,9 @@ import com.africastalking.proto.SdkServerServiceOuterClass.*;
 
 import org.pjsip.pjsua2.Account;
 
+import io.grpc.Metadata;
+import io.grpc.MethodDescriptor;
+import io.grpc.stub.MetadataUtils;
 import okhttp3.*;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -24,6 +33,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 
+import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
+
 
 /**
  * A given service offered by AT API
@@ -32,6 +43,9 @@ public abstract class Service {
 
     static final String PRODUCTION_DOMAIN = "africastalking.com";
     static final String SANDBOX_DOMAIN = "sandbox.africastalking.com";
+
+
+    private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", ASCII_STRING_MARSHALLER);
 
 
     public static String USERNAME;
@@ -96,6 +110,17 @@ public abstract class Service {
         initService();
     }
 
+    SdkServerServiceBlockingStub addClientIdentification(SdkServerServiceBlockingStub stub) {
+        // Optional auth header
+        String clientId = AfricasTalking.getClientId();
+        if (clientId != null) {
+            Metadata headers = new Metadata();
+            headers.put(CLIENT_ID_HEADER_KEY, clientId);
+            stub = MetadataUtils.attachHeaders(stub, headers);
+        }
+        return stub;
+    }
+
     public static ManagedChannel getChannel(String host, int port) {
         ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder
                 .forAddress(host, port)
@@ -108,7 +133,7 @@ public abstract class Service {
         if (LOGGING) { LOGGER.log("Fetching token..."); }
 
         ManagedChannel channel = getChannel(host, port);
-        SdkServerServiceBlockingStub stub = SdkServerServiceGrpc.newBlockingStub(channel);
+        SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
         ClientTokenRequest req = ClientTokenRequest.newBuilder()
                 .setCapability(capability)
                 .setEnvironment(ENV.toString())

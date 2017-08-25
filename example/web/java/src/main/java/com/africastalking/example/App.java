@@ -5,7 +5,11 @@ import com.africastalking.AfricasTalking;
 import com.africastalking.Authenticator;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import spark.ModelAndView;
@@ -83,7 +87,13 @@ public class App {
 
 
     private static void setupAfricastalking() throws IOException {
-        server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox");
+        server = AfricasTalking.initialize(USERNAME, API_KEY, "sandbox", new Authenticator() {
+            List<String> allowedClients = Arrays.asList("salama", "jay");
+            @Override
+            public boolean authenticate(String client) {
+                return allowedClients.contains(client);
+            }
+        });
         server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);
         server.startInsecure(RPC_PORT);
 

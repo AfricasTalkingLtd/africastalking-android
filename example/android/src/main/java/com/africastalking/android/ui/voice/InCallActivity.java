@@ -11,8 +11,8 @@ import com.africastalking.AfricasTalking;
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.android.R;
 import com.africastalking.services.VoiceService;
-import com.africastalking.services.voice.CallInfo;
-import com.africastalking.services.voice.CallListener;
+import com.africastalking.utils.voice.CallInfo;
+import com.africastalking.utils.voice.CallListener;
 
 import java.io.IOException;
 import java.util.Random;

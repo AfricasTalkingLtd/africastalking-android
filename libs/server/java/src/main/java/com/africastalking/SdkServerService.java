@@ -33,11 +33,13 @@ final class SdkServerService extends SdkServerServiceImplBase {
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
         // TODO: http request to token server with mUsername and mAPIKey
+        String token = "766ec9a0969a8a994a894c26e992e3333211d37836d2488c24d3e37266643ab4";
+        long expires = System.currentTimeMillis() + 30000;
 
 
         ClientTokenResponse tokenResponse = ClientTokenResponse.newBuilder()
-                    .setToken(String.valueOf(System.currentTimeMillis()))
-                    .setExpiration(System.currentTimeMillis() + 30000)
+                    .setToken(token)
+                    .setExpiration(expires)
                     .build();
         response.onNext(tokenResponse);
         response.onCompleted();

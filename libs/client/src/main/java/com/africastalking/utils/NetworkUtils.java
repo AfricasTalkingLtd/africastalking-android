@@ -1,8 +1,6 @@
-package com.africastalking.services.voice;
+package com.africastalking.utils;
 
 import android.util.Log;
-
-import com.africastalking.proto.SdkServerServiceOuterClass;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -18,37 +16,20 @@ import java.util.regex.Pattern;
  * Website: http://www.aksalj.me
  * <p>
  * Project : dev-mvp
- * File : SipStack
- * Date : 8/12/17 10:33 AM
+ * File : NetworkUtils
+ * Date : 8/25/17 8:02 AM
  * Description :
  */
-public abstract class SipStack implements CallController {
+public abstract class NetworkUtils {
 
-    private boolean mSipReady = false;
-    protected SdkServerServiceOuterClass.SipCredentials mCredentials;
-
-    SipStack(SdkServerServiceOuterClass.SipCredentials credentials) {
-        this.mCredentials = credentials;
-    }
-
-    public boolean isReady() {
-        return mSipReady;
-    }
-
-    void setReady(boolean isReady) {
-        mSipReady = isReady;
-    }
-
-    public abstract void destroy();
-
-    static boolean isSipUri(String uri) {
+    public static boolean isSipUri(String uri) {
         String expression = "/^(sip:)?(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$/";
         Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(uri);
         return matcher.matches();
     }
 
-    static boolean isBehindNAT() {
+    public static boolean isBehindNAT() {
         String address = determineLocalIp();
         try {
             //       10.x.x.x | 192.168.x.x | 172.16.x.x .. 172.19.x.x
