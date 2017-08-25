@@ -1,6 +1,8 @@
 syntax = "proto3";
 option java_package = "com.africastalking.proto";
 
+package africastalking;
+
 message ClientTokenRequest {
 
   enum Capability {
@@ -15,6 +17,7 @@ message ClientTokenRequest {
   }
 
   Capability capability = 1;
+  string environment = 2;
 }
 
 message ClientTokenResponse {
@@ -29,6 +32,7 @@ message SipCredentials {
   int32 port = 2;
   string username = 3;
   string password = 4;
+  string transport = 5;
 }
 
 message SipCredentialsResponse {

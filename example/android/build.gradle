@@ -1,32 +1,25 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-    }
-}
-
 apply plugin: 'com.android.application'
+
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
-
-    lintOptions {
-        abortOnError false
-    }
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
-        applicationId "com.africastalking.example"
-        minSdkVersion 21
+        applicationId "com.africastalking.android"
+        minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
-        versionName rootProject.version
+        versionName "1.0"
 
-        //buildConfigField 'String', 'WEB_HOST', "\"localhost:3000\""
-        //buildConfigField 'String', 'PAYMENT_PRODUCT', "\"TestProduct\""
+        buildConfigField 'String', 'RPC_USERNAME', "\"" + properties.getProperty("rpcUsername") + "\""
+        buildConfigField 'String', 'RPC_HOST', "\"" + properties.getProperty("rpcHost") + "\""
+        buildConfigField 'int', 'RPC_PORT', properties.getProperty("rpcPort")
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
@@ -37,20 +30,27 @@ android {
     }
 }
 
-
-repositories {
-    maven {
-        url  "http://dl.bintray.com/africastalking/java"
-    }
+configurations.all {
+    resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.0'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:25.3.1'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    // Leak canary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.jakewharton:butterknife:8.7.0'
     compile 'com.jraska:console:0.4.3'
     compile 'com.jraska:console-timber-tree:0.4.3'
-    compile 'com.google.code.gson:gson:2.8.0'
-
-//    compile "com.africastalking:client:1.1.2-rc4"
+    compile project(':libs:client')
+    testCompile 'junit:junit:4.12'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
 }

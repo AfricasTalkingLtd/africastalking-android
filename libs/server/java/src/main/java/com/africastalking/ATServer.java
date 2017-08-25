@@ -21,35 +21,39 @@ public final class ATServer {
     private static int DEFAULT_PORT = 35897;
 
     private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", ASCII_STRING_MARSHALLER);
-    static final Context.Key<String> CLIENT_ID_CONTEXT_KEY = Context.key("X-Client-Id");
+    private static final Context.Key<String> CLIENT_ID_CONTEXT_KEY = Context.key("X-Client-Id");
 
 
     private Server mGrpc;
     private SdkServerService mSdkService;
     private Authenticator mAuthenticator = null;
+
     ATServer(String username, String apiKey, String environment) {
         mSdkService = new SdkServerService(username, apiKey, environment);
-
-    }
-    public void addSipCredentials(String username, String password, String host, int port) {
-        mSdkService.addSipCredentials(username, password, host, port);
     }
 
-    public void addSipCredentials(String username, String password, String host) {
-        this.addSipCredentials(username, password, host, 5060);
-    }
-
-    public void setAuthenticator(Authenticator authenticator) {
-        if (authenticator == null) throw new NullPointerException("Authenticator cannot be null");
+    ATServer(String username, String apiKey, String environment, Authenticator authenticator) {
+        this(username, apiKey, environment);
         mAuthenticator = authenticator;
     }
 
+    public void addSipCredentials(String username, String password, String host, int port, String transport) {
+        mSdkService.addSipCredentials(username, password, host, port, transport);
+    }
+
+    public void addSipCredentials(String username, String password, String host) {
+        this.addSipCredentials(username, password, host, 5060, "udp");
+    }
+
     public void start(File certChainFile, File privateKeyFile, int port) throws IOException {
-        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
-        mGrpc = ServerBuilder.forPort(port)
-                .useTransportSecurity(certChainFile, privateKeyFile)
-                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
-                .build();
+        ServerBuilder builder = ServerBuilder.forPort(port).useTransportSecurity(certChainFile, privateKeyFile);
+        if (mAuthenticator != null) {
+            builder.addService(ServerInterceptors.intercept(
+                mSdkService, new AuthenticationInterceptor(this.mAuthenticator)));
+        } else {
+            builder.addService(mSdkService);
+        }
+        mGrpc = builder.build();
         mGrpc.start();
     }
 
@@ -58,10 +62,14 @@ public final class ATServer {
     }
 
     public void startInsecure(int port) throws IOException {
-        if (mAuthenticator == null) throw new NullPointerException("call setClientVerifier() before start()");
-        mGrpc = ServerBuilder.forPort(port)
-                .addService(ServerInterceptors.intercept(mSdkService, new AuthenticationInterceptor(this.mAuthenticator)))
-                .build();
+        ServerBuilder builder = ServerBuilder.forPort(port);
+        if (mAuthenticator != null) {
+            builder.addService(ServerInterceptors.intercept(
+                mSdkService, new AuthenticationInterceptor(this.mAuthenticator)));
+        } else {
+            builder.addService(mSdkService);
+        }
+        mGrpc = builder.build();
         mGrpc.start();
     }
 
@@ -69,8 +77,8 @@ public final class ATServer {
         startInsecure(DEFAULT_PORT);
     }
 
-    static class AuthenticationInterceptor implements ServerInterceptor {
-        static final Listener NOOP_LISTENER = new Listener() {};
+    private class AuthenticationInterceptor implements ServerInterceptor {
+        final Listener NOOP_LISTENER = new Listener() {};
         
         Authenticator authenticator;
 
@@ -82,7 +90,7 @@ public final class ATServer {
         public <ReqT, RespT> Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
             String clientId = headers.get(CLIENT_ID_HEADER_KEY);
             if (clientId == null || !authenticator.authenticate(clientId)) {
-                call.close(Status.UNAUTHENTICATED.withDescription("Invalid or unknown client"), headers);
+                call.close(Status.UNAUTHENTICATED.withDescription("Invalid or unknown client: " + clientId), headers);
                 return NOOP_LISTENER;
             }
             Context context = Context.current().withValue(CLIENT_ID_CONTEXT_KEY, clientId);

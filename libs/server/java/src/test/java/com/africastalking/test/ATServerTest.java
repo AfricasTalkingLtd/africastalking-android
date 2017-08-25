@@ -48,19 +48,15 @@ public class ATServerTest {
 
     @BeforeClass
     public static void startServer() throws IOException {
-        server = AfricasTalking.initialize(Fixtures.USERNAME, Fixtures.API_KEY, "sandbox");
-        server.addSipCredentials("test", "secret", "sip://at.dev");
-        server.setAuthenticator(new Authenticator() {
+        server = AfricasTalking.initialize(Fixtures.USERNAME, Fixtures.API_KEY, "sandbox", new Authenticator() {
             @Override
             public boolean authenticate(String client) {
                 return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
             }
         });
+        server.addSipCredentials("test", "secret", "sip://at.dev");
         server.start(certFile, privateKeyFile, TEST_PORT);
         
-        // server.startInsecure(TEST_PORT);
-        // ManagedChannel ch = ManagedChannelBuilder.forAddress("localhost", TEST_PORT).usePlaintext(true).build();
-
         ManagedChannel ch = NettyChannelBuilder.forAddress("localhost", TEST_PORT)
             .sslContext(GrpcSslContexts.forClient().trustManager(certFile).build())
             .build();

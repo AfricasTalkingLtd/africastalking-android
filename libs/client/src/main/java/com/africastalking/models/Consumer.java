@@ -1,7 +1,5 @@
 package com.africastalking.models;
 
-import com.africastalking.Currency;
-
 import java.util.HashMap;
 
 public class Consumer {
@@ -26,13 +24,13 @@ public class Consumer {
     }
 
     public String phoneNumber;
-    public Currency currencyCode;
+    public String currencyCode;
     public float amount;
 
     public Reason reason = null;
     public HashMap<String, String> metadata = new HashMap<>();
 
-    public Consumer(String phoneNumber, Currency currency, float amount) {
+    public Consumer(String phoneNumber, String currency, float amount) {
         this.phoneNumber = phoneNumber;
         this.currencyCode = currency;
         this.amount = amount;

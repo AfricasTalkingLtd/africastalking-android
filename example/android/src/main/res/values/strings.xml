@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Africa\'s Talking</string>
-    <string name="phone_number">Phone number</string>
-    <string name="message">Message</string>
+    <string name="app_name">Android SDK Demo</string>
+    <string name="xxx_xxx_xxx">071–876-9882</string>
 </resources>

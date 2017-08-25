@@ -1,104 +1,161 @@
 package com.africastalking;
 
+import android.Manifest;
+import android.app.Activity;
+import android.text.TextUtils;
+
+import com.africastalking.services.AccountService;
+import com.africastalking.services.AirtimeService;
+import com.africastalking.services.PaymentService;
+import com.africastalking.services.Service;
+import com.africastalking.services.SmsService;
+import com.africastalking.services.VoiceService;
+import com.africastalking.utils.Callback;
+import com.africastalking.utils.Environment;
+import com.africastalking.utils.Logger;
+import com.africastalking.utils.voice.RegistrationListener;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+
 import java.io.IOException;
-
-import io.grpc.ManagedChannel;
-
-public final class AfricasTalking{
-
-  private static String HOST;
-  private static int PORT = 35897;
-
-  private static String tokenString;
-
-  private static AccountService account;
-  private static AirtimeService airtime;
-  private static PaymentsService payments;
-  private static SMSService sms;
-  private static Voice voice;
-  private static Token token;
-
-  private static ManagedChannel CHANNEL;
-  static Environment ENV = Environment.SANDBOX;
-  static Boolean LOGGING = false;
-  static Logger LOGGER = new BaseLogger();
-  static CallType CALLTYPE = CallType.MOCK;
+import java.util.Arrays;
+import java.util.List;
 
 
-  public static void initialize(String host){
-    HOST = host;
-    CHANNEL = null;
-    tokenString = getToken();
-  }
-  public static void initialize(String host, int port){
-    HOST = host;
-    PORT = port;
-    CHANNEL = null;
-    tokenString = getToken();
-  }
+public final class AfricasTalking {
 
-  public static ManagedChannel getChannel(){
-    if(HOST == null || PORT == -1) throw  new RuntimeException("call AfricasTalking.initialize(host, port, token) first");
-    if(CHANNEL == null){
-      // TODO
+    private static final String TAG = AfricasTalking.class.getName();
+
+    private static String sClientId = null;
+
+    private static final List<String> PERMISSION_LIST = Arrays.asList(
+            Manifest.permission.INTERNET,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS
+    );
+
+
+    public static void initialize(String username, String host, int port, Environment environment) throws IOException {
+        Service.HOST = host;
+        Service.PORT = port;
+        Service.USERNAME = username;
+        Service.ENV = environment;
     }
-    return CHANNEL;
-  }
 
-  public static SMSService getSmsService(){
-    if(sms == null){
-      sms = new SMSService();
-      return sms;
+    public static void initialize(String username, String host, int port) throws IOException {
+        initialize(username, host, port, Environment.PRODUCTION);
     }
-    return sms;
-  }
-  public static AirtimeService getAirtimeService(){
-    if(airtime == null){
-      airtime = new AirtimeService();
+
+    public static void initialize(String username, String host, Environment environment) throws IOException {
+        initialize(username, host, Service.PORT, environment);
     }
-    return airtime;
-  }
-  public static PaymentsService getPaymentsService(){
-    if(payments == null){
-      payments = new PaymentsService();
+
+    public static void initialize(String username, String host) throws IOException {
+        initialize(username, host, Service.PORT, Environment.PRODUCTION);
     }
-    return payments;
-  }
-  public static AccountService getAccount(){
-    if(account == null){
-      account = new AccountService();
+
+    public static void setClientId(String clientId) {
+        sClientId = clientId;
     }
-    return account;
-  }
 
-  protected static String getToken() {
-    if(token == null) {
-      token = new Token();
-      tokenString = token.getTokenString();
+    public static String getClientId() {
+        return sClientId;
     }
-    else{
-      //TODO check if token not expired
-      if(token.getExpiration() != 0){
 
-      }
+    public static void setEnvironment(Environment env) {
+        Service.ENV = env;
     }
-    return tokenString;
-  }
 
-
-
-  public static void setEnvironment(Environment env) {
-    ENV = env;
-  }
-
-  private static void enableLogging(boolean enable) {
-    LOGGING = enable;
-  }
-
-  public static void setLogger(Logger logger) {
-    if (logger != null) {
-      enableLogging(true);
+    private static void enableLogging(boolean enable) {
+        Service.LOGGING = enable;
     }
-    LOGGER = logger;
-  }
+
+    public static void setLogger(Logger logger) {
+        if (logger != null) {
+            enableLogging(true);
+        }
+        Service.LOGGER = logger;
+    }
+
+    public static SmsService getSmsService() throws IOException {
+        return Service.newInstance("sms");
+    }
+
+    public static AirtimeService getAirtimeService() throws IOException {
+        return Service.newInstance("airtime");
+    }
+
+    public static PaymentService getPaymentService() throws IOException {
+        return Service.newInstance("payment");
+    }
+
+    public static AccountService getAccountService() throws IOException {
+        return Service.newInstance("account");
+    }
+
+    public static VoiceService getVoiceService() throws IOException {
+        VoiceService service = VoiceService.getsInstance();
+        if (service == null){
+            throw new IOException("Voice service was not initialized; call AfircasTalking.initializeVoiceService() first");
+        }
+        return service;
+    }
+
+
+    /**
+     * Initialize voice service
+     * @param context
+     * @param registrationListener
+     * @param callback
+     * @throws Exception
+     */
+    public static void initializeVoiceService(final Activity context, final RegistrationListener registrationListener, final Callback<VoiceService> callback) throws Exception {
+
+        if (callback == null) {
+            throw new Exception("callback cannot be null");
+        }
+
+        if (registrationListener == null) {
+            throw new Exception("registrationListener cannot be null");
+        }
+
+        // Permissions
+        Dexter.withActivity(context)
+                .withPermissions(PERMISSION_LIST)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+
+                        if (!report.areAllPermissionsGranted()) {
+                            callback.onFailure(new Exception("The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST)));
+                            return;
+                        }
+
+                        try {
+                            VoiceService service = VoiceService.newInstance(context.getApplicationContext(), registrationListener);
+                            callback.onSuccess(service);
+                        } catch (IOException e) {
+                            callback.onFailure(e);
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+
+                    }
+                })
+                .withErrorListener(new PermissionRequestErrorListener() {
+                    @Override
+                    public void onError(DexterError error) {
+                        callback.onFailure(new Exception("The following permissions are required: \n" + TextUtils.join("\n", PERMISSION_LIST)));
+                    }
+                })
+                .onSameThread()
+                .check();
+    }
 }

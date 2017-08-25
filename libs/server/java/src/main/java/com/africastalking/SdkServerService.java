@@ -1,15 +1,12 @@
 package com.africastalking;
 
-import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceImplBase;
-import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenRequest;
-import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenResponse;
-import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRequest;
-import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsResponse;
+import com.africastalking.proto.SdkServerServiceGrpc.*;
 import com.africastalking.proto.SdkServerServiceOuterClass;
+import com.africastalking.proto.SdkServerServiceOuterClass.*;
+import io.grpc.stub.StreamObserver;
 
 final class SdkServerService extends SdkServerServiceImplBase {
 
@@ -28,19 +25,21 @@ final class SdkServerService extends SdkServerServiceImplBase {
         // TODO: TOKEN_HOST based on environment?
     }
 
-    void addSipCredentials(String username, String password, String host, int port) {
-        mSipCredentials.add(new SipCredentials(username, password, host, port));
+    void addSipCredentials(String username, String password, String host, int port, String transport) {
+        mSipCredentials.add(new SipCredentials(username, password, host, port, transport));
     }
 
     @Override
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
         // TODO: http request to token server with mUsername and mAPIKey
+        String token = "766ec9a0969a8a994a894c26e992e3333211d37836d2488c24d3e37266643ab4";
+        long expires = System.currentTimeMillis() + 30000;
 
 
         ClientTokenResponse tokenResponse = ClientTokenResponse.newBuilder()
-                    .setToken(String.valueOf(System.currentTimeMillis()))
-                    .setExpiration(System.currentTimeMillis() + 30000)
+                    .setToken(token)
+                    .setExpiration(expires)
                     .build();
         response.onNext(tokenResponse);
         response.onCompleted();
@@ -55,6 +54,7 @@ final class SdkServerService extends SdkServerServiceImplBase {
                 .setPort(item.port)
                 .setUsername(item.username)
                 .setPassword(item.password)
+                .setTransport(item.transport)
                 .build();
             credentials.add(cred);
         }
@@ -69,12 +69,14 @@ final class SdkServerService extends SdkServerServiceImplBase {
         public String username, password;
         public String host;
         public int port;
+        public String transport;
 
-        SipCredentials(String username, String password, String host, int port) {
+        SipCredentials(String username, String password, String host, int port, String transport) {
             this.username = username;
             this.password = password;
             this.host = host;
             this.port = port;
+            this.transport = transport;
         }
     }
 }

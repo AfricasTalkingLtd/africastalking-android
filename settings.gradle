@@ -8,6 +8,6 @@ include 'libs:server:java'
 
 /* Examples */
 Set<String> examples = new HashSet<String>()
-//examples << 'example:web'
+examples << 'example:web:java'
 examples << 'example:android'
 examples.each { eg -> include eg }
