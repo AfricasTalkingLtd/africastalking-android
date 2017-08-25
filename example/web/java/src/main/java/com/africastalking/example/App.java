@@ -4,6 +4,7 @@ import com.africastalking.ATServer;
 import com.africastalking.AfricasTalking;
 import com.africastalking.Authenticator;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;

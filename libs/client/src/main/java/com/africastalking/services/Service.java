@@ -1,30 +1,29 @@
 package com.africastalking.services;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.proto.SdkServerServiceGrpc;
+import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
+import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenRequest;
+import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenResponse;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
-import com.africastalking.proto.SdkServerServiceGrpc;
 import com.google.gson.GsonBuilder;
-
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import com.africastalking.proto.SdkServerServiceGrpc.*;
-import com.africastalking.proto.SdkServerServiceOuterClass.*;
-
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
-import okhttp3.*;
-import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.*;
-import retrofit2.Call;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 
-import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
-
+import io.grpc.ManagedChannel;
+import io.grpc.Metadata;
+import io.grpc.okhttp.OkHttpChannelBuilder;
+import io.grpc.stub.MetadataUtils;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A given service offered by AT API
@@ -35,7 +34,7 @@ public abstract class Service {
     static final String SANDBOX_DOMAIN = "sandbox.africastalking.com";
 
 
-    private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", ASCII_STRING_MARSHALLER);
+    private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", Metadata.ASCII_STRING_MARSHALLER);
 
 
     public static String USERNAME;
@@ -84,7 +83,7 @@ public abstract class Service {
 
                 Request original = chain.request();
                 Request request = original.newBuilder()
-                        .addHeader("ApiKey", token.getToken()) // FIXME: Token
+                        .addHeader("ApiKey", token.getToken()) // FIXME: Set token header
                         .addHeader("Accept", "application/json")
                         .build();
 
@@ -101,7 +100,7 @@ public abstract class Service {
     }
 
     SdkServerServiceBlockingStub addClientIdentification(SdkServerServiceBlockingStub stub) {
-        // Optional auth header
+        // Optional client id header
         String clientId = AfricasTalking.getClientId();
         if (clientId != null) {
             Metadata headers = new Metadata();
@@ -111,10 +110,10 @@ public abstract class Service {
         return stub;
     }
 
-    public static ManagedChannel getChannel(String host, int port) {
-        ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder
+    static ManagedChannel getChannel(String host, int port) {
+        OkHttpChannelBuilder channelBuilder = OkHttpChannelBuilder
                 .forAddress(host, port)
-                .usePlaintext(true); // FIXME: Remove to Setup TLS
+                .usePlaintext(true); // TODO: Remove to use TLS
         return channelBuilder.build();
     }
 
@@ -181,7 +180,6 @@ public abstract class Service {
 
         throw new IOException("Invalid service");
     }
-
 
     /**
      *

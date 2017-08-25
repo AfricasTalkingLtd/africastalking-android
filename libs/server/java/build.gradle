@@ -110,14 +110,12 @@ repositories {
 dependencies {
 
     // grpc
-    compile 'io.grpc:grpc-stub:1.4.0'
+    compile 'io.grpc:grpc-stub:1.5.0'
 
-    compile 'io.grpc:grpc-netty:1.4.0' // Server+Client
-    // compile 'io.grpc:grpc-okhttp:1.4.0' Client on Android
+    compile 'io.grpc:grpc-netty:1.5.0' // Server+Client
     compile 'io.netty:netty-tcnative-boringssl-static:2.0.3.Final'
 
-    compile 'io.grpc:grpc-protobuf:1.4.0' // Server+Client
-    // compile 'io.grpc:grpc-protobuf-lite:1.4.0' Client on Android
+    compile 'io.grpc:grpc-protobuf:1.5.0' // Server+Client
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
