@@ -14,13 +14,12 @@ import com.africastalking.proto.SdkServerServiceOuterClass.SipCredentialsRespons
 import io.grpc.Attributes;
 import io.grpc.CallCredentials;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
-import com.africastalking.ATServer;
+import com.africastalking.Server;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class ATServerTest {
     final static String TEST_CLIENT_ID = "TEST-ID-XXXX";
     static File certFile, privateKeyFile;
 
-    static ATServer server;
+    static Server server;
     static SdkServerServiceBlockingStub client;
 
     static {

@@ -1,12 +1,10 @@
 package com.africastalking.example;
 
-import com.africastalking.ATServer;
+import com.africastalking.Server;
 import com.africastalking.AfricasTalking;
 import com.africastalking.Authenticator;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +42,7 @@ public class App {
     );
 
 
-    static ATServer server;
+    static Server server;
     private static HandlebarsTemplateEngine hbs = new HandlebarsTemplateEngine("/views");
 
     public static void main(String[] args) {

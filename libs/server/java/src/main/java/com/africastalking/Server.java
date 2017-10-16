@@ -3,7 +3,6 @@ package com.africastalking;
 import io.grpc.Context;
 import io.grpc.Contexts;
 import io.grpc.Metadata;
-import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;
@@ -16,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import static io.grpc.Metadata.ASCII_STRING_MARSHALLER;
 
-public final class ATServer {
+public final class Server {
 
     private static int DEFAULT_PORT = 35897;
 
@@ -24,15 +23,15 @@ public final class ATServer {
     private static final Context.Key<String> CLIENT_ID_CONTEXT_KEY = Context.key("X-Client-Id");
 
 
-    private Server mGrpc;
+    private io.grpc.Server mGrpc;
     private SdkServerService mSdkService;
     private Authenticator mAuthenticator = null;
 
-    ATServer(String username, String apiKey, String environment) {
+    Server(String username, String apiKey, String environment) {
         mSdkService = new SdkServerService(username, apiKey, environment);
     }
 
-    ATServer(String username, String apiKey, String environment, Authenticator authenticator) {
+    Server(String username, String apiKey, String environment, Authenticator authenticator) {
         this(username, apiKey, environment);
         mAuthenticator = authenticator;
     }
