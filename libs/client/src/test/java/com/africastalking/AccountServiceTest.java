@@ -27,7 +27,7 @@ public class AccountServiceTest {
 
     @Before
     public void setUp() throws IOException {
-        AfricasTalking.initialize("sandbox", "localhost");
+        AfricasTalking.initialize("localhost");
         account = AfricasTalking.getAccountService();
     }
 

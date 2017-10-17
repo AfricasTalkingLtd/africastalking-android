@@ -92,32 +92,27 @@ protobuf {
 
 dependencies {
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
     // annotations
-    compile 'javax.annotation:javax.annotation-api:1.2'
+    implementation 'javax.annotation:javax.annotation-api:1.2'
     // compile 'com.android.support:support-annotations:25.3.1'
 
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-scalars:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
 
     // permissions
-    compile 'com.karumi:dexter:4.1.0'
+    implementation 'com.karumi:dexter:4.1.0'
 
     // grpc
-    compile 'io.grpc:grpc-stub:1.5.0'
-    compile 'io.grpc:grpc-okhttp:1.5.0'
-    compile 'io.grpc:grpc-protobuf-lite:1.5.0'
+    implementation 'io.grpc:grpc-stub:1.5.0'
+    implementation 'io.grpc:grpc-okhttp:1.5.0'
+    implementation 'io.grpc:grpc-protobuf-lite:1.5.0'
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.squareup.okhttp3:mockwebserver:3.8.1'
+    implementation 'com.birbit:android-priority-jobqueue:2.0.1'
 
-    compile 'com.birbit:android-priority-jobqueue:2.0.1'
-
-
-
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.1'
 }
 
 task sourcesJar(type: Jar) {
@@ -159,7 +154,7 @@ bintray {
         userOrg = properties.getProperty("bintray.organization")
         vcsUrl = properties.getProperty("bintray.vcsUrl")
         licenses = ['Apache-2.0']
-        labels = ['aar', 'android', 'africastalking']
+        labels = ['android', 'africastalking', 'sms', 'voice', 'ussd', 'airtime', 'payment']
     }
 }
 

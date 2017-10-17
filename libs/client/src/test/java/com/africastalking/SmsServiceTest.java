@@ -23,7 +23,7 @@ public class SmsServiceTest {
 
     @Before
     public void setup() throws IOException {
-        AfricasTalking.initialize("sandbox", "localhost");
+        AfricasTalking.initialize("localhost");
         sms = AfricasTalking.getSmsService();
     }
 

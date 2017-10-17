@@ -17,7 +17,7 @@ public class AirtimeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        AfricasTalking.initialize("sandbox", "localhost");
+        AfricasTalking.initialize("localhost");
         airtime = AfricasTalking.getAirtimeService();
 
     }

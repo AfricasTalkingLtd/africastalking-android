@@ -19,8 +19,8 @@ public class PaymentServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        AfricasTalking.initialize("sandbox", "localhost");
-        payment = AfricasTalking.getPaymentsService();
+        AfricasTalking.initialize( "localhost");
+        payment = AfricasTalking.getPaymentService();
     }
 
     @After

@@ -24,7 +24,7 @@ public class VoiceServiceTest {
 
     @Before
     public void setup() throws IOException {
-        AfricasTalking.initialize("sandbox", "localhost");
+        AfricasTalking.initialize( "localhost");
         voice = AfricasTalking.getVoiceService();
     }
 
