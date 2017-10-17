@@ -11,7 +11,6 @@ import com.africastalking.services.Service;
 import com.africastalking.services.SmsService;
 import com.africastalking.services.VoiceService;
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.africastalking.utils.voice.RegistrationListener;
 import com.karumi.dexter.Dexter;
@@ -40,23 +39,13 @@ public final class AfricasTalking {
     );
 
 
-    public static void initialize(String username, String host, int port, Environment environment) throws IOException {
+    public static void initialize(String host, int port) throws IOException {
         Service.HOST = host;
         Service.PORT = port;
-        Service.USERNAME = username;
-        Service.ENV = environment;
     }
 
-    public static void initialize(String username, String host, int port) throws IOException {
-        initialize(username, host, port, Environment.PRODUCTION);
-    }
-
-    public static void initialize(String username, String host, Environment environment) throws IOException {
-        initialize(username, host, Service.PORT, environment);
-    }
-
-    public static void initialize(String username, String host) throws IOException {
-        initialize(username, host, Service.PORT, Environment.PRODUCTION);
+    public static void initialize(String host) throws IOException {
+        initialize(host, Service.PORT);
     }
 
     public static void setClientId(String clientId) {
@@ -65,10 +54,6 @@ public final class AfricasTalking {
 
     public static String getClientId() {
         return sClientId;
-    }
-
-    public static void setEnvironment(Environment env) {
-        Service.ENV = env;
     }
 
     private static void enableLogging(boolean enable) {

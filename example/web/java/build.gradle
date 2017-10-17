@@ -19,7 +19,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 //    compile 'com.africastalking:server:1.1.2-rc4'
     compile project(":libs:server:java")
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
 }
 
 task runWebApp(type: JavaExec, dependsOn: classes){

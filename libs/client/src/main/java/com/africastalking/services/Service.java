@@ -6,7 +6,6 @@ import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStu
 import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenRequest;
 import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenResponse;
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.google.gson.GsonBuilder;
 
@@ -36,12 +35,9 @@ public abstract class Service {
 
     private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", Metadata.ASCII_STRING_MARSHALLER);
 
-
-    public static String USERNAME;
     public static String HOST;
     public static int PORT = 35897;
 
-    public static Environment ENV = Environment.PRODUCTION;
     public static Boolean LOGGING = false;
     public static Logger LOGGER = new Logger() {
         @Override
@@ -52,12 +48,13 @@ public abstract class Service {
 
 
     Retrofit.Builder retrofitBuilder;
-    private ClientTokenResponse token;
+    boolean isSandbox = false;
+    String username = null;
+    ClientTokenResponse token;
 
     Service() throws IOException {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-
 
         if (LOGGING) {
             HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
@@ -75,7 +72,7 @@ public abstract class Service {
             public Response intercept(Chain chain) throws IOException {
 
                 if (token == null || token.getExpiration() < System.currentTimeMillis()) {
-                    fetchToken(HOST, PORT);
+                    token = fetchToken(HOST, PORT);
                     if (token == null) {
                         throw new IOException("Failed to fetch token");
                     }
@@ -91,11 +88,14 @@ public abstract class Service {
             }
         });
 
-
         retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create())) // switched from ScalarsConverterFactory
                 .client(httpClient.build());
 
+        token = fetchToken(HOST, PORT);
+        isSandbox = token.getEnvironment().toLowerCase().contentEquals("sandbox");
+        username = token.getUsername();
+        
         initService();
     }
 
@@ -117,24 +117,24 @@ public abstract class Service {
         return channelBuilder.build();
     }
 
-    void fetchServiceToken(String host, int port, ClientTokenRequest.Capability capability) throws IOException {
+    ClientTokenResponse fetchToken(String host, int port) throws IOException {
 
         if (LOGGING) { LOGGER.log("Fetching token..."); }
 
         ManagedChannel channel = getChannel(host, port);
         SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
-        ClientTokenRequest req = ClientTokenRequest.newBuilder()
-                .setCapability(capability)
-                .setEnvironment(ENV.toString())
-                .build();
-        token = stub.getToken(req);
+        ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
+        ClientTokenResponse token = stub.getToken(req);
 
         if (LOGGING) {
             LOGGER.log(
-                "\n\nToken: %s\nExpires: %s\n",
+                "\n\nToken: %s\nUsername: %s\nEnvironment: %s\nExpires: %s\n\n",
                 token.getToken(),
+                token.getUsername(),
+                token.getEnvironment(),
                 String.valueOf(token.getExpiration()));
         }
+        return token;
     }
 
 
@@ -204,9 +204,6 @@ public abstract class Service {
             }
         };
     }
-
-
-    protected abstract void fetchToken(String host, int port) throws IOException;
 
     /**
      * Get an instance of a service.

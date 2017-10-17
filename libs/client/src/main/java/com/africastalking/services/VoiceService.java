@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.africastalking.models.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
@@ -65,11 +64,6 @@ public final class VoiceService extends Service implements CallController {
     }
 
     @Override
-    protected void fetchToken(String host, int port) throws IOException {
-        fetchServiceToken(host, port, ClientTokenRequest.Capability.VOICE);
-    }
-
-    @Override
     protected VoiceService getInstance() throws IOException {
         if (sInstance == null) {
             throw new IOException("VoiceService not initialized");
@@ -85,7 +79,7 @@ public final class VoiceService extends Service implements CallController {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://voice." + (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        String baseUrl = "https://voice." + (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         mVoiceAPIInterface = retrofitBuilder.baseUrl(baseUrl).build().create(VoiceServiceInterface.class);
     }
 
@@ -154,12 +148,12 @@ public final class VoiceService extends Service implements CallController {
      * @throws IOException
      */
     public String mediaUpload(String url) throws IOException {
-        Response<String> response = mVoiceAPIInterface.mediaUpload(USERNAME, url).execute();
+        Response<String> response = mVoiceAPIInterface.mediaUpload(username, url).execute();
         return response.body();
     }
 
     public void mediaUpload(String url, Callback<String> callback) {
-        mVoiceAPIInterface.mediaUpload(USERNAME, url).enqueue(makeCallback(callback));
+        mVoiceAPIInterface.mediaUpload(username, url).enqueue(makeCallback(callback));
     }
 
     /**
@@ -170,12 +164,12 @@ public final class VoiceService extends Service implements CallController {
      * @throws IOException
      */
     public List<QueueStatus> queueStatus(String phoneNumbers) throws IOException {
-        Response<List<QueueStatus>> response = mVoiceAPIInterface.queueStatus(USERNAME, phoneNumbers).execute();
+        Response<List<QueueStatus>> response = mVoiceAPIInterface.queueStatus(username, phoneNumbers).execute();
         return response.body();
     }
 
     public void queueStatus(String phoneNumbers, Callback<List<QueueStatus>> callback) {
-        mVoiceAPIInterface.queueStatus(USERNAME, phoneNumbers).enqueue(makeCallback(callback));
+        mVoiceAPIInterface.queueStatus(username, phoneNumbers).enqueue(makeCallback(callback));
     }
 
 

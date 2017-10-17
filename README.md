@@ -44,7 +44,7 @@ public class SomeActivity extends Activity {
         
         try {
             // Init SDK
-            AfricasTalking.initialize(USERNAME, SERVER_HOSTNAME);
+            AfricasTalking.initialize(SERVER_HOSTNAME);
 
             // Get Service
             AirtimeService airtime = AfricasTalking.getAirtimeService();

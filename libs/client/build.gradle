@@ -8,10 +8,11 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0-rc1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
@@ -23,12 +24,12 @@ group properties.getProperty("bintray.groupId")
 version properties.getProperty("bintray.version")
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName version
         multiDexEnabled true
@@ -110,7 +111,7 @@ dependencies {
     compile 'io.grpc:grpc-okhttp:1.5.0'
     compile 'io.grpc:grpc-protobuf-lite:1.5.0'
 
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
     testCompile 'com.squareup.okhttp3:mockwebserver:3.8.1'
 
     compile 'com.birbit:android-priority-jobqueue:2.0.1'
@@ -195,4 +196,8 @@ install {
             }
         }
     }
+}
+
+repositories {
+    google()
 }

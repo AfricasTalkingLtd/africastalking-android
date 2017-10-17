@@ -10,36 +10,38 @@ import io.grpc.stub.StreamObserver;
 
 final class SdkServerService extends SdkServerServiceImplBase {
 
-    private static String TOKEN_HOST = "https://api.africastalking.com";
+    private static String TOKEN_HOST;
 
-    private ArrayList<SipCredentials> mSipCredentials = new ArrayList<>();
+    private ArrayList<SipCredentials> credentialsList = new ArrayList<>();
 
-    private String mUsername, mAPIKey;
-    private String mEnvironment;
+    private String username, apiKey;
+    private boolean isSandbox = false;
 
-    SdkServerService(String username, String apiKey, String environment) {
-        mUsername = username;
-        mAPIKey = apiKey;
-        mEnvironment = environment;
+    SdkServerService(String username, String apiKey) {
+        this.username = username;
+        this.apiKey = apiKey;
+        isSandbox = username.toLowerCase().contentEquals("sandbox");
 
-        // TODO: TOKEN_HOST based on environment?
+        TOKEN_HOST = isSandbox ? "https://api.sandbox.africastalking.com" : "https://api.africastalking.com";
     }
 
     void addSipCredentials(String username, String password, String host, int port, String transport) {
-        mSipCredentials.add(new SipCredentials(username, password, host, port, transport));
+        credentialsList.add(new SipCredentials(username, password, host, port, transport));
     }
 
     @Override
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
-        // TODO: http request to token server with mUsername and mAPIKey
-        String token = "766ec9a0969a8a994a894c26e992e3333211d37836d2488c24d3e37266643ab4";
+        // TODO: http request to token server with username and api
+        String token = "6e44229611d255b5d58f80d057fc2da8708aa95dad0aba6843314fdac3e2d75c";
         long expires = System.currentTimeMillis() + 30000;
 
 
         ClientTokenResponse tokenResponse = ClientTokenResponse.newBuilder()
                     .setToken(token)
                     .setExpiration(expires)
+                    .setUsername(username)
+                    .setEnvironment(isSandbox ? "sandbox" : "production")
                     .build();
         response.onNext(tokenResponse);
         response.onCompleted();
@@ -48,7 +50,7 @@ final class SdkServerService extends SdkServerServiceImplBase {
     @Override
     public void getSipCredentials(SipCredentialsRequest request, StreamObserver<SipCredentialsResponse> response) {
         List<SdkServerServiceOuterClass.SipCredentials> credentials = new ArrayList<>();
-        for(SipCredentials item: mSipCredentials) {
+        for(SipCredentials item: credentialsList) {
             SdkServerServiceOuterClass.SipCredentials cred = SdkServerServiceOuterClass.SipCredentials.newBuilder()
                 .setHost(item.host)
                 .setPort(item.port)
@@ -66,10 +68,10 @@ final class SdkServerService extends SdkServerServiceImplBase {
 
 
     class SipCredentials {
-        public String username, password;
-        public String host;
-        public int port;
-        public String transport;
+        String username, password;
+        String host;
+        int port;
+        String transport;
 
         SipCredentials(String username, String password, String host, int port, String transport) {
             this.username = username;

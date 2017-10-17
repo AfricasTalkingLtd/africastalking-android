@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
@@ -30,10 +29,8 @@ public class SmsActivity extends BaseActivity {
                 try {
                     Timber.i("Initializing SDK...");
                     AfricasTalking.initialize(
-                            BuildConfig.RPC_USERNAME,
                             BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT,
-                            Environment.SANDBOX);
+                            BuildConfig.RPC_PORT);
                     AfricasTalking.setLogger(new Logger() {
                         @Override
                         public void log(String message, Object... args) {
