@@ -47,7 +47,7 @@ public class ATServerTest {
 
     @BeforeClass
     public static void startServer() throws IOException {
-        server = AfricasTalking.initialize(Fixtures.USERNAME, Fixtures.API_KEY, "sandbox", new Authenticator() {
+        server = AfricasTalking.initialize(Fixtures.USERNAME, Fixtures.API_KEY, new Authenticator() {
             @Override
             public boolean authenticate(String client) {
                 return client.compareToIgnoreCase(TEST_CLIENT_ID) == 0;
@@ -100,9 +100,7 @@ public class ATServerTest {
 
     @Test
     public void testGetToken() throws IOException {
-        ClientTokenRequest req = ClientTokenRequest.newBuilder()
-            .setCapability(ClientTokenRequest.Capability.B2C)
-            .build();
+        ClientTokenRequest req = ClientTokenRequest.newBuilder().build();
         ClientTokenResponse res = client.getToken(req);
         assertNotNull(res);
         assertNotNull(res.getToken());

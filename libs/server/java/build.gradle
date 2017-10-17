@@ -3,17 +3,17 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.2'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
-apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
@@ -56,10 +56,12 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 shadowJar {
+    baseName = 'server'
     classifier = null // Avoid classifiers for now...
 }
 
 jar {
+    archiveName = 'server.jar'
     manifest {
         attributes 'Implementation-Title': 'Africa\'s Talking SDK',
                 'Implementation-Version': properties.getProperty("bintray.version")

@@ -1,6 +1,6 @@
 # Africa's Talking
 
-[ ![Download](https://api.bintray.com/packages/africastalking/java/com.africastalking/images/download.svg) ](https://bintray.com/africastalking/java/com.africastalking/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/africastalking/android/com.africastalking/images/download.svg) ](https://bintray.com/africastalking/android/com.africastalking/_latestVersion)
 
 This SDK simplifies the integration of Africa's Talking APIs into your Android apps. For better security,
 the SDK is split into two components: A **server** module that stores API keys, SIP credentials and other secrets.
