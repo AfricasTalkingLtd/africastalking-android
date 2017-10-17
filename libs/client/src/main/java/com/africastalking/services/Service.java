@@ -33,7 +33,8 @@ public abstract class Service {
     static final String SANDBOX_DOMAIN = "sandbox.africastalking.com";
 
 
-    private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY = Metadata.Key.of("X-Client-Id", Metadata.ASCII_STRING_MARSHALLER);
+    private static final Metadata.Key<String> CLIENT_ID_HEADER_KEY =
+            Metadata.Key.of("X-Client-Id", Metadata.ASCII_STRING_MARSHALLER);
 
     public static String HOST;
     public static int PORT = 35897;
@@ -50,7 +51,7 @@ public abstract class Service {
     Retrofit.Builder retrofitBuilder;
     boolean isSandbox = false;
     String username = null;
-    ClientTokenResponse token;
+    private ClientTokenResponse token;
 
     Service() throws IOException {
 
@@ -117,7 +118,7 @@ public abstract class Service {
         return channelBuilder.build();
     }
 
-    ClientTokenResponse fetchToken(String host, int port) throws IOException {
+    private ClientTokenResponse fetchToken(String host, int port) throws IOException {
 
         if (LOGGING) { LOGGER.log("Fetching token..."); }
 
