@@ -2,10 +2,8 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.models.AccountResponse;
 
-import com.africastalking.proto.SdkServerServiceOuterClass;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -34,13 +32,8 @@ public class AccountService extends Service {
     }
 
     @Override
-    protected void fetchToken(String host, int port) throws IOException {
-        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.UNRECOGNIZED);
-    }
-
-    @Override
     protected void initService() {
-        String url = "https://api."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN);
+        String url = "https://api."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN);
         url += "/version1/";
         Retrofit retrofit = retrofitBuilder
                 .baseUrl(url)
@@ -73,7 +66,7 @@ public class AccountService extends Service {
      * @throws IOException
      */
     public AccountResponse getUser() throws IOException {
-        Response<AccountResponse> resp = service.getUser(USERNAME).execute();
+        Response<AccountResponse> resp = service.getUser(username).execute();
         return resp.body();
     }
 
@@ -86,6 +79,6 @@ public class AccountService extends Service {
      * @param callback
      */
     public void getUser(final Callback<AccountResponse> callback) {
-        service.getUser(USERNAME).enqueue(makeCallback(callback));
+        service.getUser(username).enqueue(makeCallback(callback));
     }
 }

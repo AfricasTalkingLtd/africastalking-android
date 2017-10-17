@@ -27,12 +27,12 @@ public final class Server {
     private SdkServerService mSdkService;
     private Authenticator mAuthenticator = null;
 
-    Server(String username, String apiKey, String environment) {
-        mSdkService = new SdkServerService(username, apiKey, environment);
+    Server(String username, String apiKey) {
+        mSdkService = new SdkServerService(username, apiKey);
     }
 
-    Server(String username, String apiKey, String environment, Authenticator authenticator) {
-        this(username, apiKey, environment);
+    Server(String username, String apiKey, Authenticator authenticator) {
+        this(username, apiKey);
         mAuthenticator = authenticator;
     }
 

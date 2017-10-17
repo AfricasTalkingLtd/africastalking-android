@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
@@ -161,10 +160,8 @@ public class VoiceActivity extends BaseActivity {
         try {
             Timber.i("Setting up pjsip....");
             AfricasTalking.initialize(
-                    BuildConfig.RPC_USERNAME,
                     BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT,
-                    Environment.SANDBOX); // blocking
+                    BuildConfig.RPC_PORT); // blocking
             AfricasTalking.initializeVoiceService(this, mRegListener, new Callback<VoiceService>() {
                 @Override
                 public void onSuccess(VoiceService service) {

@@ -44,7 +44,7 @@ public class SomeActivity extends Activity {
         
         try {
             // Init SDK
-            AfricasTalking.initialize(USERNAME, SERVER_HOSTNAME);
+            AfricasTalking.initialize(SERVER_HOSTNAME);
 
             // Get Service
             AirtimeService airtime = AfricasTalking.getAirtimeService();
@@ -111,7 +111,7 @@ dependencies{
 ## Initialization
 The following static methods are available on the `AfricasTalking` class to initialize the library:
 
-- `initialize(USERNAME, HOST, POST)`: Initialize the library.
+- `initialize(HOST, POST)`: Initialize the library.
 - `getXXXService()`: Get an instance to a given `XXX` service. e.g. `AfricasTalking.getSmsService()`, `AfricasTalking.getPaymentService()`, etc.
 
 

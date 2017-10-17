@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.utils.Environment;
 import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
@@ -29,10 +28,8 @@ public class PaymentActivity extends BaseActivity {
                 try {
                     Timber.i("Initializing SDK...");
                     AfricasTalking.initialize(
-                            BuildConfig.RPC_USERNAME,
                             BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT,
-                            Environment.SANDBOX);
+                            BuildConfig.RPC_PORT);
                     AfricasTalking.setLogger(new Logger() {
                         @Override
                         public void log(String message, Object... args) {
@@ -44,7 +41,7 @@ public class PaymentActivity extends BaseActivity {
                     PaymentService payment = AfricasTalking.getPaymentService();
 
                     Timber.i("Checking out KES 100 from 0718769882");
-                    CheckoutResponse res = payment.checkout("AliceTest", "0718769882", "KES", 100);
+                    CheckoutResponse res = payment.checkout("TestProduct", "0718769882", "KES", 100);
 
                     Timber.i(res.getTransactionId());
                     Timber.i(res.getStatus());

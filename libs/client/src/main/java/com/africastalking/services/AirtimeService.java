@@ -2,9 +2,7 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.models.AirtimeResponses;
-import com.africastalking.proto.SdkServerServiceOuterClass;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,7 +16,6 @@ import retrofit2.Retrofit;
  */
 public final class AirtimeService extends Service {
 
-
     static AirtimeService sInstance;
     private AirtimeServiceInterface service;
 
@@ -26,24 +23,17 @@ public final class AirtimeService extends Service {
         super();
     }
 
-
-    @Override
-    protected void fetchToken(String host, int port) throws IOException {
-        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.AIRTIME);
-    }
-
     @Override
     protected AirtimeService getInstance() throws IOException {
         if (sInstance == null) {
             sInstance = new AirtimeService();
         }
-
         return sInstance;
     }
 
     @Override
     protected void initService() {
-        String url = "https://api."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN);
+        String url = "https://api." + (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN);
         url += "/version1/airtime/";
         Retrofit retrofit = retrofitBuilder
                 .baseUrl(url)
@@ -110,7 +100,7 @@ public final class AirtimeService extends Service {
      */
     public AirtimeResponses send(HashMap<String, String> recipients) throws IOException {
         String json = _makeRecipientsJSON(recipients);
-        Response<AirtimeResponses> resp = service.send(USERNAME, json).execute();
+        Response<AirtimeResponses> resp = service.send(username, json).execute();
         return resp.body();
     }
 
@@ -126,7 +116,7 @@ public final class AirtimeService extends Service {
     public void send(HashMap<String, String> recipients, Callback<AirtimeResponses> callback) {
         try{
             String json = _makeRecipientsJSON(recipients);
-            service.send(USERNAME, json).enqueue(makeCallback(callback));
+            service.send(username, json).enqueue(makeCallback(callback));
         }catch (IOException ioe) {
             callback.onFailure(ioe);
         }

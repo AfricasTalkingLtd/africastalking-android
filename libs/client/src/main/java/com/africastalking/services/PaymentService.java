@@ -1,13 +1,11 @@
 package com.africastalking.services;
 
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Environment;
 import com.africastalking.models.B2BResponse;
 import com.africastalking.models.B2CResponse;
 import com.africastalking.models.Business;
 import com.africastalking.models.CheckoutResponse;
 import com.africastalking.models.Consumer;
-import com.africastalking.proto.SdkServerServiceOuterClass;
 import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -29,13 +27,6 @@ public class PaymentService extends Service {
         super();
     }
 
-
-    @Override
-    protected void fetchToken(String host, int port) throws IOException {
-        // TODO: More than one capability for payments
-        fetchServiceToken(host, port, SdkServerServiceOuterClass.ClientTokenRequest.Capability.C2B);
-    }
-
     @Override
     protected PaymentService getInstance() throws IOException {
         if(sInstance == null) {
@@ -51,7 +42,7 @@ public class PaymentService extends Service {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://payments."+ (ENV == Environment.SANDBOX ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        String baseUrl = "https://payments."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         payment = retrofitBuilder
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(baseUrl)
@@ -69,7 +60,7 @@ public class PaymentService extends Service {
 
     private HashMap<String, Object> makeCheckoutRequest(String product, String phone, String currency, float amount, Map metadata) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", USERNAME);
+        body.put("username", username);
         body.put("productName", product);
         body.put("phoneNumber", phone);
         body.put("amount", amount);
@@ -80,7 +71,7 @@ public class PaymentService extends Service {
 
     private HashMap<String, Object> makeB2CRequest(String product, List<Consumer> recipients) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", USERNAME);
+        body.put("username", username);
         body.put("productName", product);
         body.put("recipients", recipients);
 
@@ -89,7 +80,7 @@ public class PaymentService extends Service {
 
     private HashMap<String, Object> makeB2BRequest(String product, Business recipient) {
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", USERNAME);
+        body.put("username", username);
         body.put("productName", product);
 
         //
