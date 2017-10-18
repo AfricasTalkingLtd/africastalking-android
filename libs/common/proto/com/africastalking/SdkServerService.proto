@@ -3,7 +3,14 @@ option java_package = "com.africastalking.proto";
 
 package africastalking;
 
-message ClientTokenRequest {}
+message ClientTokenRequest {
+
+    enum TokenType {
+        API = 0;
+        PAYMENT = 1;
+    }
+    TokenType type = 2;
+}
 
 message ClientTokenResponse {
   string username = 1;

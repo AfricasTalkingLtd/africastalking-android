@@ -18,8 +18,6 @@ import okhttp3.ResponseBody;
 
 final class SdkServerService extends SdkServerServiceImplBase {
 
-    private static String TOKEN_HOST;
-
     private ArrayList<SipCredentials> credentialsList = new ArrayList<>();
 
     private String username, apiKey;
@@ -30,10 +28,6 @@ final class SdkServerService extends SdkServerServiceImplBase {
         this.username = username;
         this.apiKey = apiKey;
         isSandbox = username.toLowerCase().contentEquals("sandbox");
-
-        // TODO: Use actual values
-        TOKEN_HOST = isSandbox ? "https://api.sandbox.africastalking.com/checkout/token/create" :
-                "https://api.africastalking.com/checkout/token/create";
     }
 
     void addSipCredentials(String username, String password, String host, int port, String transport) {
@@ -44,21 +38,38 @@ final class SdkServerService extends SdkServerServiceImplBase {
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
         try {
+            String host = "https://";
+            switch (request.getType()) {
+                case API:
+                    host += "api.";
+                    break;
+                case PAYMENT:
+                    host += "payment.";
+                    break;
+                default:
+                    throw new Exception("Invalid/Unknown token type");
+            }
+            if (isSandbox) {
+                host += "sandbox.";
+            }
+            host += "africastalking.com/token/create";
+
             MediaType type = MediaType.parse("application/x-www-form-urlencoded");
             OkHttpClient client = new OkHttpClient();
-            RequestBody data = RequestBody.create(type, "phoneNumber=0718769882"/*gson.toJson(new TokenRequest(username, apiKey))*/);
+            RequestBody data = RequestBody.create(type, "username=" + username);
             Request rq = new Request.Builder()
-                    .url(TOKEN_HOST)
+                    .url(host)
+                    .header("apiKey", apiKey)
                     .post(data)
                     .build();
             Response rs = client.newCall(rq).execute();
             ResponseBody body = rs.body();
             String json = body.string();
-            Token tk = gson.fromJson(json, Token.class);
+            TokenResponse tk = gson.fromJson(json, TokenResponse.class);
 
             ClientTokenResponse tokenResponse = ClientTokenResponse.newBuilder()
                     .setToken(tk.token)
-                    .setExpiration(tk.expires)
+                    .setExpiration(tk.lifetimeInSeconds * 1000)
                     .setUsername(username)
                     .setEnvironment(isSandbox ? "sandbox" : "production")
                     .build();
@@ -105,18 +116,8 @@ final class SdkServerService extends SdkServerServiceImplBase {
         }
     }
 
-    class TokenRequest {
-        String username;
-        String apiKey;
-        TokenRequest(String username, String apiKey) {
-            this.username = username;
-            this.apiKey = apiKey;
-        }
-    }
-
-    class Token {
+    class TokenResponse {
         String token;
-        String description;
-        long expires = System.currentTimeMillis() + 30000;
+        long lifetimeInSeconds;
     }
 }
