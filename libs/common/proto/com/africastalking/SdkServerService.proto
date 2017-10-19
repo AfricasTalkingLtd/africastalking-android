@@ -9,7 +9,7 @@ message ClientTokenRequest {
         API = 0;
         PAYMENT = 1;
     }
-    TokenType type = 2;
+    TokenType type = 1;
 }
 
 message ClientTokenResponse {
