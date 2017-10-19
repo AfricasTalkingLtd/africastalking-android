@@ -75,7 +75,7 @@ npm install --save africastalking
 ```groovy
 repositories {
   maven {
-    url  "http://dl.bintray.com/africastalking/java"
+    url  "http://dl.bintray.com/africastalking/android"
   }
 }
 dependencies{
@@ -83,7 +83,7 @@ dependencies{
 }
 ```
 
-Or Maven (from `http://dl.bintray.com/africastalking/java`)
+Or Maven (from `http://dl.bintray.com/africastalking/android`)
 
 ```xml
 <dependency>
@@ -98,7 +98,7 @@ Or Maven (from `http://dl.bintray.com/africastalking/java`)
 ```groovy
 repositories {
   maven {
-    url  "http://dl.bintray.com/africastalking/java"
+    url  "http://dl.bintray.com/africastalking/android"
   }
 }
 dependencies{
