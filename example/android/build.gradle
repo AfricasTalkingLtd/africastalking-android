@@ -15,7 +15,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        buildConfigField 'String', 'RPC_USERNAME', "\"" + properties.getProperty("rpcUsername") + "\""
         buildConfigField 'String', 'RPC_HOST', "\"" + properties.getProperty("rpcHost") + "\""
         buildConfigField 'int', 'RPC_PORT', properties.getProperty("rpcPort")
 

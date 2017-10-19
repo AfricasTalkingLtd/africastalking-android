@@ -14,7 +14,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 final class SdkServerService extends SdkServerServiceImplBase {
 
@@ -52,24 +51,24 @@ final class SdkServerService extends SdkServerServiceImplBase {
             if (isSandbox) {
                 host += "sandbox.";
             }
-            host += "africastalking.com/token/create";
+            host += "africastalking.com/token/generate";
 
-            MediaType type = MediaType.parse("application/x-www-form-urlencoded");
+            MediaType type = MediaType.parse("application/json");
             OkHttpClient client = new OkHttpClient();
-            RequestBody data = RequestBody.create(type, "username=" + username);
+            RequestBody data = RequestBody.create(type, gson.toJson(new TokenRequest(username)));
             Request rq = new Request.Builder()
                     .url(host)
                     .header("apiKey", apiKey)
                     .post(data)
                     .build();
             Response rs = client.newCall(rq).execute();
-            ResponseBody body = rs.body();
-            String json = body.string();
-            TokenResponse tk = gson.fromJson(json, TokenResponse.class);
+            String body = rs.body().string();
+            if (!rs.isSuccessful()) throw new Exception(body);
+            TokenResponse tk = gson.fromJson(body, TokenResponse.class);
 
             ClientTokenResponse tokenResponse = ClientTokenResponse.newBuilder()
                     .setToken(tk.token)
-                    .setExpiration(tk.lifetimeInSeconds * 1000)
+                    .setExpiration(System.currentTimeMillis() + (tk.lifetimeInSeconds * 1000))
                     .setUsername(username)
                     .setEnvironment(isSandbox ? "sandbox" : "production")
                     .build();
@@ -113,6 +112,13 @@ final class SdkServerService extends SdkServerServiceImplBase {
             this.host = host;
             this.port = port;
             this.transport = transport;
+        }
+    }
+
+    class TokenRequest {
+        String username;
+        TokenRequest(String username) {
+            this.username = username;
         }
     }
 
