@@ -37,21 +37,11 @@ final class SdkServerService extends SdkServerServiceImplBase {
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
         try {
-            String host = "https://";
-            switch (request.getType()) {
-                case API:
-                    host += "api.";
-                    break;
-                case PAYMENT:
-                    host += "payment.";
-                    break;
-                default:
-                    throw new Exception("Invalid/Unknown token type");
-            }
+            String host = "https://api.";
             if (isSandbox) {
                 host += "sandbox.";
             }
-            host += "africastalking.com/token/generate";
+            host += "africastalking.com/auth-token/generate";
 
             MediaType type = MediaType.parse("application/json");
             OkHttpClient client = new OkHttpClient();
