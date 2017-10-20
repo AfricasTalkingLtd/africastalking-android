@@ -37,7 +37,7 @@ final class SdkServerService extends SdkServerServiceImplBase {
     public void getToken(ClientTokenRequest request, final StreamObserver<ClientTokenResponse> response) {
 
         try {
-            String host = "https://token.";
+            String host = "https://api.";
             if (isSandbox) {
                 host += "sandbox.";
             }
