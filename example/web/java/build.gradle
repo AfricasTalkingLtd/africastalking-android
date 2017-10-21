@@ -10,6 +10,9 @@ targetCompatibility = 1.8
 
 repositories {
     jcenter()
+    maven {
+        url  "http://dl.bintray.com/africastalking/java"
+    }
 }
 
 dependencies {
@@ -17,8 +20,7 @@ dependencies {
     compile 'com.sparkjava:spark-core:2.6.0'
     compile 'com.sparkjava:spark-template-handlebars:2.3'
     compile 'com.google.code.gson:gson:2.8.2'
-//    compile 'com.africastalking:server:1.1.2-rc4'
-    compile project(":libs:server:java")
+    compile 'com.africastalking:server:2.1.0'
     testCompile 'junit:junit:4.12'
 }
 

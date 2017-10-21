@@ -48,7 +48,8 @@ public class App {
 
         // SDK Server
         try {
-            sdkServer = AfricasTalking.initialize(USERNAME, API_KEY, ALLOWED_CLIENTS::contains);
+            AfricasTalking.initialize(USERNAME, API_KEY);
+            sdkServer = new Server(ALLOWED_CLIENTS::contains);
             sdkServer.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);
             sdkServer.startInsecure(RPC_PORT);
         } catch (IOException e) {
