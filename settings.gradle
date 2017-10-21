@@ -3,8 +3,7 @@
  */
 
 /* Libs */
-include 'libs:client'
-include 'libs:server:java'
+include ':client'
 
 /* Examples */
 Set<String> examples = new HashSet<String>()

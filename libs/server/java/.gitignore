@@ -1,8 +1,0 @@
-.project
-*.iml
-.gradle/
-build/
-gen/
-bin/
-.settings/
-.idea/

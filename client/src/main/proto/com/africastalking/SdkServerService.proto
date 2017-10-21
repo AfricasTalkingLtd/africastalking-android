@@ -26,7 +26,6 @@ message SipCredentialsResponse {
   repeated SipCredentials credentials = 1;
 }
 
-
 service SdkServerService {
     rpc getToken(ClientTokenRequest) returns (ClientTokenResponse) {}
 

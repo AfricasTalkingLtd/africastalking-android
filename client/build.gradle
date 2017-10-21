@@ -49,18 +49,6 @@ android {
         textReport true
         textOutput "stdout"
     }
-    testOptions {
-//        unitTests.returnDefaultValues = true
-    }
-
-    sourceSets {
-        main {
-            java.srcDirs = ['src/main/java', '../common/src/main/java']
-            proto {
-                srcDir '../common/proto'
-            }
-        }
-    }
 }
 
 protobuf {
