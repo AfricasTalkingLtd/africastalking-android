@@ -32,6 +32,9 @@ public final class AfricasTalking {
 
     private static String sClientId = null;
 
+    @Deprecated
+    public static String hostOverride = null;
+
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
             Manifest.permission.RECORD_AUDIO,

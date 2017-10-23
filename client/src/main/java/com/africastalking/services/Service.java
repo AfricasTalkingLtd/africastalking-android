@@ -17,6 +17,7 @@ import io.grpc.okhttp.OkHttpChannelBuilder;
 import io.grpc.stub.MetadataUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -79,7 +80,12 @@ public abstract class Service {
                     }
                 }
 
-                Request original = chain.request();
+                Request original = chain.request();HttpUrl url = original.url();
+                if (AfricasTalking.hostOverride != null) {
+                    url = url.newBuilder()
+                        .host(AfricasTalking.hostOverride)
+                        .build();
+                }
                 Request request = original.newBuilder()
                         .addHeader("ApiKey", token.getToken()) // FIXME: Set token header
                         .addHeader("Accept", "application/json")
