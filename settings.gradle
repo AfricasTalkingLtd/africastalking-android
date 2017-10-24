@@ -4,6 +4,7 @@
 
 /* Libs */
 include ':client'
+include ':luhn'
 
 /* Examples */
 Set<String> examples = new HashSet<String>()

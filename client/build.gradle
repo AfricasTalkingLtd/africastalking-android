@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-rc1'
+        classpath 'com.android.tools.build:gradle:3.0.0-rc2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
@@ -28,7 +28,7 @@ android {
     buildToolsVersion "26.0.2"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName version
@@ -95,6 +95,9 @@ dependencies {
 
     // permissions
     compile 'com.karumi:dexter:4.1.0'
+
+    // Cards UI
+    compile project(':luhn')
 
     // grpc
     compile 'io.grpc:grpc-stub:1.5.0'
