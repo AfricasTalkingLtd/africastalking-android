@@ -9,7 +9,7 @@ import android.util.Log;
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Logger;
-import com.africastalking.models.QueueStatus;
+import com.africastalking.models.voice.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;

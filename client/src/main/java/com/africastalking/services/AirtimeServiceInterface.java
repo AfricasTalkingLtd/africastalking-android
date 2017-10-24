@@ -1,7 +1,7 @@
 package com.africastalking.services;
 
 
-import com.africastalking.models.AirtimeResponses;
+import com.africastalking.models.airtime.AirtimeResponses;
 
 import retrofit2.Call;
 import retrofit2.http.*;

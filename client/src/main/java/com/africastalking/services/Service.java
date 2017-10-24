@@ -1,5 +1,7 @@
 package com.africastalking.services;
 
+import android.util.Log;
+
 import com.africastalking.AfricasTalking;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
@@ -17,6 +19,7 @@ import io.grpc.okhttp.OkHttpChannelBuilder;
 import io.grpc.stub.MetadataUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -38,6 +41,7 @@ public abstract class Service {
 
     public static String HOST;
     public static int PORT = 35897;
+    public static boolean DISABLE_TLS = false;
 
     public static Boolean LOGGING = false;
     public static Logger LOGGER = new Logger() {
@@ -49,24 +53,13 @@ public abstract class Service {
 
 
     Retrofit.Builder retrofitBuilder;
-    boolean isSandbox = false;
-    String username = null;
-    private ClientTokenResponse token;
+    static boolean isSandbox = false;
+    static String username = null;
+    static private ClientTokenResponse token;
 
     Service() throws IOException {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-
-        if (LOGGING) {
-            HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                @Override
-                public void log(String message) {
-                    LOGGER.log(message);
-                }
-            });
-            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
-            httpClient.addInterceptor(logger);
-        }
 
         httpClient.addInterceptor(new Interceptor() {
             @Override
@@ -80,14 +73,32 @@ public abstract class Service {
                 }
 
                 Request original = chain.request();
+                HttpUrl url = original.url();
+                if (AfricasTalking.hostOverride != null) {
+                    url = url.newBuilder()
+                        .host(AfricasTalking.hostOverride)
+                        .build();
+                }
                 Request request = original.newBuilder()
-                        .addHeader("ApiKey", token.getToken()) // FIXME: Set token header
+                        .url(url)
+                        .addHeader("authToken", token.getToken())
                         .addHeader("Accept", "application/json")
                         .build();
 
                 return chain.proceed(request);
             }
         });
+
+        if (LOGGING) {
+            HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                @Override
+                public void log(String message) {
+                    LOGGER.log(message);
+                }
+            });
+            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            httpClient.addInterceptor(logger);
+        }
 
         retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create())) // switched from ScalarsConverterFactory
@@ -112,13 +123,21 @@ public abstract class Service {
     }
 
     static ManagedChannel getChannel(String host, int port) {
-        OkHttpChannelBuilder channelBuilder = OkHttpChannelBuilder
-                .forAddress(host, port)
-                .usePlaintext(true); // TODO: Remove to use TLS
+        OkHttpChannelBuilder channelBuilder;
+
+        if (DISABLE_TLS) {
+            channelBuilder = OkHttpChannelBuilder
+                    .forAddress(host, port)
+                    .usePlaintext(true);
+        } else {
+            channelBuilder = OkHttpChannelBuilder
+                    .forAddress(host, port);
+        }
+
         return channelBuilder.build();
     }
 
-    private ClientTokenResponse fetchToken(String host, int port) throws IOException {
+    protected ClientTokenResponse fetchToken(String host, int port) throws IOException {
 
         if (LOGGING) { LOGGER.log("Fetching token..."); }
 
@@ -177,6 +196,13 @@ public abstract class Service {
                 VoiceService.sInstance = new VoiceService();
             }
             return (T) VoiceService.sInstance;
+        }
+
+        if (service.contentEquals("token")) {
+            if (TokenService.sInstance == null) {
+                TokenService.sInstance = new TokenService();
+            }
+            return (T) TokenService.sInstance;
         }
 
         throw new IOException("Invalid service");

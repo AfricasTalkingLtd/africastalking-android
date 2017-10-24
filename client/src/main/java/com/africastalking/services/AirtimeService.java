@@ -2,7 +2,7 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.models.AirtimeResponses;
+import com.africastalking.models.airtime.AirtimeResponses;
 
 import java.io.IOException;
 import java.util.HashMap;

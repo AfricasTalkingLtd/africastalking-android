@@ -1,4 +1,4 @@
-package com.africastalking.models;
+package com.africastalking.models.sms;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

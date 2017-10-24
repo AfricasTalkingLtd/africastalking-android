@@ -9,6 +9,7 @@ import com.africastalking.services.AirtimeService;
 import com.africastalking.services.PaymentService;
 import com.africastalking.services.Service;
 import com.africastalking.services.SmsService;
+import com.africastalking.services.TokenService;
 import com.africastalking.services.VoiceService;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Logger;
@@ -32,6 +33,9 @@ public final class AfricasTalking {
 
     private static String sClientId = null;
 
+    @Deprecated
+    public static String hostOverride = null;
+
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
             Manifest.permission.RECORD_AUDIO,
@@ -39,13 +43,18 @@ public final class AfricasTalking {
     );
 
 
-    public static void initialize(String host, int port) throws IOException {
+    public static void initialize(String host, int port, boolean disableTLS) throws IOException {
         Service.HOST = host;
         Service.PORT = port;
+        Service.DISABLE_TLS = disableTLS;
+    }
+
+    public static void initialize(String host, int port) throws IOException {
+        initialize(host, port, false);
     }
 
     public static void initialize(String host) throws IOException {
-        initialize(host, Service.PORT);
+        initialize(host, Service.PORT, false);
     }
 
     public static void setClientId(String clientId) {
@@ -81,6 +90,10 @@ public final class AfricasTalking {
 
     public static AccountService getAccountService() throws IOException {
         return Service.newInstance("account");
+    }
+
+    public static TokenService getTokenService() throws IOException {
+        return Service.newInstance("token");
     }
 
     public static VoiceService getVoiceService() throws IOException {

@@ -3,10 +3,10 @@ package com.africastalking.services;
 import android.text.TextUtils;
 
 import com.africastalking.utils.Callback;
-import com.africastalking.models.FetchMessageResponse;
-import com.africastalking.models.SendMessageResponse;
-import com.africastalking.models.SubscriptionResponse;
-import com.africastalking.models.Subscriptions;
+import com.africastalking.models.sms.FetchMessageResponse;
+import com.africastalking.models.sms.SendMessageResponse;
+import com.africastalking.models.sms.SubscriptionResponse;
+import com.africastalking.models.sms.Subscriptions;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -221,7 +221,7 @@ public final class SmsService extends Service {
      */
     public SendMessageResponse sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
-        Response<SendMessageResponse> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration).execute();
+        Response<SendMessageResponse> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration, 0).execute();
         return resp.body();
     }
 
@@ -235,7 +235,7 @@ public final class SmsService extends Service {
     public void sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<SendMessageResponse> callback) {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
         sms.sendPremium(username, formatRecipients(recipients),
-                from, message, keyword, linkId, retryDuration)
+                from, message, keyword, linkId, retryDuration, 0)
                 .enqueue(makeCallback(callback));
     }
 
@@ -356,7 +356,7 @@ public final class SmsService extends Service {
      * </p>
      */
     public Subscriptions fetchSubscription(String shortCode, String keyword, String lastReceivedId) throws IOException {
-        Response<Subscriptions> resp = sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).execute();
+        Response<Subscriptions> resp = sms.fetchSubscription(username, shortCode, keyword, lastReceivedId).execute();
         return resp.body();
     }
 
@@ -368,8 +368,7 @@ public final class SmsService extends Service {
      * </p>
      */
     public void fetchSubscription(String shortCode, String keyword, String lastReceivedId, Callback<Subscriptions> callback) {
-        sms.fetchSubsciption(username, shortCode, keyword, lastReceivedId).enqueue(makeCallback(callback));
-
+        sms.fetchSubscription(username, shortCode, keyword, lastReceivedId).enqueue(makeCallback(callback));
     }
 
     /**
@@ -402,8 +401,8 @@ public final class SmsService extends Service {
      *     Synchronously send the request and return its response.
      * </p>
      */
-    public SubscriptionResponse createSubscription(String shortCode, String keyword, String phoneNumber) throws IOException {
-        Response<SubscriptionResponse> resp = sms.createSubscription(username, shortCode, keyword, phoneNumber).execute();
+    public SubscriptionResponse createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken) throws IOException {
+        Response<SubscriptionResponse> resp = sms.createSubscription(username, shortCode, keyword, phoneNumber, checkoutToken).execute();
         return resp.body();
     }
 
@@ -414,7 +413,7 @@ public final class SmsService extends Service {
      * occurred
      * </p>
      */
-    public void createSubscription(String shortCode, String keyword, String phoneNumber, Callback<SubscriptionResponse> callback) {
-        sms.createSubscription(username, shortCode, keyword, phoneNumber).enqueue(makeCallback(callback));
+    public void createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken, Callback<SubscriptionResponse> callback) {
+        sms.createSubscription(username, shortCode, keyword, phoneNumber, checkoutToken).enqueue(makeCallback(callback));
     }
 }

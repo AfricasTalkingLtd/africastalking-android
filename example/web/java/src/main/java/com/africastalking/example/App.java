@@ -23,10 +23,10 @@ public class App {
     private static final int RPC_PORT = 35897;
 
     private static final String USERNAME = "sandbox";
-    private static final String API_KEY = "6e44229611d255b5d58f80d057fc2da8708aa95dad0aba6843314fdac3e2d75c";
+    private static final String API_KEY = "021d406e8f864e38102ac9309c7edd5bdb3355c3cf68038d94fed345fd2cc056";
 
-    private static final String SIP_USERNAME = "test.aksalj";
-    private static final String SIP_PASSWORD = "DOPx_9bf185d689";
+    private static final String SIP_USERNAME = "fake";
+    private static final String SIP_PASSWORD = "key";
     private static final String SIP_HOST = "ke.sip.africastalking.com";
     private static final String SIP_TRANSPORT = "udp";
     private static final int SIP_PORT = 5060;
@@ -49,6 +49,8 @@ public class App {
         // SDK Server
         try {
             AfricasTalking.initialize(USERNAME, API_KEY);
+            AfricasTalking.hostOverride = "kaende-api-rs-host.africastalking.com";
+            AfricasTalking.setLogger((s, objects) -> System.out.println(String.format(s, objects)));
             sdkServer = new Server(ALLOWED_CLIENTS::contains);
             sdkServer.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);
             sdkServer.startInsecure(RPC_PORT);

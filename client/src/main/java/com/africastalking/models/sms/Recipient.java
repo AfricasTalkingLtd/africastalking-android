@@ -1,4 +1,4 @@
-package com.africastalking.models;
+package com.africastalking.models.sms;
 
 public class Recipient {
     private String number;
