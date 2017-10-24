@@ -2,7 +2,7 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.models.AccountResponse;
+import com.africastalking.models.account.AccountResponse;
 
 import retrofit2.Response;
 import retrofit2.Retrofit;

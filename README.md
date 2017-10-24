@@ -111,7 +111,7 @@ dependencies{
 ## Initialization
 The following static methods are available on the `AfricasTalking` class to initialize the library:
 
-- `initialize(HOST, POST)`: Initialize the library.
+- `initialize(String host, int port, bool disableTLS)`: Initialize the library.
 - `getXXXService()`: Get an instance to a given `XXX` service. e.g. `AfricasTalking.getSmsService()`, `AfricasTalking.getPaymentService()`, etc.
 
 
@@ -129,6 +129,10 @@ All methods are synchronous (i.e. will block current thread) but provide asynchr
 - `send(HashMap<String, String> recipients)`: Send airtime to a bunch of phone numbers. The keys in the `recipients` map are phone numbers while the values are airtime amounts ( e.g. `KES 678`).
 
 For more information about status notification, please read [http://docs.africastalking.com/airtime/callback](http://docs.africastalking.com/airtime/callback)
+
+### `Token`
+
+- `createCheckoutToken(String phoneNumber)`: Create a checkout token.
 
 ### `SMS`
 

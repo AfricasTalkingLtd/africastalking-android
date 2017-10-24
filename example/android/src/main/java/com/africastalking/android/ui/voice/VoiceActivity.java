@@ -161,7 +161,7 @@ public class VoiceActivity extends BaseActivity {
             Timber.i("Setting up pjsip....");
             AfricasTalking.initialize(
                     BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT); // blocking
+                    BuildConfig.RPC_PORT, true); // blocking
             AfricasTalking.initializeVoiceService(this, mRegListener, new Callback<VoiceService>() {
                 @Override
                 public void onSuccess(VoiceService service) {

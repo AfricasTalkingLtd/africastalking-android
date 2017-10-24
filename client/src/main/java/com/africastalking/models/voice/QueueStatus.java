@@ -1,4 +1,4 @@
-package com.africastalking.models;
+package com.africastalking.models.voice;
 
 public class QueueStatus {
     public String phoneNumber;

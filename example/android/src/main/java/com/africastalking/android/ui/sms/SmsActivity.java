@@ -8,7 +8,7 @@ import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
-import com.africastalking.models.SendMessageResponse;
+import com.africastalking.models.sms.SendMessageResponse;
 import com.africastalking.services.SmsService;
 
 import timber.log.Timber;
@@ -30,7 +30,7 @@ public class SmsActivity extends BaseActivity {
                     Timber.i("Initializing SDK...");
                     AfricasTalking.initialize(
                             BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT);
+                            BuildConfig.RPC_PORT, true);
                     AfricasTalking.setLogger(new Logger() {
                         @Override
                         public void log(String message, Object... args) {

@@ -1,4 +1,4 @@
-package com.africastalking.models;
+package com.africastalking.models.payment;
 
 public class B2BResponse {
 

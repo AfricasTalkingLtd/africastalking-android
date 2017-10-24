@@ -1,13 +1,15 @@
-package com.africastalking.models;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+package com.africastalking.models.sms;
 
 /**
  * Created by jay on 7/17/17.
  */
 
-public class FetchMessageResponse {
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+public class SendMessageResponse {
+
     @SerializedName("SMSMessageData")
     @Expose
     private SMSMessageData sMSMessageData;
@@ -19,4 +21,5 @@ public class FetchMessageResponse {
     public void setSMSMessageData(SMSMessageData sMSMessageData) {
         this.sMSMessageData = sMSMessageData;
     }
+
 }

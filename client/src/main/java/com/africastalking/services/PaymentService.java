@@ -1,11 +1,13 @@
 package com.africastalking.services;
 
+import com.africastalking.models.payment.checkout.CheckoutRequest;
+import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
 import com.africastalking.utils.Callback;
-import com.africastalking.models.B2BResponse;
-import com.africastalking.models.B2CResponse;
-import com.africastalking.models.Business;
-import com.africastalking.models.CheckoutResponse;
-import com.africastalking.models.Consumer;
+import com.africastalking.models.payment.B2BResponse;
+import com.africastalking.models.payment.B2CResponse;
+import com.africastalking.models.payment.Business;
+import com.africastalking.models.payment.checkout.CheckoutResponse;
+import com.africastalking.models.payment.Consumer;
 import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -58,14 +60,24 @@ public class PaymentService extends Service {
     }
 
 
-    private HashMap<String, Object> makeCheckoutRequest(String product, String phone, String currency, float amount, Map metadata) {
+    private HashMap<String, Object> makeCheckoutRequest(CheckoutRequest request) {
+
         HashMap<String, Object> body = new HashMap<>();
-        body.put("username", username);
-        body.put("productName", product);
-        body.put("phoneNumber", phone);
-        body.put("amount", amount);
-        body.put("currencyCode", currency);
-        body.put("metadata", metadata);
+
+        switch (request.type) {
+            case MOBILE:
+                MobileCheckoutRequest rq = (MobileCheckoutRequest) request;
+                body.put("username", username);
+                body.put("productName", rq.productName);
+                body.put("phoneNumber", rq.phoneNumber);
+                body.put("amount", rq.amount);
+                body.put("currencyCode", rq.currencyCode);
+                body.put("metadata", rq.metadata);
+                break;
+            case CARD:
+                // TODO: Card Request
+                break;
+        }
         return body;
     }
 
@@ -94,53 +106,47 @@ public class PaymentService extends Service {
 
     /**
      *
-     * @param productName
-     * @param phoneNumber
-     * @param currency
-     * @param amount
-     * @param metadata
+     * @param request
      * @return
      * @throws IOException
      */
-    public CheckoutResponse checkout(String productName, String phoneNumber, String currency, float amount, Map metadata) throws IOException {
-        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, currency, amount, metadata);
-
-        Call<CheckoutResponse> call = payment.checkout(body);
+    public CheckoutResponse checkout(CheckoutRequest request) throws IOException {
+        HashMap<String, Object> body = makeCheckoutRequest(request);
+        Call<CheckoutResponse> call;
+        switch (request.type) {
+            case MOBILE:
+                call = payment.mobileCheckout(body);
+                break;
+            case CARD:
+                call = payment.cardCheckout(body);
+                break;
+            default:
+                throw new IOException("Invalid checkout type");
+        }
         Response<CheckoutResponse> res = call.execute();
         return res.body();
-
     }
 
     /**
      *
-     * @param productName
-     * @param phoneNumber
-     * @param currency
-     * @param amount
-     * @return
-     * @throws IOException
-     */
-    public CheckoutResponse checkout(String productName, String phoneNumber, String currency, float amount) throws IOException {
-        return this.checkout(productName, phoneNumber, currency, amount, new HashMap());
-    }
-
-    /**
-     *
-     * @param productName
-     * @param phoneNumber
-     * @param amount
-     * @param currency
-     * @param metadata
+     * @param request
      * @param callback
      */
-    public void checkout(String productName, String phoneNumber, String currency, float amount, Map metadata, Callback<CheckoutResponse> callback) {
-        HashMap<String, Object> body = makeCheckoutRequest(productName, phoneNumber, currency, amount, metadata);
-        Call<CheckoutResponse> call = payment.checkout(body);
+    public void checkout(CheckoutRequest request, Callback<CheckoutResponse> callback) {
+        HashMap<String, Object> body = makeCheckoutRequest(request);
+        Call<CheckoutResponse> call;
+        switch (request.type) {
+            case MOBILE:
+                call = payment.mobileCheckout(body);
+                break;
+            case CARD:
+                call = payment.cardCheckout(body);
+                break;
+            default:
+                callback.onFailure(new IOException("Invalid checkout type"));
+                return;
+        }
         call.enqueue(makeCallback(callback));
-    }
-
-    public void checkout(String productName, String phoneNumber, String currency, float amount, Callback<CheckoutResponse> callback) {
-        this.checkout(productName, phoneNumber, currency, amount, new HashMap(), callback);
     }
 
 

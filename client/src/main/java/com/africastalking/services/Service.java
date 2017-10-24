@@ -39,6 +39,7 @@ public abstract class Service {
 
     public static String HOST;
     public static int PORT = 35897;
+    public static boolean DISABLE_TLS = false;
 
     public static Boolean LOGGING = false;
     public static Logger LOGGER = new Logger() {
@@ -50,9 +51,9 @@ public abstract class Service {
 
 
     Retrofit.Builder retrofitBuilder;
-    boolean isSandbox = false;
-    String username = null;
-    private ClientTokenResponse token;
+    static boolean isSandbox = false;
+    static String username = null;
+    static private ClientTokenResponse token;
 
     Service() throws IOException {
 
@@ -80,7 +81,8 @@ public abstract class Service {
                     }
                 }
 
-                Request original = chain.request();HttpUrl url = original.url();
+                Request original = chain.request();
+                HttpUrl url = original.url();
                 if (AfricasTalking.hostOverride != null) {
                     url = url.newBuilder()
                         .host(AfricasTalking.hostOverride)
@@ -118,13 +120,21 @@ public abstract class Service {
     }
 
     static ManagedChannel getChannel(String host, int port) {
-        OkHttpChannelBuilder channelBuilder = OkHttpChannelBuilder
-                .forAddress(host, port)
-                .usePlaintext(true); // TODO: Remove to use TLS
+        OkHttpChannelBuilder channelBuilder;
+
+        if (DISABLE_TLS) {
+            channelBuilder = OkHttpChannelBuilder
+                    .forAddress(host, port)
+                    .usePlaintext(true);
+        } else {
+            channelBuilder = OkHttpChannelBuilder
+                    .forAddress(host, port);
+        }
+
         return channelBuilder.build();
     }
 
-    private ClientTokenResponse fetchToken(String host, int port) throws IOException {
+    protected ClientTokenResponse fetchToken(String host, int port) throws IOException {
 
         if (LOGGING) { LOGGER.log("Fetching token..."); }
 
@@ -183,6 +193,13 @@ public abstract class Service {
                 VoiceService.sInstance = new VoiceService();
             }
             return (T) VoiceService.sInstance;
+        }
+
+        if (service.contentEquals("token")) {
+            if (TokenService.sInstance == null) {
+                TokenService.sInstance = new TokenService();
+            }
+            return (T) TokenService.sInstance;
         }
 
         throw new IOException("Invalid service");
