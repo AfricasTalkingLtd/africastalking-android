@@ -1,5 +1,7 @@
 package com.africastalking.services;
 
+import android.util.Log;
+
 import com.africastalking.AfricasTalking;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
@@ -59,17 +61,6 @@ public abstract class Service {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-        if (LOGGING) {
-            HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-                @Override
-                public void log(String message) {
-                    LOGGER.log(message);
-                }
-            });
-            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
-            httpClient.addInterceptor(logger);
-        }
-
         httpClient.addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
@@ -89,13 +80,25 @@ public abstract class Service {
                         .build();
                 }
                 Request request = original.newBuilder()
-                        .addHeader("ApiKey", token.getToken()) // FIXME: Set token header
+                        .url(url)
+                        .addHeader("authToken", token.getToken())
                         .addHeader("Accept", "application/json")
                         .build();
 
                 return chain.proceed(request);
             }
         });
+
+        if (LOGGING) {
+            HttpLoggingInterceptor logger = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+                @Override
+                public void log(String message) {
+                    LOGGER.log(message);
+                }
+            });
+            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            httpClient.addInterceptor(logger);
+        }
 
         retrofitBuilder = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create())) // switched from ScalarsConverterFactory
