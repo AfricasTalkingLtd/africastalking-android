@@ -1,11 +1,5 @@
 package com.africastalking.services;
 
-import android.app.Activity;
-import android.content.Context;
-import android.util.Log;
-
-import com.africastalking.R;
-import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
 import com.africastalking.utils.Callback;
@@ -18,16 +12,11 @@ import com.google.gson.Gson;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
-import xyz.belvi.luhn.Luhn;
-import xyz.belvi.luhn.cardValidator.models.LuhnCard;
-import xyz.belvi.luhn.interfaces.LuhnCallback;
-import xyz.belvi.luhn.interfaces.LuhnCardVerifier;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PaymentService extends Service {
 
@@ -158,65 +147,6 @@ public class PaymentService extends Service {
         }
         call.enqueue(makeCallback(callback));
     }
-
-    /**
-     *
-     * @param context
-     * @param callback
-     */
-    public void checkout(CardCheckoutRequest request, final Activity context, Callback<CheckoutResponse> callback) {
-        Luhn.startLuhn(context, new LuhnCallback() {
-            @Override
-            public void cardDetailsRetrieved(Context luhnContext, LuhnCard creditCard, final LuhnCardVerifier cardVerifier) {
-                Log.e("LLLL", "Details Received: " + creditCard.toString());
-                cardVerifier.startProgress();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(3500);
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    cardVerifier.requestOTP(10);
-                                }
-                            });
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-
-            @Override
-            public void otpRetrieved(Context luhnContext, final LuhnCardVerifier cardVerifier, String otp) {
-                Log.e("LLLL", "OTP Received: " + otp);
-                cardVerifier.startProgress();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(3500);
-                            context.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    cardVerifier.onCardVerified(false, "Payment failed", "We ave not implemented this yet!");
-                                }
-                            });
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }).start();
-            }
-
-            @Override
-            public void onFinished(boolean isVerified) {
-                Log.e("LLLL", "Verified " + String.valueOf(isVerified));
-            }
-        }, R.style.AfricasTalkingStyle);
-    }
-
 
     /**
      *

@@ -4,6 +4,7 @@
 
 /* Libs */
 include ':client'
+include ':client-ui'
 include ':luhn'
 
 /* Examples */

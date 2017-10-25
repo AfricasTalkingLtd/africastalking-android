@@ -11,6 +11,7 @@ import com.africastalking.AfricasTalking;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
+import com.africastalking.services.CardCheckout;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
@@ -85,7 +86,8 @@ public class PaymentActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.mnuCardCheckout) {
             if (payment != null) {
-                payment.checkout(new CardCheckoutRequest(), this, new Callback<CheckoutResponse>() {
+
+                new CardCheckout(payment).startCheckout(new CardCheckoutRequest(), this, new Callback<CheckoutResponse>() {
                     @Override
                     public void onSuccess(CheckoutResponse data) {
                         Log.e("PaymentActivity", data.toString());
