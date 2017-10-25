@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.google.protobuf'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 //apply from: 'maven-push.gradle'
@@ -32,11 +31,6 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName version
-        multiDexEnabled true
-
-        ndk {
-            moduleName = "libpjsua2"
-        }
     }
     buildTypes {
         release {
@@ -51,57 +45,17 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = 'com.google.protobuf:protoc:3.3.0'
-    }
-    plugins {
-        javalite {
-            artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
-        }
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.4.0'
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.plugins {
-                javalite {}
-                grpc {
-                    // Options added to --grpc_out
-                    option 'lite'
-                }
-            }
-        }
-    }
-
-    generatedFilesBaseDir = "$projectDir/build/generated/proto"
-}
-
 repositories {
     google()
 }
 
 dependencies {
 
-    // annotations
-    compile 'javax.annotation:javax.annotation-api:1.2'
-    // compile 'com.android.support:support-annotations:25.3.1'
+    // Client
+    compile project(':client')
 
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-scalars:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
-
-    // permissions
-    compile 'com.karumi:dexter:4.1.0'
-
-    // grpc
-    compile 'io.grpc:grpc-stub:1.5.0'
-    compile 'io.grpc:grpc-okhttp:1.5.0'
-    compile 'io.grpc:grpc-protobuf-lite:1.5.0'
-
-    compile 'com.birbit:android-priority-jobqueue:2.0.1'
+    // Cards UI
+    compile project(':luhn')
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.8.1'
