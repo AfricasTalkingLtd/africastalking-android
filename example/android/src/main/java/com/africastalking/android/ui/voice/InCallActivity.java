@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.africastalking.AfricasTalking;
 import com.africastalking.AfricasTalkingException;
 import com.africastalking.android.R;
-import com.africastalking.services.VoiceService;
+import com.africastalking.ui.VoiceService;
 import com.africastalking.utils.voice.CallInfo;
 import com.africastalking.utils.voice.CallListener;
 

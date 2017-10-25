@@ -9,7 +9,7 @@ import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.sms.SendMessageResponse;
-import com.africastalking.services.SmsService;
+import com.africastalking.ui.SmsService;
 
 import timber.log.Timber;
 
@@ -27,17 +27,6 @@ public class SmsActivity extends BaseActivity {
             protected Void doInBackground(Void... params) {
 
                 try {
-                    Timber.i("Initializing SDK...");
-                    AfricasTalking.initialize(
-                            BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT, true);
-                    AfricasTalking.setLogger(new Logger() {
-                        @Override
-                        public void log(String message, Object... args) {
-                            Timber.d(message, args);
-                        }
-                    });
-
                     Timber.i("Getting sms service");
                     SmsService sms = AfricasTalking.getSmsService();
 

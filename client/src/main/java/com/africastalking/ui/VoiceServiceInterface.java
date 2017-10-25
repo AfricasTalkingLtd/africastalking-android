@@ -1,4 +1,4 @@
-package com.africastalking.services;
+package com.africastalking.ui;
 
 import com.africastalking.models.voice.QueueStatus;
 import retrofit2.Call;

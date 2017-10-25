@@ -2,7 +2,7 @@ package com.africastalking;
 
 import com.africastalking.models.payment.Business;
 import com.africastalking.models.payment.Consumer;
-import com.africastalking.services.PaymentService;
+import com.africastalking.ui.PaymentService;
 
 import org.junit.After;
 import org.junit.Before;

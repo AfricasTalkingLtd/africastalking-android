@@ -9,7 +9,7 @@ import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.airtime.AirtimeResponses;
-import com.africastalking.services.AirtimeService;
+import com.africastalking.ui.AirtimeService;
 
 import timber.log.Timber;
 
@@ -27,17 +27,6 @@ public class AirtimeActivity extends BaseActivity {
             protected Void doInBackground(Void... params) {
 
                 try {
-                    Timber.i("Initializing SDK...");
-                    AfricasTalking.initialize(
-                            BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT, true);
-                    AfricasTalking.setLogger(new Logger() {
-                        @Override
-                        public void log(String message, Object... args) {
-                            Timber.d(message, args);
-                        }
-                    });
-
                     Timber.i("Getting airtime service");
                     AirtimeService airtime = AfricasTalking.getAirtimeService();
 

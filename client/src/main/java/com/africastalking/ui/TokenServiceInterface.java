@@ -1,4 +1,4 @@
-package com.africastalking.services;
+package com.africastalking.ui;
 
 
 import retrofit2.Call;

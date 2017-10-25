@@ -6,6 +6,11 @@ package com.africastalking.models.payment.checkout;
 
 public class CardCheckoutRequest extends CheckoutRequest {
 
+    public String number;
+    public int expirationMonth;
+    public int expirationYear;
+    public int cvv;
+
     public CardCheckoutRequest() {
         this.type = TYPE.CARD;
     }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.RelativeLayout;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 
 import butterknife.BindView;
@@ -17,7 +18,11 @@ import com.africastalking.android.ui.airtime.AirtimeActivity;
 import com.africastalking.android.ui.payment.PaymentActivity;
 import com.africastalking.android.ui.sms.SmsActivity;
 import com.africastalking.android.ui.voice.VoiceActivity;
+import com.africastalking.utils.Logger;
+import com.jraska.console.Console;
 import com.jraska.console.timber.ConsoleTree;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +50,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        try {
+            Timber.i("Initializing SDK...");
+            AfricasTalking.initialize(
+                    BuildConfig.RPC_HOST,
+                    BuildConfig.RPC_PORT, true);
+            AfricasTalking.hostOverride = "kaende-api-rs-host.africastalking.com";
+            AfricasTalking.setLogger(new Logger() {
+                @Override
+                public void log(String message, Object... args) {
+                    Timber.d(message, args);
+                }
+            });
+        } catch (IOException ex) {
+            Timber.e(ex.getMessage());
+        }
     }
 
     @OnClick(R.id.airtime_layout)
@@ -65,5 +86,11 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.voice_layout)
     void voice() {
         startActivity(new Intent(this, VoiceActivity.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Console.clear();
     }
 }

@@ -9,16 +9,15 @@ import android.view.MenuItem;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
-import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
-import com.africastalking.services.CardCheckout;
+import com.africastalking.ui.CardCheckout;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
-import com.africastalking.services.PaymentService;
+import com.africastalking.ui.PaymentService;
 
 import timber.log.Timber;
 
@@ -37,17 +36,6 @@ public class PaymentActivity extends BaseActivity {
             protected Void doInBackground(Void... params) {
 
                 try {
-                    Timber.i("Initializing SDK...");
-                    AfricasTalking.initialize(
-                            BuildConfig.RPC_HOST,
-                            BuildConfig.RPC_PORT, true);
-                    AfricasTalking.setLogger(new Logger() {
-                        @Override
-                        public void log(String message, Object... args) {
-                            Timber.d(message, args);
-                        }
-                    });
-
                     Timber.i("Getting payment service");
                     payment = AfricasTalking.getPaymentService();
 
@@ -87,7 +75,7 @@ public class PaymentActivity extends BaseActivity {
         if (item.getItemId() == R.id.mnuCardCheckout) {
             if (payment != null) {
 
-                new CardCheckout(payment).startCheckout(new CardCheckoutRequest(), this, new Callback<CheckoutResponse>() {
+                new CardCheckout(payment).startCheckout(this, new Callback<CheckoutResponse>() {
                     @Override
                     public void onSuccess(CheckoutResponse data) {
                         Log.e("PaymentActivity", data.toString());

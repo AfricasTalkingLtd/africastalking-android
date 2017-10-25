@@ -12,7 +12,7 @@ import com.africastalking.utils.Logger;
 import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
-import com.africastalking.services.VoiceService;
+import com.africastalking.ui.VoiceService;
 import com.africastalking.utils.voice.CallInfo;
 import com.africastalking.utils.voice.CallListener;
 import com.africastalking.utils.voice.RegistrationListener;
@@ -159,9 +159,6 @@ public class VoiceActivity extends BaseActivity {
 
         try {
             Timber.i("Setting up pjsip....");
-            AfricasTalking.initialize(
-                    BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT, true); // blocking
             AfricasTalking.initializeVoiceService(this, mRegListener, new Callback<VoiceService>() {
                 @Override
                 public void onSuccess(VoiceService service) {

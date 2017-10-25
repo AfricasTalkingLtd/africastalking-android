@@ -1,6 +1,6 @@
 package com.africastalking;
 
-import com.africastalking.services.VoiceService;
+import com.africastalking.ui.VoiceService;
 
 import org.junit.Before;
 import org.junit.Test;

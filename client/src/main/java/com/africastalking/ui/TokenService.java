@@ -1,8 +1,7 @@
-package com.africastalking.services;
+package com.africastalking.ui;
 
 
 
-import com.africastalking.proto.SdkServerServiceOuterClass.ClientTokenResponse;
 import com.africastalking.utils.Callback;
 
 import retrofit2.Response;

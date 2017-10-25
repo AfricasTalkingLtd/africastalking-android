@@ -1,4 +1,4 @@
-package com.africastalking.services;
+package com.africastalking.ui;
 
 
 import com.africastalking.models.payment.B2BResponse;

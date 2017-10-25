@@ -1,4 +1,4 @@
-package com.africastalking.services;
+package com.africastalking.ui;
 
 
 import android.content.Context;
@@ -113,7 +113,7 @@ public final class VoiceService extends Service implements CallController {
                 protected List<SipCredentials> doInBackground(Void[] objects) {
                     try {
                         Log.d(TAG, "Fetching SIP credentials");
-                        ManagedChannel channel = com.africastalking.services.Service.getChannel(HOST, PORT);
+                        ManagedChannel channel = com.africastalking.ui.Service.getChannel(HOST, PORT);
                         SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
                         SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
                         return stub.getSipCredentials(req).getCredentialsList();
