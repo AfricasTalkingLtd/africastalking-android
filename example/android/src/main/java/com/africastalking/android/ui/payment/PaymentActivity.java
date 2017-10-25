@@ -8,16 +8,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
 import com.africastalking.ui.CardCheckout;
 import com.africastalking.utils.Callback;
-import com.africastalking.utils.Logger;
-import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
-import com.africastalking.ui.PaymentService;
+import com.africastalking.services.PaymentService;
 
 import timber.log.Timber;
 

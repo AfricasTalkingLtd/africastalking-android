@@ -1,6 +1,6 @@
 package com.africastalking;
 
-import com.africastalking.ui.AccountService;
+import com.africastalking.services.AccountService;
 
 import org.junit.After;
 import org.junit.Before;

@@ -1,6 +1,6 @@
 package com.africastalking;
 
-import com.africastalking.ui.AirtimeService;
+import com.africastalking.services.AirtimeService;
 
 import org.junit.After;
 import org.junit.Before;

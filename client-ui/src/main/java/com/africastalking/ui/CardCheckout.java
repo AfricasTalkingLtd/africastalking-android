@@ -3,10 +3,10 @@ package com.africastalking.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
+import com.africastalking.services.PaymentService;
 import com.africastalking.utils.Callback;
 
 import xyz.belvi.luhn.Luhn;

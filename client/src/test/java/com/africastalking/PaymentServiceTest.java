@@ -2,7 +2,9 @@ package com.africastalking;
 
 import com.africastalking.models.payment.Business;
 import com.africastalking.models.payment.Consumer;
-import com.africastalking.ui.PaymentService;
+import com.africastalking.models.payment.checkout.CardCheckoutRequest;
+import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
+import com.africastalking.services.PaymentService;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,8 +32,8 @@ public class PaymentServiceTest {
 
     @Test
     public void checkout() throws Exception {
-        assertNotNull("Response response is null", payment.checkout("","", "KES", 0.00f));
-        assertEquals("Status not correct", "PendingConfirmation", payment.checkout("","", "KES", 0.00f).getStatus());
+        assertNotNull("Response response is null", payment.checkout(new CardCheckoutRequest()));
+        assertEquals("Status not correct", "PendingConfirmation", payment.checkout(new MobileCheckoutRequest()).getStatus());
     }
 
     @Test

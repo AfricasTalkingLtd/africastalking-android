@@ -1,6 +1,6 @@
 package com.africastalking;
 
-import com.africastalking.ui.SmsService;
+import com.africastalking.services.SmsService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class SmsServiceTest {
 
     @Test
     public void createSubscription() throws Exception {
-        assertNotNull("Create subscription", sms.createSubscription("","",""));
+        assertNotNull("Create subscription", sms.createSubscription("","","", ""));
     }
 
 }

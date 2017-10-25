@@ -1,4 +1,4 @@
-package com.africastalking.ui;
+package com.africastalking.services;
 
 import android.text.TextUtils;
 

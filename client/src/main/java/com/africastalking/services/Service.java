@@ -1,4 +1,4 @@
-package com.africastalking.ui;
+package com.africastalking.services;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.proto.SdkServerServiceGrpc;

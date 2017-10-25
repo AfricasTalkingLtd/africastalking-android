@@ -4,12 +4,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
-import com.africastalking.utils.Logger;
-import com.africastalking.android.BuildConfig;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.sms.SendMessageResponse;
-import com.africastalking.ui.SmsService;
+import com.africastalking.services.SmsService;
 
 import timber.log.Timber;
 
