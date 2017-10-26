@@ -9,9 +9,9 @@ public class CardCheckoutRequest extends CheckoutRequest {
         this.type = TYPE.CARD;
     }
 
-    class PaymentCard {
+    public static class PaymentCard {
         public long number;
-        public short cvvNumber;
+        public int cvvNumber;
         public int expiryMonth;
         public int expiryYear;
         public String cardType;
