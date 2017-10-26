@@ -1,6 +1,10 @@
 package com.africastalking.services;
 
+import com.africastalking.models.payment.checkout.BankCheckoutRequest;
+import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
+import com.africastalking.models.payment.checkout.CheckoutValidateRequest;
+import com.africastalking.models.payment.checkout.CheckoutValidationResponse;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
 import com.africastalking.utils.Callback;
 import com.africastalking.models.payment.B2BResponse;
@@ -63,20 +67,38 @@ public class PaymentService extends Service {
 
         HashMap<String, Object> body = new HashMap<>();
 
+        body.put("username", username);
+        body.put("amount", request.amount);
+        body.put("currencyCode", request.currencyCode);
+        body.put("metadata", request.metadata);
+        if (request.narration != null) {
+            body.put("narration", request.narration);
+        }
+
         switch (request.type) {
             case MOBILE:
-                MobileCheckoutRequest rq = (MobileCheckoutRequest) request;
-                body.put("username", username);
-                body.put("productName", rq.productName);
-                body.put("phoneNumber", rq.phoneNumber);
-                body.put("amount", rq.amount);
-                body.put("currencyCode", rq.currencyCode);
-                body.put("metadata", rq.metadata);
+                MobileCheckoutRequest mobileRequest = (MobileCheckoutRequest) request;
+                body.put("productName", mobileRequest.productName);
+                body.put("phoneNumber", mobileRequest.phoneNumber);
                 break;
             case CARD:
-                // TODO: Card Request
+                CardCheckoutRequest cardRequest = (CardCheckoutRequest) request;
+                body.put("checkoutToken", cardRequest.checkoutToken);
+                body.put("paymentCard", cardRequest.paymentCard);
+                break;
+            case BANK:
+                BankCheckoutRequest bankRequest = (BankCheckoutRequest) request;
+                body.put("bankAccount", bankRequest.bankAccount);
                 break;
         }
+
+        return body;
+    }
+
+    private HashMap<String, Object> makeCheckoutValidationRequest(CheckoutValidateRequest request) {
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("transactionId", request.transactionId);
+        body.put("token", request.token);
         return body;
     }
 
@@ -117,7 +139,10 @@ public class PaymentService extends Service {
                 call = payment.mobileCheckout(body);
                 break;
             case CARD:
-                call = payment.cardCheckout(body);
+                call = payment.cardCheckoutCharge(body);
+                break;
+            case BANK:
+                call = payment.bankCheckoutCharge(body);
                 break;
             default:
                 throw new IOException("Invalid checkout type");
@@ -139,10 +164,60 @@ public class PaymentService extends Service {
                 call = payment.mobileCheckout(body);
                 break;
             case CARD:
-                call = payment.cardCheckout(body);
+                call = payment.cardCheckoutCharge(body);
+                break;
+            case BANK:
+                call = payment.bankCheckoutCharge(body);
                 break;
             default:
                 callback.onFailure(new IOException("Invalid checkout type"));
+                return;
+        }
+        call.enqueue(makeCallback(callback));
+    }
+
+    /**
+     *
+     * @param type
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    public CheckoutValidationResponse validateCheckout(CheckoutRequest.TYPE type, CheckoutValidateRequest request) throws IOException {
+        HashMap<String, Object> body = makeCheckoutValidationRequest(request);
+        Call<CheckoutValidationResponse> call;
+        switch (type) {
+            case CARD:
+                call = payment.cardCheckoutValidate(body);
+                break;
+            case BANK:
+                call = payment.bankCheckoutValidate(body);
+                break;
+            default:
+                throw new IOException("Invalid type: Only CARD and BANK are allowed");
+        }
+        Response<CheckoutValidationResponse> res = call.execute();
+        return res.body();
+    }
+
+    /**
+     *
+     * @param type
+     * @param request
+     * @param callback
+     */
+    public void validateCheckout(CheckoutRequest.TYPE type, CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback) {
+        HashMap<String, Object> body = makeCheckoutValidationRequest(request);
+        Call<CheckoutValidationResponse> call;
+        switch (type) {
+            case CARD:
+                call = payment.cardCheckoutValidate(body);
+                break;
+            case BANK:
+                call = payment.bankCheckoutValidate(body);
+                break;
+            default:
+                callback.onFailure(new IOException("Invalid type: Only CARD and BANK are allowed"));
                 return;
         }
         call.enqueue(makeCallback(callback));

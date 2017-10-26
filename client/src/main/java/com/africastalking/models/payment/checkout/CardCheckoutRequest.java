@@ -1,17 +1,22 @@
 package com.africastalking.models.payment.checkout;
 
-/**
- * Created by aksalj on 24/10/2017.
- */
-
 public class CardCheckoutRequest extends CheckoutRequest {
 
-    public String number;
-    public int expirationMonth;
-    public int expirationYear;
-    public int cvv;
+    public PaymentCard paymentCard;
+    public String checkoutToken;
 
     public CardCheckoutRequest() {
         this.type = TYPE.CARD;
+    }
+
+    class PaymentCard {
+        public long number;
+        public short cvvNumber;
+        public int expiryMonth;
+        public int expiryYear;
+        public String cardType;
+        public String countryCode;
+        public String authModel;
+        public String authToken;
     }
 }

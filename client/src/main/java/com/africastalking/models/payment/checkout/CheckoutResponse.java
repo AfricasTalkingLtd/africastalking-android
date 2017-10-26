@@ -5,6 +5,7 @@ public class CheckoutResponse {
     private String status;
     private String description;
     private String transactionId;
+    private String checkoutToken;
 
     public String getStatus() {
         return status;
@@ -30,4 +31,11 @@ public class CheckoutResponse {
         this.transactionId = transactionId;
     }
 
+    public void setCheckoutToken(String checkoutToken) {
+        this.checkoutToken = checkoutToken;
+    }
+
+    public String getCheckoutToken() {
+        return checkoutToken;
+    }
 }
