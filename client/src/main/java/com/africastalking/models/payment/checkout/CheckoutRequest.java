@@ -18,4 +18,10 @@ public abstract class CheckoutRequest {
         CARD,
         BANK,
     }
+
+    CheckoutRequest(String productName, String currencyCode, float amount) {
+        this.productName = productName;
+        this.currencyCode = currencyCode;
+        this.amount = amount;
+    }
 }

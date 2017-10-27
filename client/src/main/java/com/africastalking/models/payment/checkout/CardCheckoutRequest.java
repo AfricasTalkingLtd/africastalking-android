@@ -5,7 +5,8 @@ public class CardCheckoutRequest extends CheckoutRequest {
     public PaymentCard paymentCard;
     public String checkoutToken;
 
-    public CardCheckoutRequest() {
+    public CardCheckoutRequest(String productName, String currencyCode, float amount) {
+        super(productName, currencyCode, amount);
         this.type = TYPE.CARD;
     }
 

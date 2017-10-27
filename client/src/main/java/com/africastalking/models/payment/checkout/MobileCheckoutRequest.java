@@ -6,7 +6,9 @@ public class MobileCheckoutRequest extends CheckoutRequest {
     public String providerChannel;
     public String phoneNumber;
 
-    public MobileCheckoutRequest() {
+    public MobileCheckoutRequest(String productName, String currencyCode, float amount, String phoneNumber) {
+        super(productName, currencyCode, amount);
         this.type = TYPE.MOBILE;
+        this.phoneNumber = phoneNumber;
     }
 }

@@ -8,8 +8,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.models.payment.checkout.BankCheckoutRequest;
+import com.africastalking.models.payment.checkout.CardCheckoutRequest;
+import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
-import com.africastalking.ui.CardCheckout;
+import com.africastalking.ui.Checkout;
 import com.africastalking.utils.Callback;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
@@ -37,11 +40,7 @@ public class PaymentActivity extends BaseActivity {
                     payment = AfricasTalking.getPaymentService();
 
                     Timber.i("Checking out KES 100 from 0718769882");
-                    MobileCheckoutRequest request = new MobileCheckoutRequest();
-                    request.productName = "TestProduct";
-                    request.phoneNumber = "0718769882";
-                    request.currencyCode = "KES";
-                    request.amount = 100;
+                    MobileCheckoutRequest request = new MobileCheckoutRequest("TestProduct", "KES", 100, "0718769882");
                     CheckoutResponse res = payment.checkout(request);
 
                     Timber.i(res.getTransactionId());
@@ -69,10 +68,16 @@ public class PaymentActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.mnuCardCheckout) {
-            if (payment != null) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.mnuCardCheckout || itemId == R.id.mnuBankCheckout) {
 
-                new CardCheckout(payment).startCheckout(this, new Callback<CheckoutResponse>() {
+            CheckoutRequest request = itemId == R.id.mnuCardCheckout ?
+                    new CardCheckoutRequest("TestProduct", "NGN", 6000) :
+                    new BankCheckoutRequest("TestProduct", "NGN", 5000);
+
+            if (payment != null) {
+                Checkout checkout = new Checkout(payment);
+                checkout.start(this, request, new Callback<CheckoutResponse>() {
                     @Override
                     public void onSuccess(CheckoutResponse data) {
                         Log.e("PaymentActivity", data.toString());

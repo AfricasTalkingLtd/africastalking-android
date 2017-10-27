@@ -36,8 +36,11 @@ android {
 
         ndk {
             moduleName = "libpjsua2"
+            abiFilters "armeabi", "x86" // TODO: Build pjsua for all architectures
         }
     }
+
+
     buildTypes {
         release {
             minifyEnabled false

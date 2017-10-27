@@ -31,13 +31,14 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <include layout="@layout/lh_pan_layout" />
+                <include layout="@layout/lh_bank_account_name_layout" />
 
-                <include layout="@layout/lh_exp_cvv_grp_layout" />
+                <include layout="@layout/lh_bank_number_layout" />
 
-                <include layout="@layout/lh_pin_layout" />
+                <include layout="@layout/lh_bank_country_layout" />
 
                 <include layout="@layout/lh_otp_layout" />
+
             </android.support.v7.widget.LinearLayoutCompat>
 
         </android.support.v4.widget.NestedScrollView>

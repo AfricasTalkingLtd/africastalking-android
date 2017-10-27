@@ -5,7 +5,11 @@
     <item
         android:id="@+id/mnuCardCheckout"
         android:title="Card"
-        app:showAsAction="always"
-        android:icon="@drawable/payment_method_generic_card"/>
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/mnuBankCheckout"
+        android:title="Bank"
+        app:showAsAction="always"/>
 
 </menu>
