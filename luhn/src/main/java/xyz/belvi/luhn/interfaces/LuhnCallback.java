@@ -2,6 +2,7 @@ package xyz.belvi.luhn.interfaces;
 
 import android.content.Context;
 
+import xyz.belvi.luhn.cardValidator.models.LuhnBank;
 import xyz.belvi.luhn.cardValidator.models.LuhnCard;
 
 /**
@@ -9,9 +10,12 @@ import xyz.belvi.luhn.cardValidator.models.LuhnCard;
  */
 
 public interface LuhnCallback {
-    void cardDetailsRetrieved(Context luhnContext, LuhnCard creditCard, LuhnCardVerifier cardVerifier);
 
-    void otpRetrieved(Context luhnContext, LuhnCardVerifier cardVerifier, String otp);
+    void bankDetailsRetrieved(Context luhnContext, LuhnBank bank, LuhnVerifier verifier);
+
+    void cardDetailsRetrieved(Context luhnContext, LuhnCard creditCard, LuhnVerifier verifier);
+
+    void otpRetrieved(Context luhnContext, LuhnVerifier verifier, String otp);
 
     void onFinished(boolean isVerified);
 }

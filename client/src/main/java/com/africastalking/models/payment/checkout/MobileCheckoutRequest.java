@@ -1,21 +1,14 @@
 package com.africastalking.models.payment.checkout;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Created by aksalj on 24/10/2017.
- */
 
 public class MobileCheckoutRequest extends CheckoutRequest {
 
-    public String productName;
+    public String providerChannel;
     public String phoneNumber;
-    public String currencyCode;
-    public float amount;
-    public Map metadata = new HashMap();
 
-    public MobileCheckoutRequest() {
+    public MobileCheckoutRequest(String productName, String currencyCode, float amount, String phoneNumber) {
+        super(productName, currencyCode, amount);
         this.type = TYPE.MOBILE;
+        this.phoneNumber = phoneNumber;
     }
 }

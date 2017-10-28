@@ -3,8 +3,14 @@
 
     <application>
         <activity
-            android:name=".Luhn"
+            android:name=".Cuhn"
             android:label="@string/add_card"
+            android:theme="@style/LuhnAppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".Buhn"
+            android:label="@string/add_bank"
             android:theme="@style/LuhnAppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
     </application>

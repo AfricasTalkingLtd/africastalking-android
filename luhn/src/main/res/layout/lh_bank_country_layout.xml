@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:hint="@string/country"
+        android:textColorHint="@color/ln_colorHint"
+        app:errorEnabled="true"
+        app:theme="@style/MyTextInputLayout">
+
+        <xyz.belvi.luhn.customTextInputLayout.inputLayouts.AutoCompleteDropdown
+            android:id="@+id/country_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:textSize="@dimen/ln_input_size"
+            app:theme="@style/MyTextInputEdit" />
+    </xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout>
+
+
+    <xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:hint="@string/bank"
+        android:textColorHint="@color/ln_colorHint"
+        app:errorEnabled="true"
+        app:theme="@style/MyTextInputLayout">
+
+        <xyz.belvi.luhn.customTextInputLayout.inputLayouts.AutoCompleteDropdown
+            android:id="@+id/bank_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:textSize="@dimen/ln_input_size"
+            app:theme="@style/MyTextInputEdit" />
+
+
+    </xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout>
+
+
+</android.support.v7.widget.LinearLayoutCompat>
+

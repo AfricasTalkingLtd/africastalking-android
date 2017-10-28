@@ -1,7 +1,5 @@
 package com.africastalking.services;
 
-import android.util.Log;
-
 import com.africastalking.AfricasTalking;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;

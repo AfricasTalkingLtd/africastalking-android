@@ -1,13 +1,9 @@
 package com.africastalking;
 
-import android.content.res.Resources;
-import android.text.TextUtils;
-
 import com.africastalking.services.SmsService;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
@@ -55,7 +51,7 @@ public class SmsServiceTest {
 
     @Test
     public void createSubscription() throws Exception {
-        assertNotNull("Create subscription", sms.createSubscription("","",""));
+        assertNotNull("Create subscription", sms.createSubscription("","","", ""));
     }
 
 }

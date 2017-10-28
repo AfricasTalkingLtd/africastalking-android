@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ctil_otp_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:visibility="gone">
+    android:visibility="gone"
+    tools:visibility="visible">
 
     <xyz.belvi.luhn.customTextInputLayout.inputLayouts.CardTextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,7 +29,6 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:inputType="textPassword"
-            android:maxLength="4"
             android:textSize="@dimen/ln_input_size"
             app:theme="@style/MyTextInputEdit" />
     </xyz.belvi.luhn.customTextInputLayout.inputLayouts.CardTextInputLayout>

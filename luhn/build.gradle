@@ -1,4 +1,25 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.0-rc2'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+group properties.getProperty("bintray.groupId")
+version properties.getProperty("bintray.version")
 
 android {
     compileSdkVersion 26
@@ -9,7 +30,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName version
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -19,6 +40,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -31,5 +56,84 @@ dependencies {
     }
     compile ('uk.co.chrisjenx:calligraphy:2.3.0'){
         exclude group: "com.android.support"
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+task findConventions {
+    doLast {
+        println project.getConvention()
+    }
+}
+
+
+bintray {
+    dryRun = false
+    publish = true
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.key")
+
+    configurations = ['archives'] //When uploading configuration files
+    pkg {
+        repo = properties.getProperty("bintray.repo")
+        name = properties.getProperty("bintray.package")
+        userOrg = properties.getProperty("bintray.organization")
+        vcsUrl = properties.getProperty("bintray.vcsUrl")
+        licenses = ['MIT']
+        labels = ['android', 'africastalking', 'sms', 'voice', 'ussd', 'airtime', 'payment']
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'Africa\'s Talking Android SDK'
+                groupId = properties.getProperty("bintray.groupId")
+                artifactId = 'luhn'
+                url properties.getProperty("bintray.vcsUrl")
+                licenses {
+                    license {
+                        name 'MIT'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'aksalj'
+                        name 'Salama AB'
+                        email 'aksalj@aksalj.com'
+                    }
+                    developer {
+                        id 'jaykayitare'
+                        name 'Jay Kayitare'
+                        email 'jaykayitare@gmail.com'
+                    }
+                }
+                scm {
+                    connection properties.getProperty("bintray.vcsUrl")
+                    developerConnection properties.getProperty("bintray.vcsUrl")
+                    url properties.getProperty("bintray.vcsUrl")
+                }
+            }
+        }
     }
 }
