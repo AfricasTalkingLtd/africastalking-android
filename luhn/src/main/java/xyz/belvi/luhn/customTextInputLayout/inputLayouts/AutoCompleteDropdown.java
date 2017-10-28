@@ -2,16 +2,11 @@ package xyz.belvi.luhn.customTextInputLayout.inputLayouts;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ListView;
-
-import xyz.belvi.luhn.R;
 
 
 public class AutoCompleteDropdown extends AppCompatAutoCompleteTextView {

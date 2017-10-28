@@ -13,17 +13,7 @@
     <string name="exp_details">You should be able to find this date on the front of your card, under your card number.</string>
     <string name="pin_details">You can\'t find this on the card. It is a 4 digit security pin to authorised card transactions.\nYou might have to contact your bank if you\'ve forgotten the pin</string>
     <string name="otp_details">One time verification password sent from your bank to your registered mobile number to verify transaction</string>
-
-
-    <string-array name="banks">
-        <item>Access Bank</item>
-        <item>Ecobank Bank</item>
-        <item>GT Bank</item>
-    </string-array>
-
-    <string-array name="countries">
-        <item>Nigeria</item>
-        <item>Kenya</item>
-    </string-array>
+    <string name="country">Country</string>
+    <string name="bank">Bank</string>
 
 </resources>

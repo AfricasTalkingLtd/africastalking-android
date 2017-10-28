@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import xyz.belvi.luhn.customTextInputLayout.inputLayouts.CardTextInputLayout;
+import xyz.belvi.luhn.customTextInputLayout.textWatchers.OTPTextWatcher;
 import xyz.belvi.luhn.screens.CardVerificationProgressScreen;
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -68,6 +69,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected BottomSheetBehavior bottomSheetBehavior;
     protected CardTextInputLayout otpInputLayout;
     protected boolean OTP_MODE;
+    protected String otp;
 
     protected void hideKeyboard() {
         View view = this.getCurrentFocus();
@@ -95,6 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected abstract void initViews();
+    protected abstract void enableNextBtn();
 
     protected void initStyle(int style) {
         TypedArray ta = obtainStyledAttributes(style, R.styleable.luhnStyle);
@@ -102,6 +105,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         String title = ta.getString(R.styleable.luhnStyle_luhn_title);
         includeCalligraphy(fontName);
         initViews();
+        initBottomSheet();
         retrievePin = ta.getBoolean(R.styleable.luhnStyle_luhn_show_pin, false);
         ((AppCompatTextView) findViewById(R.id.toolbar_title)).setText(TextUtils.isEmpty(title) ? "Checkout" : title);
         findViewById(R.id.btn_proceed).setBackground(ta.getDrawable(R.styleable.luhnStyle_luhn_btn_verify_selector));
@@ -151,6 +155,23 @@ public abstract class BaseActivity extends AppCompatActivity {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
+    protected void initBottomSheet() {
+        llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        llBottomSheet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+        findViewById(R.id.ok_dimiss).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss(v);
+            }
+        });
+    }
+
 
     protected void dismiss(View v) {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -160,6 +181,34 @@ public abstract class BaseActivity extends AppCompatActivity {
         android.support.v7.widget.LinearLayoutCompat.LayoutParams params = (android.support.v7.widget.LinearLayoutCompat.LayoutParams) view.getLayoutParams();
         params.setMargins(left, top, right, bottom); //left, top, right, bottom
         view.setLayoutParams(params);
+    }
+
+    protected void initOtp(final int otpLength) {
+        OTP_MODE = true;
+        findViewById(R.id.ctil_otp_layout).setVisibility(View.VISIBLE);
+        otpInputLayout = (CardTextInputLayout) findViewById(R.id.ctil_otp_input);
+        otpInputLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                otpInputLayout.requestFocus();
+                showKeyboard();
+                otpInputLayout.getPasswordToggleView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showInfo(R.string.otp_header, R.string.otp_details, R.drawable.payment_bank_pin, false);
+
+                    }
+                });
+                otpInputLayout.getEditText().addTextChangedListener(new OTPTextWatcher(otpInputLayout, otpLength) {
+                    @Override
+                    public void onValidated(boolean moveToNext, String otpValue) {
+                        otp = otpValue;
+                        enableNextBtn();
+                    }
+                });
+            }
+        });
+
     }
 
     @Override

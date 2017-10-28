@@ -23,7 +23,6 @@ import xyz.belvi.luhn.customTextInputLayout.inputLayouts.PinTextInputLayout;
 import xyz.belvi.luhn.customTextInputLayout.textWatchers.CardNumberTextWatcher;
 import xyz.belvi.luhn.customTextInputLayout.textWatchers.CvvTextWatcher;
 import xyz.belvi.luhn.customTextInputLayout.textWatchers.ExpiringDateTextWatcher;
-import xyz.belvi.luhn.customTextInputLayout.textWatchers.OTPTextWatcher;
 import xyz.belvi.luhn.customTextInputLayout.textWatchers.PinTextWatcher;
 import xyz.belvi.luhn.interfaces.LuhnVerifier;
 import xyz.belvi.luhn.screens.CardVerificationProgressScreen;
@@ -37,7 +36,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
     private PinTextInputLayout pinInputLayout;
 
     private int expMonth, expYear;
-    private String cardPan, cardName, cvv, expDate, pin, otp;
+    private String cardPan, cardName, cvv, expDate, pin;
 
     private final int CARDIO_REQUEST_ID = 555;
 
@@ -136,7 +135,6 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
     @Override
     protected void initViews() {
         initCardField();
-        initBottomSheet();
         initExpiryDateField();
         initCvvField();
         initPin();
@@ -155,22 +153,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
         });
     }
 
-    private void initBottomSheet() {
-        llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
-        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
-        llBottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
-        });
-        findViewById(R.id.ok_dimiss).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss(v);
-            }
-        });
-    }
+
 
 
     private void initCardField() {
@@ -259,7 +242,6 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
 
     }
 
-
     private void initCvvField() {
         cvvInputLayout = (CardTextInputLayout) findViewById(R.id.ctil_cvv_input);
 
@@ -314,33 +296,6 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
 
     }
 
-    private void initOtp(final int otpLength) {
-        OTP_MODE = true;
-        findViewById(R.id.ctil_otp_layout).setVisibility(View.VISIBLE);
-        otpInputLayout = (CardTextInputLayout) findViewById(R.id.ctil_otp_input);
-        otpInputLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                otpInputLayout.requestFocus();
-                showKeyboard();
-                otpInputLayout.getPasswordToggleView().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        showInfo(R.string.otp_header, R.string.otp_details, R.drawable.payment_bank_pin, false);
-
-                    }
-                });
-                otpInputLayout.getEditText().addTextChangedListener(new OTPTextWatcher(otpInputLayout, otpLength) {
-                    @Override
-                    public void onValidated(boolean moveToNext, String otpValue) {
-                        otp = otpValue;
-                        enableNextBtn();
-                    }
-                });
-            }
-        });
-
-    }
 
     public void onScanPress(View v) {
 
@@ -363,7 +318,8 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
     }
 
 
-    void enableNextBtn() {
+    @Override
+    protected void enableNextBtn() {
         if (OTP_MODE)
             findViewById(R.id.btn_proceed).setEnabled(otpInputLayout.hasValidInput());
         else if (retrievePin)

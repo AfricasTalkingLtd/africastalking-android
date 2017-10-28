@@ -14,7 +14,7 @@ import xyz.belvi.luhn.customTextInputLayout.inputLayouts.CardTextInputLayout;
 public abstract class OTPTextWatcher implements TextWatcher {
     private CardTextInputLayout mCardTextInputLayout;
 
-    int length = 0;
+    int length = 1;
 
     public OTPTextWatcher(CardTextInputLayout cardTextInputLayout, int length) {
         this.length = length;
@@ -30,13 +30,6 @@ public abstract class OTPTextWatcher implements TextWatcher {
                 }
             }
         });
-        setMaxLength(length);
-    }
-
-    private void setMaxLength(int length) {
-        InputFilter[] FilterArray = new InputFilter[1];
-        FilterArray[0] = new InputFilter.LengthFilter(length);
-        mCardTextInputLayout.getEditText().setFilters(FilterArray);
     }
 
 
@@ -68,7 +61,7 @@ public abstract class OTPTextWatcher implements TextWatcher {
     }
 
     private boolean isValid(CharSequence source) {
-        return source.toString().length() == length;
+        return source.toString().length() >= length;
     }
 
     protected abstract void onValidated(boolean moveToNext, String pin);
