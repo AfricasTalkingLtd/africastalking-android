@@ -2,6 +2,7 @@ package com.africastalking.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
@@ -17,6 +18,7 @@ import xyz.belvi.luhn.cardValidator.models.LuhnBank;
 import xyz.belvi.luhn.cardValidator.models.LuhnCard;
 import xyz.belvi.luhn.interfaces.LuhnCallback;
 import xyz.belvi.luhn.interfaces.LuhnVerifier;
+import io.card.payment.CardIOActivity;
 
 public class Checkout {
 
@@ -142,7 +144,16 @@ public class Checkout {
                 return;
         }
 
-        Luhn.startLuhn(context, type, R.style.AfricasTalkingStyle, new LuhnCallback() {
+        Bundle cardIoBundle = new Bundle();
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_REQUIRE_EXPIRY, false); // default: false
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_SCAN_EXPIRY, false); // default: false
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_REQUIRE_CVV, false); // default: false
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_REQUIRE_POSTAL_CODE, false); // default: false
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_HIDE_CARDIO_LOGO, true); // default: false
+        cardIoBundle.putBoolean(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, false); // default: false
+
+
+        Luhn.startLuhn(context, type, R.style.AfricasTalkingStyle, cardIoBundle, new LuhnCallback() {
 
             @Override
             public void bankDetailsRetrieved(Context luhnContext, LuhnBank bank, final LuhnVerifier verifier) {
