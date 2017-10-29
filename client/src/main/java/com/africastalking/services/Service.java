@@ -102,7 +102,9 @@ public abstract class Service {
                 .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().setLenient().create())) // switched from ScalarsConverterFactory
                 .client(httpClient.build());
 
-        token = fetchToken(HOST, PORT);
+        if (token == null || token.getExpiration() < System.currentTimeMillis()) {
+            token = fetchToken(HOST, PORT);
+        }
         isSandbox = token.getEnvironment().toLowerCase().contentEquals("sandbox");
         username = token.getUsername();
         
