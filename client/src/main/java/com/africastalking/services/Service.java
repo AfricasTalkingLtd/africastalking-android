@@ -94,7 +94,7 @@ public abstract class Service {
                     LOGGER.log(message);
                 }
             });
-            logger.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            logger.setLevel(HttpLoggingInterceptor.Level.BODY);
             httpClient.addInterceptor(logger);
         }
 
