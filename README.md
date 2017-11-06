@@ -50,7 +50,17 @@ public class SomeActivity extends Activity {
             AirtimeService airtime = AfricasTalking.getAirtimeService();
 
             // Use Service
-            AirtimeResponses responses = airtime.send("+25467675655", "KES", 100);
+            airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
+              @Override
+              void onSuccess(AirtimeResponses responses) {
+                //...
+              }
+
+              @Override
+              void onError(Throwable throwable) {
+                //...
+              }
+            });
         
         } catch (IOException ex) {
             // grrr
@@ -96,6 +106,21 @@ Or Maven (from `http://dl.bintray.com/africastalking/android`)
 
 #### Client (Android)
 ```groovy
+
+android {
+
+    // ...
+    
+    defaultConfig {
+        
+        // ...
+        
+        ndk {
+            abiFilters "armeabi", "x86"
+        }
+    }
+}
+
 repositories {
   maven {
     url  "http://dl.bintray.com/africastalking/android"
@@ -103,6 +128,8 @@ repositories {
 }
 dependencies{
   compile 'com.africastalking:client:VERSION'
+  // or
+  compile 'com.africastalking:client-ui:VERSION' // with checkout UI for payment
 }
 ```
 
@@ -158,11 +185,61 @@ For more information on:
 
 ### `Payment`
 
-- `checkout(String productName, String phoneNumber, String currencyCode, float amount)`: Initiate mobile checkout.
+- `checkout(CheckoutRequest request)`: Initiate checkout(mobile, card or bank).
+
+- `validateCheckout(CheckoutValidateRequest request)`: Validate checkout (card or bank).
 
 - `payConsumers(String productName, List<Consumer> recipients)`: Send money to consumer. 
 
 - `payBusiness(String productName, Business recipient)`: Send money to business.
+
+### Voice
+
+Unlike other services, voice is initialized as follows:
+
+```java
+AfricasTalking.initializeVoiceService(Context cxt, RegistrationListener listener, new Callback<VoiceService>() {
+    @Override
+    public void onSuccess(VoiceService service) {
+      // keep a reference to the 'service'
+    }
+
+    @Override
+    public void onFailure(Throwable throwable) {
+      // something blew up
+    }
+});
+```
+
+
+- `registerCallListener(CallListener listener)`:
+
+- `makeCall(String phoneNumber)`:
+
+- `picCall()`:
+
+- `holdCall()`:
+
+- `resumeCall()`:
+
+- `endCall()`:
+
+- `sendDtmf(char character)`:
+
+- `startAudio()`:
+
+- `toggleMute()`:
+
+- `setSpeakerMode(Context context, boolean loudSpeaker)`:
+
+- `isCallInProgress()`:
+
+- `getCallInfo()`
+
+- `queueStatus(String phoneNumbers)`:
+
+- `mediaUpload(String url)`:
+
 
 
 ## Requirements

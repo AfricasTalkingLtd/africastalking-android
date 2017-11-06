@@ -106,9 +106,10 @@ public class Checkout {
         }
 
         CheckoutValidateRequest validateRequest = new CheckoutValidateRequest();
+        validateRequest.type = type;
         validateRequest.token = otp;
         validateRequest.transactionId = checkoutResponse.getTransactionId();
-        paymentService.validateCheckout(type, validateRequest, new Callback<CheckoutValidationResponse>() {
+        paymentService.validateCheckout(validateRequest, new Callback<CheckoutValidationResponse>() {
             @Override
             public void onSuccess(CheckoutValidationResponse data) {
                 boolean success = data.status.contentEquals(STATUS_SUCCESS);

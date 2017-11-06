@@ -178,15 +178,14 @@ public class PaymentService extends Service {
 
     /**
      *
-     * @param type
      * @param request
      * @return
      * @throws IOException
      */
-    public CheckoutValidationResponse validateCheckout(CheckoutRequest.TYPE type, CheckoutValidateRequest request) throws IOException {
+    public CheckoutValidationResponse validateCheckout(CheckoutValidateRequest request) throws IOException {
         HashMap<String, Object> body = makeCheckoutValidationRequest(request);
         Call<CheckoutValidationResponse> call;
-        switch (type) {
+        switch (request.type) {
             case CARD:
                 call = payment.cardCheckoutValidate(body);
                 break;
@@ -202,14 +201,13 @@ public class PaymentService extends Service {
 
     /**
      *
-     * @param type
      * @param request
      * @param callback
      */
-    public void validateCheckout(CheckoutRequest.TYPE type, CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback) {
+    public void validateCheckout(CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback) {
         HashMap<String, Object> body = makeCheckoutValidationRequest(request);
         Call<CheckoutValidationResponse> call;
-        switch (type) {
+        switch (request.type) {
             case CARD:
                 call = payment.cardCheckoutValidate(body);
                 break;
