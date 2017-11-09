@@ -5,19 +5,20 @@ public final class CardCheckoutRequest extends CheckoutRequest {
     public PaymentCard paymentCard;
     public String checkoutToken;
 
-    public CardCheckoutRequest(String productName, String amount) {
+    public CardCheckoutRequest(String productName, String amount, String narration) {
         super(productName, amount);
         this.type = TYPE.CARD;
+        this.narration = narration;
     }
 
-    public CardCheckoutRequest(String productName, String amount, PaymentCard paymentCard) {
-        this(productName, amount);
+    public CardCheckoutRequest(String productName, String amount, String narration, PaymentCard paymentCard) {
+        this(productName, amount, narration);
         this.paymentCard = paymentCard;
     }
 
 
-    public CardCheckoutRequest(String productName, String amount, String checkoutToken) {
-        this(productName, amount);
+    public CardCheckoutRequest(String productName, String amount, String narration, String checkoutToken) {
+        this(productName, amount, narration);
         this.checkoutToken = checkoutToken;
     }
 

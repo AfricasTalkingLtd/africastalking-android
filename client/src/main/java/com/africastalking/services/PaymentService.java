@@ -83,8 +83,11 @@ public class PaymentService extends Service {
                 break;
             case CARD:
                 CardCheckoutRequest cardRequest = (CardCheckoutRequest) request;
-                body.put("checkoutToken", cardRequest.checkoutToken);
-                body.put("paymentCard", cardRequest.paymentCard);
+                if (cardRequest.checkoutToken != null) {
+                    body.put("checkoutToken", cardRequest.checkoutToken);
+                } else {
+                    body.put("paymentCard", cardRequest.paymentCard);
+                }
                 break;
             case BANK:
                 BankCheckoutRequest bankRequest = (BankCheckoutRequest) request;

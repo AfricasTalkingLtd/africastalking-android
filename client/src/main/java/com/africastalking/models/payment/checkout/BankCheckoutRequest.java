@@ -4,9 +4,10 @@ public final class BankCheckoutRequest extends CheckoutRequest {
 
     public BankAccount bankAccount;
 
-    public BankCheckoutRequest(String productName, String amount) {
+    public BankCheckoutRequest(String productName, String amount, String narration) {
         super(productName, amount);
         this.type = TYPE.BANK;
+        this.narration = narration;
     }
 
     /**
