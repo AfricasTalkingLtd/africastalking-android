@@ -1,13 +1,17 @@
 package com.africastalking.android.ui.sms;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
+import com.africastalking.models.sms.Recipient;
 import com.africastalking.models.sms.SendMessageResponse;
 import com.africastalking.services.SmsService;
+
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -19,7 +23,7 @@ public class SmsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms);
 
-        AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -29,10 +33,10 @@ public class SmsActivity extends BaseActivity {
                     SmsService sms = AfricasTalking.getSmsService();
 
                     Timber.i("Sending hello to 0718769882");
-                    SendMessageResponse res = sms.send("hello", new String[]{"0718769882"});
+                    List<Recipient> res = sms.send("hello", new String[]{"0718769882"});
 
-                    Timber.i(res.getSMSMessageData().getRecipients().get(0).getMessageId());
-                    Timber.i(res.getSMSMessageData().getRecipients().get(0).getStatus());
+                    Timber.i(res.get(0).messageId);
+                    Timber.i(res.get(0).status);
 
                 } catch (Exception e) {
                     Timber.e(e, "IOException");

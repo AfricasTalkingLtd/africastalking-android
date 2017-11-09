@@ -5,26 +5,26 @@ public final class CardCheckoutRequest extends CheckoutRequest {
     public PaymentCard paymentCard;
     public String checkoutToken;
 
-    private CardCheckoutRequest(String productName, String currencyCode, float amount) {
-        super(productName, currencyCode, amount);
+    public CardCheckoutRequest(String productName, String amount) {
+        super(productName, amount);
         this.type = TYPE.CARD;
     }
 
-    public CardCheckoutRequest(String productName, String currencyCode, float amount, PaymentCard paymentCard) {
-        this(productName, currencyCode, amount);
+    public CardCheckoutRequest(String productName, String amount, PaymentCard paymentCard) {
+        this(productName, amount);
         this.paymentCard = paymentCard;
     }
 
 
-    public CardCheckoutRequest(String productName, String currencyCode, float amount, String checkoutToken) {
-        this(productName, currencyCode, amount);
+    public CardCheckoutRequest(String productName, String amount, String checkoutToken) {
+        this(productName, amount);
         this.checkoutToken = checkoutToken;
     }
 
     /**
      * A payment card
      */
-    public final class PaymentCard {
+    public static final class PaymentCard {
 
         public long number;
         public int cvvNumber;

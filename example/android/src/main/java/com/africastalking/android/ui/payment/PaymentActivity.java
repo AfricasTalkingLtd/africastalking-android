@@ -1,5 +1,6 @@
 package com.africastalking.android.ui.payment;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,7 +31,7 @@ public class PaymentActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
-        AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -40,12 +41,12 @@ public class PaymentActivity extends BaseActivity {
                     payment = AfricasTalking.getPaymentService();
 
                     Timber.i("Checking out KES 100 from 0718769882");
-                    MobileCheckoutRequest request = new MobileCheckoutRequest("TestProduct", "KES", 100, "0718769882");
+                    MobileCheckoutRequest request = new MobileCheckoutRequest("TestProduct", "KES 100", "0718769882");
                     CheckoutResponse res = payment.checkout(request);
 
-                    Timber.i(res.getTransactionId());
-                    Timber.i(res.getStatus());
-                    Timber.i(res.getDescription());
+                    Timber.i(res.transactionId);
+                    Timber.i(res.status);
+                    Timber.i(res.description);
 
                 } catch (Exception e) {
                     Timber.e(e, "IOException");
@@ -72,8 +73,8 @@ public class PaymentActivity extends BaseActivity {
         if (itemId == R.id.mnuCardCheckout || itemId == R.id.mnuBankCheckout) {
 
             CheckoutRequest request = itemId == R.id.mnuCardCheckout ?
-                    new CardCheckoutRequest("TestProduct", "NGN", 6000) :
-                    new BankCheckoutRequest("TestProduct", "NGN", 5000);
+                    new CardCheckoutRequest("TestProduct", "NGN 6000") :
+                    new BankCheckoutRequest("TestProduct", "NGN 5000");
 
             if (payment != null) {
                 Checkout checkout = new Checkout(payment);

@@ -19,9 +19,15 @@ public abstract class CheckoutRequest {
         BANK,
     }
 
-    CheckoutRequest(String productName, String currencyCode, float amount) {
+    CheckoutRequest(String productName, String amount) {
         this.productName = productName;
-        this.currencyCode = currencyCode;
-        this.amount = amount;
+
+        try {
+            String[] currenciedAmount = amount.trim().split(" ");
+            this.currencyCode = currenciedAmount[0];
+            this.amount = Float.parseFloat(currenciedAmount[1]);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

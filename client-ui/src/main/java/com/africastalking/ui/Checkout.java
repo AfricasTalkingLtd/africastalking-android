@@ -5,7 +5,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
+import com.africastalking.models.payment.checkout.BankCheckoutRequest.BankAccount;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
+import com.africastalking.models.payment.checkout.CardCheckoutRequest.PaymentCard;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
 import com.africastalking.models.payment.checkout.CheckoutValidateRequest;
@@ -33,25 +35,28 @@ public class Checkout {
         this.paymentService = service;
     }
 
-    private void handleCardCharge(CardCheckoutRequest request, LuhnCard creditCard, final LuhnVerifier verifier, final Callback<CheckoutResponse> callback) {
+    private void handleCardCharge(CardCheckoutRequest request, LuhnCard paymentCard, final LuhnVerifier verifier, final Callback<CheckoutResponse> callback) {
 
-        request.checkoutToken = null; // FIXME: ???
-        request.paymentCard = new CardCheckoutRequest.PaymentCard();
-        request.paymentCard.cvvNumber = Integer.parseInt(creditCard.getCvv());
-        request.paymentCard.expiryMonth = creditCard.getExpMonth();
-        request.paymentCard.expiryYear = creditCard.getExpYear();
-        request.paymentCard.number = Long.parseLong(creditCard.getPan()); // FIXME: ???
+        request.checkoutToken = null;
+        request.paymentCard = new PaymentCard(
+                Long.parseLong(paymentCard.getPan()),
+                Integer.parseInt(paymentCard.getCvv()),
+                paymentCard.getExpMonthShort(),
+                paymentCard.getExpYear(),
+                paymentCard.getCountryCode(),
+                paymentCard.getPin()
+        );
 
         paymentService.checkout(request, new Callback<CheckoutResponse>() {
             @Override
             public void onSuccess(CheckoutResponse data) {
                 checkoutResponse = data;
-                boolean success = data.getStatus().contentEquals(STATUS_SUCCESS);
+                boolean success = data.status.contentEquals(STATUS_SUCCESS);
                 if (success) {
                     verifier.requestOTP(OTP_LENGTH);
                 } else {
-                    verifier.onDetailsVerified(false, "Payment Failed", data.getDescription());
-                    callback.onFailure(new Exception(data.getDescription()));
+                    verifier.onDetailsVerified(false, "Payment Failed", data.description);
+                    callback.onFailure(new Exception(data.description));
                 }
             }
 
@@ -67,22 +72,24 @@ public class Checkout {
 
     private void handleBankCharge(BankCheckoutRequest request, LuhnBank bank, final LuhnVerifier verifier, final Callback<CheckoutResponse> callback) {
 
-        request.bankAccount = new BankCheckoutRequest.BankAccount();
-        request.bankAccount.accountName = bank.getAccountName();
-        request.bankAccount.accountNumber = bank.getAccountNumber();
-        request.bankAccount.bankName = bank.getBankName();
-        request.bankAccount.countryCode = bank.getCountryCode();
+        request.bankAccount = new BankAccount(
+                bank.getAccountName(),
+                bank.getAccountNumber(),
+                bank.getCountryCode(),
+                bank.getBankCode(),
+                bank.getBankName()
+        );
 
         paymentService.checkout(request, new Callback<CheckoutResponse>() {
             @Override
             public void onSuccess(CheckoutResponse data) {
                 checkoutResponse = data;
-                boolean success = data.getStatus().contentEquals(STATUS_SUCCESS);
+                boolean success = data.status.contentEquals(STATUS_SUCCESS);
                 if (success) {
                     verifier.requestOTP(OTP_LENGTH);
                 } else {
-                    verifier.onDetailsVerified(false, "Payment Failed", data.getDescription());
-                    callback.onFailure(new Exception(data.getDescription()));
+                    verifier.onDetailsVerified(false, "Payment Failed", data.description);
+                    callback.onFailure(new Exception(data.description));
                 }
             }
 
@@ -108,7 +115,7 @@ public class Checkout {
         CheckoutValidateRequest validateRequest = new CheckoutValidateRequest();
         validateRequest.type = type;
         validateRequest.token = otp;
-        validateRequest.transactionId = checkoutResponse.getTransactionId();
+        validateRequest.transactionId = checkoutResponse.transactionId;
         paymentService.validateCheckout(validateRequest, new Callback<CheckoutValidationResponse>() {
             @Override
             public void onSuccess(CheckoutValidationResponse data) {

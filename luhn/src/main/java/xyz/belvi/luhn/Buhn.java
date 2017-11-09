@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseArray;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import xyz.belvi.luhn.cardValidator.models.LuhnBank;
 import xyz.belvi.luhn.customTextInputLayout.inputLayouts.AutoCompleteDropdown;
@@ -32,16 +35,16 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
     BankTextInputLayout accountName, accountNumber;
     CardTextInputLayout otp;
 
-    private static ArrayList<String> banks = new ArrayList<>();
+    private static HashMap<Integer, String> banks = new HashMap<>();
     private static HashMap<String, String> countries = new HashMap<>();
 
     static {
-        banks.add("Access Bank");
-        banks.add("Fidelity");
-        banks.add("GT Bank");
-        banks.add("Zenith Bank");
-        banks.add("Wema Bank");
-        banks.add("Comercica");
+        banks.put(0, "Access Bank");
+        banks.put(1, "Fidelity");
+        banks.put(2, "GT Bank");
+        banks.put(3, "Zenith Bank");
+        banks.put(4, "Wema Bank");
+        banks.put(5, "Comercica");
 
         countries.put("NG", "Nigeria");
         countries.put("KE", "Kenya");
@@ -104,7 +107,7 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
         // TODO: Load banks based on Country
         bankName = (AutoCompleteDropdown) findViewById(R.id.bank_name);
         bankName.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, banks));
+                android.R.layout.simple_dropdown_item_1line, new ArrayList<String>(banks.values())));
 
         countryName = (AutoCompleteDropdown) findViewById(R.id.country_name);
         countryName.setAdapter(new ArrayAdapter<String>(this,
@@ -132,6 +135,8 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
         bankName.addTextChangedListener(watchSelection);
         countryName.addTextChangedListener(watchSelection);
 
+        final List<Integer> bankCodes = new ArrayList<>(banks.keySet());
+
         findViewById(R.id.btn_proceed).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,10 +154,21 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
                             }
                         }
 
+                        String name = bankName.getText().toString();
+                        Integer code = -1;
+
+                        for(Integer c: bankCodes) {
+                            if (banks.get(c).contentEquals(name)) {
+                                code = c;
+                                break;
+                            }
+                        }
+
                         LuhnBank bank = new LuhnBank(
                                 accountName.getEditText().getText().toString(),
                                 accountNumber.getEditText().getText().toString(),
-                                bankName.getText().toString(),
+                                name,
+                                code,
                                 countryCode);
                         Luhn.sLuhnCallback.bankDetailsRetrieved(Buhn.this, bank, Buhn.this);
                     }

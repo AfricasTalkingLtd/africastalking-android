@@ -4,15 +4,15 @@ public final class BankCheckoutRequest extends CheckoutRequest {
 
     public BankAccount bankAccount;
 
-    public BankCheckoutRequest(String productName, String currencyCode, float amount) {
-        super(productName, currencyCode, amount);
+    public BankCheckoutRequest(String productName, String amount) {
+        super(productName, amount);
         this.type = TYPE.BANK;
     }
 
     /**
      * A bank account
      */
-    public final class BankAccount {
+    public static final class BankAccount {
 
         public String accountName;
         public String accountNumber;

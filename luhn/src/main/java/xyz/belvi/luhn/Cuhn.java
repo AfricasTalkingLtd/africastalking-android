@@ -37,6 +37,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
 
     private int expMonth, expYear;
     private String cardPan, cardName, cvv, expDate, pin;
+    private String countryCode = "NG";
 
     private final int CARDIO_REQUEST_ID = 555;
 
@@ -138,6 +139,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
         initExpiryDateField();
         initCvvField();
         initPin();
+        initCountry();
         findViewById(R.id.btn_proceed).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,7 +149,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
                         Luhn.sLuhnCallback.otpRetrieved(Cuhn.this, Cuhn.this, otp);
                     else {
                         cardPan = cardPan.replace(" ", "");
-                        Luhn.sLuhnCallback.cardDetailsRetrieved(Cuhn.this, new LuhnCard(cardPan, cardName, expDate, cvv, pin, expMonth, expYear), Cuhn.this);
+                        Luhn.sLuhnCallback.cardDetailsRetrieved(Cuhn.this, new LuhnCard(cardPan, cardName, expDate, cvv, pin, expMonth, expYear, countryCode), Cuhn.this);
                     }
             }
         });
@@ -294,6 +296,10 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
             }
         });
 
+    }
+
+    private void initCountry() {
+        // TODO: Country dropdown
     }
 
 

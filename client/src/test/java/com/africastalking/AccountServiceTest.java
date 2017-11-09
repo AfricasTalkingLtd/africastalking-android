@@ -43,7 +43,7 @@ public class AccountServiceTest {
         server.enqueue(new MockResponse().setBody("{\"UserData\": {\"balance\": \"2000\" } }"));
         server.start();
         assertNotNull("GetUser: Response is null", account.getUser());
-        assertEquals("GetUser: Balance is not 2000", "2000", account.getUser().getUserData().getBalance().trim());
+        assertEquals("GetUser: Balance is not 2000", "2000", account.getUser().userData.balance.trim());
     }
 
 }

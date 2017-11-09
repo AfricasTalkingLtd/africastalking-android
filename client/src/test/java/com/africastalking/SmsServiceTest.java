@@ -26,7 +26,7 @@ public class SmsServiceTest {
     @Test
     public void send() throws Exception {
         assertNotNull("SMS not sent", sms.send("Test sms", "", new String[]{"+250784476268"}));
-        assertEquals("SMS not sent", "Success", sms.send("Test sms", "", new String[]{"+250784476268"}).getSMSMessageData().getRecipients().get(0).getStatus());
+        assertEquals("SMS not sent", "Success", sms.send("Test sms", "", new String[]{"+250784476268"}).get(0).status);
     }
 
     @Test

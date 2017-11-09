@@ -1,8 +1,7 @@
 package com.africastalking.services;
 
-
+import com.africastalking.models.airtime.AirtimeResponse;
 import com.africastalking.utils.Callback;
-import com.africastalking.models.airtime.AirtimeResponses;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,7 +65,7 @@ public final class AirtimeService extends Service {
      * @return
      * @throws IOException
      */
-    public AirtimeResponses send(String phone, String currency, float amount) throws IOException {
+    public AirtimeResponse send(String phone, String currency, float amount) throws IOException {
         HashMap<String, String> map = new HashMap<>();
         map.put(phone, currency + " " + amount);
         return send(map);
@@ -83,7 +82,7 @@ public final class AirtimeService extends Service {
      * @param amount
      * @param callback
      */
-    public void send(String phone, String currency, float amount, Callback<AirtimeResponses> callback) {
+    public void send(String phone, String currency, float amount, Callback<AirtimeResponse> callback) {
         HashMap<String, String> map = new HashMap<>();
         map.put(phone, currency + " " + amount);
         send(map, callback);
@@ -98,10 +97,14 @@ public final class AirtimeService extends Service {
      * @return
      * @throws IOException
      */
-    public AirtimeResponses send(HashMap<String, String> recipients) throws IOException {
+    public AirtimeResponse send(HashMap<String, String> recipients) throws IOException {
         String json = _makeRecipientsJSON(recipients);
-        Response<AirtimeResponses> resp = service.send(username, json).execute();
-        return resp.body();
+        Response<AirtimeResponse> resp = service.send(username, json).execute();
+        if (resp.isSuccessful()) {
+            return resp.body();
+        }
+
+        throw new IOException(resp.message());
     }
 
     /**
@@ -113,7 +116,7 @@ public final class AirtimeService extends Service {
      * @param recipients
      * @param callback
      */
-    public void send(HashMap<String, String> recipients, Callback<AirtimeResponses> callback) {
+    public void send(HashMap<String, String> recipients, Callback<AirtimeResponse> callback) {
         try{
             String json = _makeRecipientsJSON(recipients);
             service.send(username, json).enqueue(makeCallback(callback));

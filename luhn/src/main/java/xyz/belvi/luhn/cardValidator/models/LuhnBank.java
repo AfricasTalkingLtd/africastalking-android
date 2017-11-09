@@ -12,12 +12,14 @@ public final class LuhnBank implements Parcelable {
     private String accountName;
     private String accountNumber;
     private String bankName;
+    private int bankCode;
     private String countryCode;
 
-    public LuhnBank(String accountName, String accountNumber, String bankName, String countryCode) {
+    public LuhnBank(String accountName, String accountNumber, String bankName, int bankCode, String countryCode) {
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.bankName = bankName;
+        this.bankCode = bankCode;
         this.countryCode = countryCode;
     }
 
@@ -25,6 +27,7 @@ public final class LuhnBank implements Parcelable {
         accountName = in.readString();
         accountNumber = in.readString();
         bankName = in.readString();
+        bankCode = in.readInt();
         countryCode = in.readString();
     }
 
@@ -50,6 +53,7 @@ public final class LuhnBank implements Parcelable {
         dest.writeString(accountName);
         dest.writeString(accountNumber);
         dest.writeString(bankName);
+        dest.writeInt(bankCode);
         dest.writeString(countryCode);
     }
 
@@ -63,6 +67,10 @@ public final class LuhnBank implements Parcelable {
 
     public String getBankName() {
         return bankName;
+    }
+
+    public int getBankCode() {
+        return bankCode;
     }
 
     public String getCountryCode() {

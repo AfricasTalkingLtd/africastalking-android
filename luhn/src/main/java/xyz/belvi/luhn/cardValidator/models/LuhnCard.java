@@ -8,11 +8,11 @@ import android.os.Parcelable;
  */
 
 public final class LuhnCard implements Parcelable {
-    private String pan, cardName, expDate, cvv, pin;
+    private String pan, cardName, expDate, cvv, pin, countryCode;
     private int expMonth, expYear;
 
 
-    public LuhnCard(String pan, String cardName, String expDate, String cvv, String pin, int expMonth, int expYear) {
+    public LuhnCard(String pan, String cardName, String expDate, String cvv, String pin, int expMonth, int expYear, String countryCode) {
         this.pan = pan;
         this.cardName = cardName;
         this.expMonth = expMonth;
@@ -20,6 +20,7 @@ public final class LuhnCard implements Parcelable {
         this.cvv = cvv;
         this.pin = pin;
         this.expDate = expDate;
+        this.countryCode = countryCode;
     }
 
     protected LuhnCard(Parcel in) {
@@ -30,6 +31,7 @@ public final class LuhnCard implements Parcelable {
         cvv = in.readString();
         pin = in.readString();
         expDate = in.readString();
+        countryCode = in.readString();
     }
 
     public static final Creator<LuhnCard> CREATOR = new Creator<LuhnCard>() {
@@ -58,6 +60,7 @@ public final class LuhnCard implements Parcelable {
         dest.writeString(cvv);
         dest.writeString(pin);
         dest.writeString(expDate);
+        dest.writeString(countryCode);
     }
 
     public String getPan() {
@@ -66,6 +69,36 @@ public final class LuhnCard implements Parcelable {
 
     public int getExpMonth() {
         return this.expMonth;
+    }
+
+    public String getExpMonthShort() {
+        switch (this.expMonth) {
+            case 1:
+                return "Jan";
+            case 2:
+                return "Feb";
+            case 3:
+                return "Mar";
+            case 4:
+                return "Apr";
+            case 5:
+                return "May";
+            case 6:
+                return "Jun";
+            case 7:
+                return "Jul";
+            case 8:
+                return "Aug";
+            case 9:
+                return "Sep";
+            case 10:
+                return "Oct";
+            case 11:
+                return "Nov";
+            case 12:
+            default:
+                return "Dec";
+        }
     }
 
     public int getExpYear() {
@@ -86,5 +119,9 @@ public final class LuhnCard implements Parcelable {
 
     public String getCardName() {
         return this.cardName;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
     }
 }

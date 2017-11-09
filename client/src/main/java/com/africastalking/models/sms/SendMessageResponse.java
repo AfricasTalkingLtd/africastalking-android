@@ -1,6 +1,8 @@
 package com.africastalking.models.sms;
 
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public final class SendMessageResponse {
@@ -10,7 +12,7 @@ public final class SendMessageResponse {
 
     public static final class SmsMessageData {
         @SerializedName("Recipients")
-        public List<Recipient> recipients;
+        public List<Recipient> recipients = new ArrayList<>();
     }
 
 }

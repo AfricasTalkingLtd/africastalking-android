@@ -6,7 +6,7 @@
         <item name="luhn_typeface">fonts/Roboto-Regular.ttf</item>
         <item name="luhn_btn_verify_selector">@drawable/card_next_btn_selector</item>
         <item name="luhn_show_toolbar_color">@color/ln_colorPrimary</item>
-        <item name="luhn_show_pin">false</item>
+        <item name="luhn_show_pin">true</item>
     </style>
 
 </resources>

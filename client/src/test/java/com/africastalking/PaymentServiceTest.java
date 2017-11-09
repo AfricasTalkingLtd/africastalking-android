@@ -2,7 +2,6 @@ package com.africastalking;
 
 import com.africastalking.models.payment.Business;
 import com.africastalking.models.payment.Consumer;
-import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
 import com.africastalking.services.PaymentService;
 
@@ -32,20 +31,20 @@ public class PaymentServiceTest {
 
     @Test
     public void checkout() throws Exception {
-        assertNotNull("Response response is null", payment.checkout(new CardCheckoutRequest()));
-        assertEquals("Status not correct", "PendingConfirmation", payment.checkout(new MobileCheckoutRequest()).getStatus());
+        assertNotNull("Response response is null", payment.checkout(new MobileCheckoutRequest("", "KES 234", "043343", "")));
+        assertEquals("Status not correct", "PendingConfirmation", payment.checkout(new MobileCheckoutRequest("", "KES 234", "043343", "")).status);
     }
 
     @Test
     public void payConsumer() throws Exception {
-        assertNotNull("Pay Consummer response is null", payment.payConsumer("", new Consumer("+254792424735", "KES", 0.00f)));
-        assertEquals("Total value is not accurate", "KES 100", payment.payConsumer("", new Consumer("+254792424735", "KES", 0.00f)).getTotalValue());
+        assertNotNull("Pay Consummer response is null", payment.payConsumer("", new Consumer("Salama","+254792424735", "KES 0.00", "")));
+        assertEquals("Total value is not accurate", "KES 100.000", payment.payConsumer("", new Consumer("Salama","+254792424735", "KES 100.00", "")).totalValue);
     }
 
     @Test
     public void payBusiness() throws Exception {
-        assertNotNull("Pay Business response is null", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, "KES", 0.00f)));
-        assertEquals("Status not correct", "Queued", payment.payBusiness("", new Business("","", Business.TransferType.TRANSFER, "KES", 0.00f)).getStatus());
+        assertNotNull("Pay Business response is null", payment.payBusiness("", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")));
+        assertEquals("Status not correct", "Queued", payment.payBusiness("", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")).status);
     }
 
 }

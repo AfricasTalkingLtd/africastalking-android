@@ -6,7 +6,7 @@ import android.os.Bundle;
 import com.africastalking.AfricasTalking;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
-import com.africastalking.models.airtime.AirtimeResponses;
+import com.africastalking.models.airtime.AirtimeResponse;
 import com.africastalking.services.AirtimeService;
 
 import timber.log.Timber;
@@ -29,8 +29,8 @@ public class AirtimeActivity extends BaseActivity {
                     AirtimeService airtime = AfricasTalking.getAirtimeService();
 
                     Timber.i("Sending KES 100 to 0718769882");
-                    AirtimeResponses res = airtime.send("0718769882", "KES", 100);
-                    Timber.i("Sent a total of " + res.getTotalAmount());
+                    AirtimeResponse res = airtime.send("0718769882", "KES", 100);
+                    Timber.i("Sent a total of " + res.totalAmount);
 
                 } catch (Exception e) {
                     Timber.e(e, "IOException");
