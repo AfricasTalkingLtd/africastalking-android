@@ -41,7 +41,7 @@ public class Checkout {
         request.paymentCard = new PaymentCard(
                 Long.parseLong(paymentCard.getPan()),
                 Integer.parseInt(paymentCard.getCvv()),
-                paymentCard.getExpMonthShort(),
+                paymentCard.getExpMonth(),
                 paymentCard.getExpYear(),
                 paymentCard.getCountryCode(),
                 paymentCard.getPin()

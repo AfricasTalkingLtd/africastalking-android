@@ -102,7 +102,7 @@ public final class LuhnCard implements Parcelable {
     }
 
     public int getExpYear() {
-        return this.expYear;
+        return this.expYear + 2000; // FIXME: grhhh
     }
 
     public String getExpDate() {
