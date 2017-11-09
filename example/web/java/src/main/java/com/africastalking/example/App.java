@@ -41,7 +41,7 @@ public class App {
     );
 
 
-    private static Server sdkServer;
+    // private static Server sdkServer;
     private static HandlebarsTemplateEngine hbs = new HandlebarsTemplateEngine("/views");
 
     public static void main(String[] args) {
@@ -51,7 +51,7 @@ public class App {
             AfricasTalking.initialize(USERNAME, API_KEY);
             AfricasTalking.hostOverride = "kaende-api-rs-host.africastalking.com";
             AfricasTalking.setLogger((s, objects) -> System.out.println(String.format(s, objects)));
-            sdkServer = new Server(ALLOWED_CLIENTS::contains);
+            Server sdkServer = new Server(ALLOWED_CLIENTS::contains);
             sdkServer.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST, SIP_PORT, SIP_TRANSPORT);
             sdkServer.startInsecure(RPC_PORT);
         } catch (IOException e) {
