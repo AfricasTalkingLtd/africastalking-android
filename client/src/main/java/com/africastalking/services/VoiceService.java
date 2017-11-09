@@ -1,15 +1,14 @@
 package com.africastalking.services;
 
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.africastalking.AfricasTalkingException;
+import com.africastalking.models.voice.QueuedCallsResponse;
 import com.africastalking.utils.Callback;
 import com.africastalking.utils.Logger;
-import com.africastalking.models.voice.QueueStatus;
 import com.africastalking.proto.SdkServerServiceGrpc;
 import com.africastalking.proto.SdkServerServiceGrpc.SdkServerServiceBlockingStub;
 import com.africastalking.proto.SdkServerServiceOuterClass.*;
@@ -23,6 +22,7 @@ import io.grpc.ManagedChannel;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public final class VoiceService extends Service implements CallController {
@@ -41,6 +41,54 @@ public final class VoiceService extends Service implements CallController {
         }
     };
 
+    private static class SipStackLoader extends AsyncTask<Void, Void, List<SipCredentials>> {
+
+        WeakReference<Context> context;
+        RegistrationListener registrationListener;
+
+
+        SipStackLoader(Context context, RegistrationListener registrationListener) {
+            this.context = new WeakReference<>(context);
+            this.registrationListener = registrationListener;
+        }
+
+        @Override
+        protected void onPostExecute(List<SipCredentials> sipCredentials) {
+            if (sipCredentials != null && sipCredentials.size() > 0) {
+
+                Log.d(TAG, "Initializing PJSIP...");
+
+                // FIXME: Find a way to select credentials in case of many
+                final SipCredentials credentials = sipCredentials.get(0);
+
+                try {
+                    mSipStack = SipStack.newInstance(context.get(), registrationListener, credentials);
+                } catch (Exception e) {
+                    registrationListener.onError(e);
+                }
+
+            } else {
+                registrationListener.onError(new Exception("Invalid SIP Credentials"));
+            }
+
+        }
+
+        @Override
+        protected List<SipCredentials> doInBackground(Void[] objects) {
+            try {
+                Log.d(TAG, "Fetching SIP credentials");
+                ManagedChannel channel = com.africastalking.services.Service.getChannel(HOST, PORT);
+                SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
+                SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
+                return stub.getSipCredentials(req).getCredentialsList();
+            } catch (Exception ex) {
+                Log.e(TAG, ex.getMessage() + "");
+            }
+            return null;
+        }
+
+    }
+
     VoiceService() throws IOException {
         super();
         initService();
@@ -52,14 +100,14 @@ public final class VoiceService extends Service implements CallController {
         initSipStack(context, registrationListener);
     }
 
+    public static VoiceService getsInstance() {
+        return sInstance;
+    }
+
     public static VoiceService newInstance(Context context, RegistrationListener registrationListener) throws IOException {
         if (sInstance == null) {
             sInstance = new VoiceService(context, registrationListener);
         }
-        return sInstance;
-    }
-
-    public static VoiceService getsInstance() {
         return sInstance;
     }
 
@@ -85,47 +133,8 @@ public final class VoiceService extends Service implements CallController {
 
     private void initSipStack(final Context context, final RegistrationListener registrationListener) {
         try {
-
-            AsyncTask<Void, Void, List<SipCredentials>> task = new AsyncTask<Void, Void, List<SipCredentials>>() {
-
-                @Override
-                protected void onPostExecute(List<SipCredentials> sipCredentials) {
-                    if (sipCredentials != null && sipCredentials.size() > 0) {
-
-                        Log.d(TAG, "Initializing PJSIP...");
-
-                        // TODO: Find a way to select credentials in case of many
-                        final SipCredentials credentials = sipCredentials.get(0);
-
-                        try {
-                            mSipStack = SipStack.newInstance(context, registrationListener, credentials);
-                        } catch (Exception e) {
-                            registrationListener.onError(e);
-                        }
-
-                    } else {
-                        registrationListener.onError(new Exception("Invalid SIP Credentials"));
-                    }
-
-                }
-
-                @Override
-                protected List<SipCredentials> doInBackground(Void[] objects) {
-                    try {
-                        Log.d(TAG, "Fetching SIP credentials");
-                        ManagedChannel channel = com.africastalking.services.Service.getChannel(HOST, PORT);
-                        SdkServerServiceBlockingStub stub = addClientIdentification(SdkServerServiceGrpc.newBlockingStub(channel));
-                        SipCredentialsRequest req = SipCredentialsRequest.newBuilder().build();
-                        return stub.getSipCredentials(req).getCredentialsList();
-                    } catch (Exception ex) {
-                        Log.e(TAG, ex.getMessage() + "");
-                    }
-                    return null;
-                }
-            };
-
+            SipStackLoader task = new SipStackLoader(context, registrationListener);
             task.execute();
-
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() + "");
         }
@@ -163,12 +172,12 @@ public final class VoiceService extends Service implements CallController {
      * @return
      * @throws IOException
      */
-    public List<QueueStatus> queueStatus(String phoneNumbers) throws IOException {
-        Response<List<QueueStatus>> response = mVoiceAPIInterface.queueStatus(username, phoneNumbers).execute();
+    public QueuedCallsResponse queueStatus(String phoneNumbers) throws IOException {
+        Response<QueuedCallsResponse> response = mVoiceAPIInterface.queueStatus(username, phoneNumbers).execute();
         return response.body();
     }
 
-    public void queueStatus(String phoneNumbers, Callback<List<QueueStatus>> callback) {
+    public void queueStatus(String phoneNumbers, Callback<QueuedCallsResponse> callback) {
         mVoiceAPIInterface.queueStatus(username, phoneNumbers).enqueue(makeCallback(callback));
     }
 
@@ -313,5 +322,4 @@ public final class VoiceService extends Service implements CallController {
         }
         return new CallInfo("unknown");
     }
-
 }

@@ -1,7 +1,7 @@
 package com.africastalking.services;
 
 
-
+import com.africastalking.models.token.CheckoutTokenResponse;
 import com.africastalking.utils.Callback;
 
 import retrofit2.Response;
@@ -56,15 +56,15 @@ public class TokenService extends Service {
 
     // ->
 
-    public String createCheckoutToken(String phoneNumber) throws IOException {
-        Response<String> resp = service.createCheckoutToken(phoneNumber).execute();
+    public CheckoutTokenResponse createCheckoutToken(String phoneNumber) throws IOException {
+        Response<CheckoutTokenResponse> resp = service.createCheckoutToken(phoneNumber).execute();
         if (resp.isSuccessful()) {
             return resp.body();
         }
         throw new IOException(resp.message());
     }
 
-    public void createCheckoutToken(String phoneNumber, Callback<String> callback) {
+    public void createCheckoutToken(String phoneNumber, Callback<CheckoutTokenResponse> callback) {
         service.createCheckoutToken(phoneNumber).enqueue(makeCallback(callback));
     }
 }

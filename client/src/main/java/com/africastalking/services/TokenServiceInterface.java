@@ -1,6 +1,8 @@
 package com.africastalking.services;
 
 
+import com.africastalking.models.token.CheckoutTokenResponse;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -10,6 +12,6 @@ interface TokenServiceInterface {
 
     @FormUrlEncoded
     @POST("checkout/token/create")
-    Call<String> createCheckoutToken(@Field("phoneNumber") String phoneNumber);
+    Call<CheckoutTokenResponse> createCheckoutToken(@Field("phoneNumber") String phoneNumber);
 
 }

@@ -1,12 +1,11 @@
 package com.africastalking.services;
 
-import com.africastalking.models.voice.QueueStatus;
+import com.africastalking.models.voice.QueuedCallsResponse;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
-
-import java.util.List;
 
 public interface VoiceServiceInterface {
 
@@ -17,5 +16,5 @@ public interface VoiceServiceInterface {
 
     @FormUrlEncoded
     @POST("queueStatus")
-    Call<List<QueueStatus>> queueStatus(@Field("username") String username, @Field(value = "phoneNumbers") String phoneNumbers);
+    Call<QueuedCallsResponse> queueStatus(@Field("username") String username, @Field(value = "phoneNumbers") String phoneNumbers);
 }

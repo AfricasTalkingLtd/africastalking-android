@@ -1,9 +1,9 @@
 package com.africastalking.services;
 
 import com.africastalking.models.sms.FetchMessageResponse;
+import com.africastalking.models.sms.FetchSubscriptionResponse;
 import com.africastalking.models.sms.SendMessageResponse;
 import com.africastalking.models.sms.SubscriptionResponse;
-import com.africastalking.models.sms.Subscriptions;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -37,8 +37,8 @@ public interface SmsServiceInterface {
 
 
     @GET("subscription")
-    Call<Subscriptions> fetchSubscription(@Query("username") String username, @Query("shortCode") String shortCode,
-                                         @Query("keyword") String keyword, @Query("lastReceivedId") String lastReceivedId);
+    Call<FetchSubscriptionResponse> fetchSubscription(@Query("username") String username, @Query("shortCode") String shortCode,
+                                                      @Query("keyword") String keyword, @Query("lastReceivedId") String lastReceivedId);
 
     @FormUrlEncoded
     @POST("subscription/create")

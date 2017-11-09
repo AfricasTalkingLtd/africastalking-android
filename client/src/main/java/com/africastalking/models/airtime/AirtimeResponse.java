@@ -1,59 +1,22 @@
 package com.africastalking.models.airtime;
 
-public class AirtimeResponse {
+import java.util.List;
 
-    private String errorMessage;
-    private String phoneNumber;
-    private String amount;
-    private String discount;
-    private String status;
-    private String requestId;
+public final class AirtimeResponse {
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+    public int numSent;
+    public String totalAmount;
+    public String totalDiscount;
+    public String errorMessage;
+    public List<AirtimeEntry> responses;
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
-
-    public String getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(String discount) {
-        this.discount = discount;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public static class AirtimeEntry {
+        public String errorMessage;
+        public String phoneNumber;
+        public String amount;
+        public String discount;
+        public String status;
+        public String requestId;
     }
 }
+

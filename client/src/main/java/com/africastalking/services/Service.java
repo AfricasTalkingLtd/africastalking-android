@@ -111,7 +111,7 @@ public abstract class Service {
         initService();
     }
 
-    SdkServerServiceBlockingStub addClientIdentification(SdkServerServiceBlockingStub stub) {
+    static SdkServerServiceBlockingStub addClientIdentification(SdkServerServiceBlockingStub stub) {
         // Optional client id header
         String clientId = AfricasTalking.getClientId();
         if (clientId != null) {

@@ -2,38 +2,48 @@ package com.africastalking.models.payment;
 
 import java.util.HashMap;
 
-public class Consumer {
+/**
+ * Consumer-type payment recipient, used in B2C transactions
+ */
+public final class Consumer {
 
-    public enum Reason {
-        SALARY("SalaryPayment"),
-        SALARY_WITH_CHARGE("SalaryPaymentWithWithdrawalChargePaid"),
-        BUSINESS("BusinessPayment"),
-        BUSINESS_WITH_CHARGE("BusinessPaymentWithWithdrawalChargePaid"),
-        PROMOTION("PromotionPayment");
+    /*
+     * Payment Reasons
+     */
+    public static final String REASON_SALARY = "SalaryPayment";
+    public static final String REASON_SALARY_WITH_CHARGE = "SalaryPaymentWithWithdrawalChargePaid";
+    public static final String REASON_BUSINESS = "BusinessPayment";
+    public static final String REASON_BUSINESS_WITH_CHARGE = "BusinessPaymentWithWithdrawalChargePaid";
+    public static final String REASON_PROMOTION = "PromotionPayment";
 
-        private final String text;
-
-        private Reason(final String text) {
-            this.text = text;
-        }
-
-        @Override
-        public String toString() {
-            return this.text;
-        }
-    }
-
+    public String name;
     public String phoneNumber;
     public String currencyCode;
     public float amount;
+    public String providerChannel;
 
-    public Reason reason = null;
+    public String reason;
     public HashMap<String, String> metadata = new HashMap<>();
 
-    public Consumer(String phoneNumber, String currency, float amount) {
+    /**
+     * Consumer-type payment recipient, used in B2C transactions
+     * @param name Consumer name
+     * @param phoneNumber Consumer phone number
+     * @param amount Amount to transact, along with the currency code. e.g. KES 345
+     * @param reason Purpose for the payment. e.g. {@link com.africastalking.models.payment.Consumer Consumer.REASON_SALARY}
+     */
+    public Consumer(String name, String phoneNumber, String amount, String reason) {
+        this.name = name;
         this.phoneNumber = phoneNumber;
-        this.currencyCode = currency;
-        this.amount = amount;
+        this.reason = reason;
+
+        try {
+            String[] currenciedAmount = amount.trim().split(" ");
+            this.currencyCode = currenciedAmount[0];
+            this.amount = Float.parseFloat(currenciedAmount[1]);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }
