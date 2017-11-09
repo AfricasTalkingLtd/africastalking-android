@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             AfricasTalking.initialize(
                     BuildConfig.RPC_HOST,
                     BuildConfig.RPC_PORT, true);
-            AfricasTalking.hostOverride = "kaende-api-rs-host.africastalking.com";
             AfricasTalking.setLogger(new Logger() {
                 @Override
                 public void log(String message, Object... args) {
