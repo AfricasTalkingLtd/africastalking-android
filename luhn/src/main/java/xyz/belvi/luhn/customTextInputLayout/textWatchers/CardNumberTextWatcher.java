@@ -54,7 +54,7 @@ public abstract class CardNumberTextWatcher implements TextWatcher {
             StringBuilder result = new StringBuilder();
             for (int i = 0; i < source.length(); i++) {
                 if (i % 4 == 0 && i != 0) {
-                    result.append(" ");
+                    result.append("-");
                 }
 
                 result.append(source.charAt(i));

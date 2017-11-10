@@ -15,5 +15,6 @@
     <string name="otp_details">One time verification password sent from your bank to your registered mobile number to verify transaction</string>
     <string name="country">Country</string>
     <string name="bank">Bank</string>
+    <string name="date_of_birth">Date Of Birth</string>
 
 </resources>

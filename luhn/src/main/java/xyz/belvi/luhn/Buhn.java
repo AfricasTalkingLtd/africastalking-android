@@ -2,7 +2,6 @@ package xyz.belvi.luhn;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +20,8 @@ import xyz.belvi.luhn.cardValidator.models.LuhnBank;
 import xyz.belvi.luhn.customTextInputLayout.inputLayouts.AutoCompleteDropdown;
 import xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout;
 import xyz.belvi.luhn.customTextInputLayout.inputLayouts.CardTextInputLayout;
+import xyz.belvi.luhn.customTextInputLayout.textWatchers.BankTextWatcher;
+import xyz.belvi.luhn.customTextInputLayout.textWatchers.DobTextWatcher;
 import xyz.belvi.luhn.interfaces.LuhnVerifier;
 import xyz.belvi.luhn.screens.CardVerificationProgressScreen;
 
@@ -30,38 +31,25 @@ import static xyz.belvi.luhn.Luhn.STYLE_KEY;
 public final class Buhn extends BaseActivity implements LuhnVerifier {
 
     AutoCompleteDropdown bankCode;
-    TextInputEditText dateOfBirth;
-    BankTextInputLayout accountName, accountNumber;
+    BankTextInputLayout accountName, accountNumber, dateOfBirth;
     CardTextInputLayout otp;
 
     private static HashMap<Integer, String> banks = new HashMap<>();
+    private static List<Integer> bankCodes = new ArrayList<>();
+    private static ArrayList<Integer> banksWithDateOfBirth = new ArrayList<>();
 
     static {
         // FIXME: Get banks from caller
+
         banks.put(234002, "FCMB NG");
         banks.put(234002, "Zenith Nigeria");
         banks.put(234003, "Access Nigeria");
         banks.put(234007, "Providus Nigeria");
         banks.put(234010, "Sterling Nigeria");
-        /*banks.put(234004, "GTBank Nigeria");
-        banks.put(234005, "Ecobank Nigeria");
-        banks.put(234006, "Diamond Nigeria");
-        banks.put(234007, "Providus Nigeria");
-        banks.put(234008, "Unity Nigeria");
-        banks.put(234009, "Stanbic Nigeria");
-        banks.put(234011, "Parkway Nigeria");
-        banks.put(234012, "Afribank Nigeria");
-        banks.put(234013, "Enterprise Nigeria");
-        banks.put(234014, "Fidelity Nigeria");
-        banks.put(234015, "Heritage Nigeria");
-        banks.put(234016, "Keystone Nigeria");
-        banks.put(234017, "Skye Nigeria");
-        banks.put(234018, "Stanchart Nigeria");
-        banks.put(234019, "Union Nigeria");
-        banks.put(234020, "UBA Nigeria");
-        banks.put(234021, "Wema Nigeria");
-        banks.put(234022, "First Nigeria");
-        banks.put(254001, "CBA Kenya");*/
+
+        banksWithDateOfBirth.add(234002);
+
+        bankCodes = new ArrayList<>(banks.keySet());
 
     }
 
@@ -94,10 +82,11 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
 
         accountName = (BankTextInputLayout) findViewById(R.id.account_name_layout);
         accountNumber = (BankTextInputLayout) findViewById(R.id.account_number_layout);
+        dateOfBirth = (BankTextInputLayout) findViewById(R.id.account_dob_layout);
         otp = (CardTextInputLayout) findViewById(R.id.ctil_otp_input);
 
 
-        BankTextInputLayout.BankTextWatcher accountNameWatcher = new BankTextInputLayout.BankTextWatcher(
+        BankTextWatcher accountNameWatcher = new BankTextWatcher(
                 accountName, 2, "Enter a valid account name",
                 new Runnable() {
                     @Override
@@ -105,8 +94,16 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
                         enableNextBtn();
                     }
                 });
-        BankTextInputLayout.BankTextWatcher accountNumberWatcher = new BankTextInputLayout.BankTextWatcher(
+        BankTextWatcher accountNumberWatcher = new BankTextWatcher(
                 accountNumber, 5, "Enter a valid account number",
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        enableNextBtn();
+                    }
+                });
+        DobTextWatcher dobWatcher = new DobTextWatcher(
+                dateOfBirth,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -116,9 +113,9 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
 
         accountName.getEditText().addTextChangedListener(accountNameWatcher);
         accountNumber.getEditText().addTextChangedListener(accountNumberWatcher);
+        dateOfBirth.getEditText().addTextChangedListener(dobWatcher);
 
 
-        dateOfBirth = (TextInputEditText) findViewById(R.id.account_dob);
 
         // Read banks
         bankCode = (AutoCompleteDropdown) findViewById(R.id.bank_code);
@@ -134,6 +131,7 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                dateOfBirth.setVisibility(isDobEnabled() ? View.VISIBLE : View.GONE);
                 enableNextBtn();
             }
 
@@ -143,8 +141,6 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
             }
         };
         bankCode.addTextChangedListener(watchSelection);
-
-        final List<Integer> bankCodes = new ArrayList<>(banks.keySet());
 
         findViewById(R.id.btn_proceed).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +164,7 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
                                 accountName.getEditText().getText().toString(),
                                 accountNumber.getEditText().getText().toString(),
                                 code,
-                                dateOfBirth.getText().toString());
+                                dateOfBirth.getEditText().getText().toString());
                         Luhn.sLuhnCallback.bankDetailsRetrieved(Buhn.this, bank, Buhn.this);
                     }
             }
@@ -200,18 +196,31 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
 
     @Override
     protected void enableNextBtn() {
-        if (OTP_MODE)
+        if (OTP_MODE) {
             findViewById(R.id.btn_proceed).setEnabled(otpInputLayout.hasValidInput());
-        else
-            findViewById(R.id.btn_proceed).setEnabled(accountName.hasValidInput() &&
+        } else {
+            boolean moveNext = accountName.hasValidInput() &&
                     accountNumber.hasValidInput() &&
-                    bankCode.getText().length() > 0
-            );
+                    bankCode.getText().length() > 0;
+            if (isDobEnabled()) {
+                moveNext = moveNext && dateOfBirth.hasValidInput();
+            }
+            findViewById(R.id.btn_proceed).setEnabled(moveNext);
+        }
+    }
+
+    private boolean isDobEnabled() {
+        for (Integer c : bankCodes) {
+            if (banks.get(c).contentEquals(bankCode.getText().toString())) {
+                return banksWithDateOfBirth.contains(c);
+            }
+        }
+        return false;
     }
 
     private void disableAllFields() {
-        BankTextInputLayout allFields[] = {accountNumber, accountName};
-        AutoCompleteDropdown allSpinners[] = {bankCode};
+        BankTextInputLayout allFields[] = { accountNumber, accountName, dateOfBirth };
+        AutoCompleteDropdown allSpinners[] = { bankCode };
         for (BankTextInputLayout field : allFields) {
             field.setEnabled(false);
         }

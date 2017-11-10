@@ -57,7 +57,8 @@ public abstract class CvvTextWatcher implements TextWatcher {
     }
 
     private boolean isValid(CharSequence source) {
-        return source.toString().length() == 3;
+        int length = source.toString().length();
+        return length == 3;
     }
 
     protected abstract void onValidated(boolean moveToNext, String pin);

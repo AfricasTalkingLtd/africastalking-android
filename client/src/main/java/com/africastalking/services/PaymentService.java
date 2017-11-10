@@ -46,7 +46,7 @@ public class PaymentService extends Service {
 
     @Override
     protected void initService() {
-         String baseUrl = "https://payments."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+        String baseUrl = "https://payments."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         payment = retrofitBuilder
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(baseUrl)

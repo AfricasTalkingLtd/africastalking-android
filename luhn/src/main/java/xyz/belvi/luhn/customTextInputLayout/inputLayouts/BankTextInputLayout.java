@@ -4,15 +4,11 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.design.widget.TextInputLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -102,55 +98,5 @@ public class BankTextInputLayout extends TextInputLayout {
     public BankTextInputLayout setHasValidInput(boolean hasValidInput) {
         this.hasValidInput = hasValidInput;
         return this;
-    }
-
-
-    public static class BankTextWatcher implements TextWatcher {
-
-        private static final long DEBOUNCE_DELAY = 500;
-        private Timer timer = new Timer();
-
-        int minLength = 1;
-        String message;
-        Runnable action;
-        BankTextInputLayout instance;
-
-        public BankTextWatcher(BankTextInputLayout inputLayout, int minLength, String errorMessage, Runnable action) {
-            this.minLength = minLength;
-            this.message = errorMessage;
-            this.action = action;
-            this.instance = inputLayout;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-        @Override
-        public void afterTextChanged(final Editable text) {
-            timer.cancel();
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    instance.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (text.length() >= minLength) {
-                                instance.setHasValidInput(true);
-                                instance.setError("");
-                            } else {
-                                instance.setError(message);
-                                instance.setHasValidInput(false);
-                            }
-                            action.run();
-                        }
-                    });
-                }
-            }, DEBOUNCE_DELAY);
-
-        }
     }
 }

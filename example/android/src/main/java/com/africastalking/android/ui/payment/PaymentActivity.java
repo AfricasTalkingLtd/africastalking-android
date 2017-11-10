@@ -3,12 +3,12 @@ package com.africastalking.android.ui.payment;
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.africastalking.AfricasTalking;
+import com.africastalking.android.BuildConfig;
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
@@ -73,8 +73,8 @@ public class PaymentActivity extends BaseActivity {
         if (itemId == R.id.mnuCardCheckout || itemId == R.id.mnuBankCheckout) {
 
             CheckoutRequest request = itemId == R.id.mnuCardCheckout ?
-                    new CardCheckoutRequest("Ikoyi Store", "NGN 100", "Some desc") :
-                    new BankCheckoutRequest("Ikoyi Store", "NGN 100", "Some desc");
+                    new CardCheckoutRequest(BuildConfig.PRODUCT_NAME, "NGN 100", "Some desc") :
+                    new BankCheckoutRequest(BuildConfig.PRODUCT_NAME, "NGN 100", "Some desc");
 
             if (payment != null) {
                 Checkout checkout = new Checkout(payment);
