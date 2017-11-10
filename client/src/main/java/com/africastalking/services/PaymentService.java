@@ -18,7 +18,6 @@ import retrofit2.Response;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class PaymentService extends Service {
 
     @Override
     protected void initService() {
-        String baseUrl = "https://payments."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
+         String baseUrl = "https://payments."+ (isSandbox ? SANDBOX_DOMAIN : PRODUCTION_DOMAIN) + "/";
         payment = retrofitBuilder
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(baseUrl)
@@ -68,6 +67,7 @@ public class PaymentService extends Service {
         HashMap<String, Object> body = new HashMap<>();
 
         body.put("username", username);
+        body.put("productName", request.productName);
         body.put("amount", request.amount);
         body.put("currencyCode", request.currencyCode);
         body.put("metadata", request.metadata);
@@ -78,7 +78,6 @@ public class PaymentService extends Service {
         switch (request.type) {
             case MOBILE:
                 MobileCheckoutRequest mobileRequest = (MobileCheckoutRequest) request;
-                body.put("productName", mobileRequest.productName);
                 body.put("phoneNumber", mobileRequest.phoneNumber);
                 break;
             case CARD:
@@ -101,7 +100,8 @@ public class PaymentService extends Service {
     private HashMap<String, Object> makeCheckoutValidationRequest(CheckoutValidateRequest request) {
         HashMap<String, Object> body = new HashMap<>();
         body.put("transactionId", request.transactionId);
-        body.put("token", request.token);
+        body.put("otp", request.token);
+        body.put("username", username);
         return body;
     }
 
@@ -224,51 +224,29 @@ public class PaymentService extends Service {
         call.enqueue(makeCallback(callback));
     }
 
-    /**
-     *
-     * @param product
-     * @param recipients
-     * @return
-     */
-    public B2CResponse payConsumers(String product, List<Consumer> recipients) throws IOException {
+    public B2CResponse mobileB2C(String product, List<Consumer> recipients) throws IOException {
         HashMap<String, Object> body = makeB2CRequest(product, recipients);
         Call<B2CResponse> call = payment.requestB2C(body);
         Response<B2CResponse> res = call.execute();
         return res.body();
     }
 
-    public B2CResponse payConsumer(String product, Consumer recipient) throws IOException {
-        List<Consumer> recipients = new ArrayList<>();
-        recipients.add(recipient);
-        return this.payConsumers(product, recipients);
-    }
-
-    /**
-     *
-     * @param product
-     * @param recipients
-     * @param callback
-     */
-    public void payConsumers(String product, List<Consumer> recipients, Callback<B2CResponse> callback) {
+    public void mobileB2C(String product, List<Consumer> recipients, Callback<B2CResponse> callback) {
         HashMap<String, Object> body = makeB2CRequest(product, recipients);
         Call<B2CResponse> call = payment.requestB2C(body);
         call.enqueue(makeCallback(callback));
     }
 
-    public void payConsumer(String product, Consumer recipient, Callback<B2CResponse> callback) {
-        List<Consumer> recipients = new ArrayList<>();
-        recipients.add(recipient);
-        this.payConsumers(product, recipients, callback);
-    }
 
-    public B2BResponse payBusiness(String product, Business recipient) throws IOException {
+
+    public B2BResponse mobileB2B(String product, Business recipient) throws IOException {
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
         Response<B2BResponse> res = call.execute();
         return res.body();
     }
 
-    public void payBusiness(String product, Business recipient, Callback<B2BResponse> callback) {
+    public void mobileB2B(String product, Business recipient, Callback<B2BResponse> callback) {
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
         call.enqueue(makeCallback(callback));

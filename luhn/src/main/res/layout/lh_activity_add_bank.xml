@@ -35,7 +35,9 @@
 
                 <include layout="@layout/lh_bank_number_layout" />
 
-                <include layout="@layout/lh_bank_country_layout" />
+                <include layout="@layout/lh_bank_code_layout" />
+
+                <include layout="@layout/lh_bank_dob_layout" />
 
                 <include layout="@layout/lh_otp_layout" />
 

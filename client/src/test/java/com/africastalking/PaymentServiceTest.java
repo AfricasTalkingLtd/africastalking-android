@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 /**
@@ -36,15 +38,14 @@ public class PaymentServiceTest {
     }
 
     @Test
-    public void payConsumer() throws Exception {
-        assertNotNull("Pay Consummer response is null", payment.payConsumer("", new Consumer("Salama","+254792424735", "KES 0.00", "")));
-        assertEquals("Total value is not accurate", "KES 100.000", payment.payConsumer("", new Consumer("Salama","+254792424735", "KES 100.00", "")).totalValue);
+    public void mobileB2C() throws Exception {
+        assertNotNull("Pay Consumer response is null", payment.mobileB2C("TestProduct", Arrays.asList(new Consumer("Salama","+254792424735", "KES 0.00", ""))));
+        assertEquals("Total value is not accurate", "KES 100.000", payment.mobileB2C("TestProduct", Arrays.asList(new Consumer("Salama","+254792424735", "KES 100.00", ""))).totalValue);
     }
 
     @Test
-    public void payBusiness() throws Exception {
-        assertNotNull("Pay Business response is null", payment.payBusiness("", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")));
-        assertEquals("Status not correct", "Queued", payment.payBusiness("", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")).status);
+    public void mobileB2B() throws Exception {
+        assertNotNull("Pay Business response is null", payment.mobileB2B("TestProduct", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")));
+        assertEquals("Status not correct", "Queued", payment.mobileB2B("TestProduct", new Business("","", Business.TRANSFER_TYPE_PAYBILL, Business.PROVIDER_ATHENA,"KES 110.00")).status);
     }
-
 }

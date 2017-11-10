@@ -27,7 +27,7 @@ public final class CardCheckoutRequest extends CheckoutRequest {
      */
     public static final class PaymentCard {
 
-        public long number;
+        public String number;
         public int cvvNumber;
         public int expiryMonth;
         public int expiryYear;
@@ -39,11 +39,11 @@ public final class CardCheckoutRequest extends CheckoutRequest {
          * @param number Card number (PAN)
          * @param cvvNumber 3-4 Card Verification Value
          * @param expiryMonth Expiration month on the card. e.g. 11 for November
-         * @param expiryYear Card expiration year e.g. 23 for 2023
+         * @param expiryYear Card expiration year e.g. 2023
          * @param countryCode <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2ISO">3166-1 alpha-2</a> country code e.g. NG for Nigeria
          * @param authToken PIN from card owner
          */
-        public PaymentCard(long number, int cvvNumber, int expiryMonth, int expiryYear, String countryCode, String authToken) {
+        public PaymentCard(String number, int cvvNumber, int expiryMonth, int expiryYear, String countryCode, String authToken) {
             this.number = number;
             this.cvvNumber = cvvNumber;
             this.expiryMonth = expiryMonth;

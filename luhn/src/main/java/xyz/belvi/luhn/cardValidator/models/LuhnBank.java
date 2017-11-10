@@ -11,24 +11,21 @@ public final class LuhnBank implements Parcelable {
 
     private String accountName;
     private String accountNumber;
-    private String bankName;
+    private String dateOfBirth;
     private int bankCode;
-    private String countryCode;
 
-    public LuhnBank(String accountName, String accountNumber, String bankName, int bankCode, String countryCode) {
+    public LuhnBank(String accountName, String accountNumber, int bankCode, String dateOfBirth) {
         this.accountName = accountName;
         this.accountNumber = accountNumber;
-        this.bankName = bankName;
         this.bankCode = bankCode;
-        this.countryCode = countryCode;
+        this.dateOfBirth = dateOfBirth;
     }
 
     protected LuhnBank(Parcel in) {
         accountName = in.readString();
         accountNumber = in.readString();
-        bankName = in.readString();
         bankCode = in.readInt();
-        countryCode = in.readString();
+        dateOfBirth = in.readString();
     }
 
     public static final Creator<LuhnBank> CREATOR = new Creator<LuhnBank>() {
@@ -52,9 +49,8 @@ public final class LuhnBank implements Parcelable {
     public final void writeToParcel(Parcel dest, int flags) {
         dest.writeString(accountName);
         dest.writeString(accountNumber);
-        dest.writeString(bankName);
         dest.writeInt(bankCode);
-        dest.writeString(countryCode);
+        dest.writeString(dateOfBirth);
     }
 
     public String getAccountName() {
@@ -65,15 +61,11 @@ public final class LuhnBank implements Parcelable {
         return accountNumber;
     }
 
-    public String getBankName() {
-        return bankName;
-    }
-
     public int getBankCode() {
         return bankCode;
     }
 
-    public String getCountryCode() {
-        return countryCode;
+    public String getDateOfBirth() {
+        return dateOfBirth;
     }
 }

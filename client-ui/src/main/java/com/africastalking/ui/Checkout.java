@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.africastalking.Status;
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
 import com.africastalking.models.payment.checkout.BankCheckoutRequest.BankAccount;
+import com.africastalking.models.payment.checkout.BankCode;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest.PaymentCard;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
@@ -25,7 +27,6 @@ import io.card.payment.CardIOActivity;
 public class Checkout {
 
     private static final int OTP_LENGTH = 4;
-    private static final String STATUS_SUCCESS = "Success";
 
     private PaymentService paymentService;
     private CheckoutResponse checkoutResponse = null;
@@ -39,7 +40,7 @@ public class Checkout {
 
         request.checkoutToken = null;
         request.paymentCard = new PaymentCard(
-                Long.parseLong(paymentCard.getPan()),
+                paymentCard.getPan(),
                 Integer.parseInt(paymentCard.getCvv()),
                 paymentCard.getExpMonth(),
                 paymentCard.getExpYear(),
@@ -51,7 +52,7 @@ public class Checkout {
             @Override
             public void onSuccess(CheckoutResponse data) {
                 checkoutResponse = data;
-                boolean success = data.status.contentEquals(STATUS_SUCCESS);
+                boolean success = data.status.contentEquals(Status.PENDING_VALIDATION);
                 if (success) {
                     verifier.requestOTP(OTP_LENGTH);
                 } else {
@@ -75,16 +76,15 @@ public class Checkout {
         request.bankAccount = new BankAccount(
                 bank.getAccountName(),
                 bank.getAccountNumber(),
-                bank.getCountryCode(),
-                bank.getBankCode(),
-                bank.getBankName()
+                BankCode.valueOf(bank.getBankCode())
         );
+        request.bankAccount.dateOfBirth = bank.getDateOfBirth();
 
         paymentService.checkout(request, new Callback<CheckoutResponse>() {
             @Override
             public void onSuccess(CheckoutResponse data) {
                 checkoutResponse = data;
-                boolean success = data.status.contentEquals(STATUS_SUCCESS);
+                boolean success = data.status.contentEquals(Status.PENDING_VALIDATION);
                 if (success) {
                     verifier.requestOTP(OTP_LENGTH);
                 } else {
@@ -119,10 +119,15 @@ public class Checkout {
         paymentService.validateCheckout(validateRequest, new Callback<CheckoutValidationResponse>() {
             @Override
             public void onSuccess(CheckoutValidationResponse data) {
-                boolean success = data.status.contentEquals(STATUS_SUCCESS);
+                boolean success = data.status.contentEquals(Status.SUCCESS);
                 verifier.onDetailsVerified(success, "Payment Failed", data.description);
                 if (success) {
-                    callback.onSuccess(checkoutResponse);
+                    CheckoutResponse response = new CheckoutResponse();
+                    response.transactionId = checkoutResponse.transactionId;
+                    response.checkoutToken = checkoutResponse.checkoutToken;
+                    response.status = data.status;
+                    response.description = data.description;
+                    callback.onSuccess(response);
                 } else {
                     callback.onFailure(new Exception(data.description));
                 }

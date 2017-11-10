@@ -6,7 +6,7 @@
     <string name="cvv_header">CVV</string>
     <string name="cvv_desc">A three-digit code on your credit card, you can find this on the back of your card.</string>
     <string name="exp_header">Expiration Date</string>
-    <string name="pin_header">Card Pin</string>
+    <string name="pin_header">Card PIN</string>
     <string name="otp_header">OTP</string>
     <string name="verification_error">Sorry,something went wrong</string>
     <string name="verification_details">Please contact your bank for more details, or try adding a different payment method</string>

@@ -1,6 +1,5 @@
 package com.africastalking.models.payment.checkout;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class CheckoutRequest {
@@ -9,9 +8,9 @@ public abstract class CheckoutRequest {
     public float amount;
     public String currencyCode;
     public String narration;
-    public Map metadata = new HashMap();
+    public Map metadata;
 
-    public TYPE type = TYPE.MOBILE;
+    public transient TYPE type = TYPE.MOBILE;
 
     public enum TYPE {
         MOBILE,

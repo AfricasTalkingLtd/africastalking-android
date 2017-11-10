@@ -99,7 +99,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initViews();
     protected abstract void enableNextBtn();
 
-    protected void initStyle(int style) {
+    protected void initStyle(int style, String defaultTitle) {
         TypedArray ta = obtainStyledAttributes(style, R.styleable.luhnStyle);
         String fontName = ta.getString(R.styleable.luhnStyle_luhn_typeface);
         String title = ta.getString(R.styleable.luhnStyle_luhn_title);
@@ -107,7 +107,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         initViews();
         initBottomSheet();
         retrievePin = ta.getBoolean(R.styleable.luhnStyle_luhn_show_pin, false);
-        ((AppCompatTextView) findViewById(R.id.toolbar_title)).setText(TextUtils.isEmpty(title) ? "Checkout" : title);
+        ((AppCompatTextView) findViewById(R.id.toolbar_title)).setText(TextUtils.isEmpty(title) ? defaultTitle : title);
         findViewById(R.id.btn_proceed).setBackground(ta.getDrawable(R.styleable.luhnStyle_luhn_btn_verify_selector));
         findViewById(R.id.toolbar).setBackgroundColor(ta.getColor(R.styleable.luhnStyle_luhn_show_toolbar_color, ContextCompat.getColor(this, R.color.ln_colorPrimary)));
     }

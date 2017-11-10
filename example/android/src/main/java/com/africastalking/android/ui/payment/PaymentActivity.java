@@ -41,7 +41,7 @@ public class PaymentActivity extends BaseActivity {
                     payment = AfricasTalking.getPaymentService();
 
                     Timber.i("Checking out KES 100 from 0718769882");
-                    MobileCheckoutRequest request = new MobileCheckoutRequest("TestProduct", "KES 100", "0718769882");
+                    MobileCheckoutRequest request = new MobileCheckoutRequest("Ikoyi Store", "KES 100", "0718769882");
                     CheckoutResponse res = payment.checkout(request);
 
                     Timber.i(res.transactionId);
@@ -73,21 +73,21 @@ public class PaymentActivity extends BaseActivity {
         if (itemId == R.id.mnuCardCheckout || itemId == R.id.mnuBankCheckout) {
 
             CheckoutRequest request = itemId == R.id.mnuCardCheckout ?
-                    new CardCheckoutRequest("TestProduct", "NGN 6000", "Some desc") :
-                    new BankCheckoutRequest("TestProduct", "NGN 5000", "Some desc");
+                    new CardCheckoutRequest("Ikoyi Store", "NGN 100", "Some desc") :
+                    new BankCheckoutRequest("Ikoyi Store", "NGN 100", "Some desc");
 
             if (payment != null) {
                 Checkout checkout = new Checkout(payment);
                 checkout.start(this, request, new Callback<CheckoutResponse>() {
                     @Override
                     public void onSuccess(CheckoutResponse data) {
-                        Log.e("PaymentActivity", data.toString());
+                        Timber.i("Payment {\n%s\n%s\n%s\n}", data.transactionId, data.status, data.description);
                     }
 
                     @Override
                     public void onFailure(Throwable throwable) {
                         throwable.printStackTrace();
-                        Log.e("PaymentActivity", throwable.getMessage() + "");
+                        Timber.e(throwable.getMessage());
                     }
                 });
             }

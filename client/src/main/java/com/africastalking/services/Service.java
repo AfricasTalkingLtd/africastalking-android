@@ -221,7 +221,13 @@ public abstract class Service {
                 if (response.isSuccessful()) {
                     cb.onSuccess(response.body());
                 } else {
-                    cb.onFailure(new Exception(response.message()));
+                    String message;
+                    try {
+                        message = response.errorBody().string();
+                    } catch (Exception ex) {
+                        message = response.message();
+                    }
+                    cb.onFailure(new Exception(message));
                 }
             }
 

@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public final class Cuhn extends BaseActivity implements LuhnVerifier {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.lh_activity_add_card);
-        initStyle(getIntent().getIntExtra(STYLE_KEY, R.style.LuhnStyle));
+        initStyle(getIntent().getIntExtra(STYLE_KEY, R.style.LuhnStyle), "Card Checkout");
         attachKeyboardListeners(R.id.root_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

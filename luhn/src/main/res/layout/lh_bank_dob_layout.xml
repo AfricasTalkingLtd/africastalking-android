@@ -1,25 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xyz.belvi.luhn.customTextInputLayout.inputLayouts.PinTextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/ctil_pin_input"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="@string/pin_header"
+    android:hint="Date Of Birth (Optional)"
     android:textColorHint="@color/ln_colorHint"
     app:errorEnabled="true"
     app:errorTextAppearance="@style/ErrorTextStyle"
-    app:passwordToggleDrawable="@drawable/payment_bank_card_info"
+    app:passwordToggleDrawable="@drawable/password_selector"
     app:passwordToggleEnabled="true"
     app:passwordToggleTint="@null"
-    app:theme="@style/MyTextInputLayout">
+    app:theme="@style/MyTextInputLayout"
+    android:id="@+id/account_dob_layout">
 
     <android.support.design.widget.TextInputEditText
-        android:id="@+id/tiet_pin_input"
+        android:id="@+id/account_dob"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawablePadding="8dp"
-        android:inputType="textPassword"
-        android:maxLength="4"
+        android:fontFamily="serif"
+        android:inputType="text"
         android:textSize="@dimen/ln_input_size"
         app:theme="@style/MyTextInputEdit" />
-</xyz.belvi.luhn.customTextInputLayout.inputLayouts.PinTextInputLayout>
+
+</xyz.belvi.luhn.customTextInputLayout.inputLayouts.BankTextInputLayout>
+
