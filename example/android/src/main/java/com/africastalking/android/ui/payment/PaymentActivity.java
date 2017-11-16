@@ -41,7 +41,7 @@ public class PaymentActivity extends BaseActivity {
                     payment = AfricasTalking.getPaymentService();
 
                     Timber.i("Checking out KES 100 from 0718769882");
-                    MobileCheckoutRequest request = new MobileCheckoutRequest("Ikoyi Store", "KES 100", "0718769882");
+                    MobileCheckoutRequest request = new MobileCheckoutRequest(BuildConfig.PRODUCT_NAME, "KES 100", "0718769882");
                     CheckoutResponse res = payment.checkout(request);
 
                     Timber.i(res.transactionId);
