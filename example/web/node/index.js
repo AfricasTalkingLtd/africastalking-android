@@ -3,7 +3,7 @@
  */
 
 const restify = require('restify');
-const Server = require('../../../libs/server/node/server');
+const Server = require('africastalking/server');
 
 
 function respond(req, res, next) {

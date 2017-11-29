@@ -22,12 +22,12 @@ public class App {
     private static final int HTTP_PORT = 3001;
     private static final int RPC_PORT = 35897;
 
-    private static final String USERNAME = "fake";
-    private static final String API_KEY = "fake";
+    private static final String USERNAME = BuildConfig.USERNAME;
+    private static final String API_KEY = BuildConfig.API_KEY;
 
-    private static final String SIP_USERNAME = "fake";
-    private static final String SIP_PASSWORD = "key";
-    private static final String SIP_HOST = "ke.sip.africastalking.com";
+    private static final String SIP_USERNAME = BuildConfig.SIP_USERNAME;
+    private static final String SIP_PASSWORD = BuildConfig.SIP_PASSWORD;
+    private static final String SIP_HOST = BuildConfig.SIP_HOST;
     private static final String SIP_TRANSPORT = "udp";
     private static final int SIP_PORT = 5060;
 

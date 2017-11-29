@@ -48,7 +48,8 @@ public final class SipStack implements CallController {
     private boolean mSipReady = false;
     private Account mAccount = null;
     private SipCredentials mCredentials = null;
-    private TransportConfig mSipTransportConfig = null;
+    private TransportConfig mUdpTransportConfig = null;
+    // private TransportConfig mTcpTransportConfig = null;
 
     private JobManager mJobManager;
     private LogWriter mLogWriter;
@@ -125,10 +126,15 @@ public final class SipStack implements CallController {
 
         sEndPoint.libInit(config);
 
-        mSipTransportConfig = new TransportConfig();
-        mSipTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mSipTransportConfig);
+        mUdpTransportConfig = new TransportConfig();
+        mUdpTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mUdpTransportConfig);
+
+        /*
+        // TODO: Should be used when UDP invite is too big
+        mTcpTransportConfig = new TransportConfig();
+        mTcpTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mTcpTransportConfig);*/
 
         sEndPoint.libStart();
 
@@ -741,6 +747,7 @@ public final class SipStack implements CallController {
         @Override
         public void onRun() throws Throwable {
             mLogger.log(text);
+            // Log.e("SipStack", text);
         }
     }
 
