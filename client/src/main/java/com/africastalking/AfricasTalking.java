@@ -39,7 +39,8 @@ public final class AfricasTalking {
     private static final List<String> PERMISSION_LIST = Arrays.asList(
             Manifest.permission.INTERNET,
             Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.MODIFY_AUDIO_SETTINGS
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            Manifest.permission.ACCESS_NETWORK_STATE
     );
 
 

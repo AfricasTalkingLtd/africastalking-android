@@ -49,7 +49,7 @@ public final class SipStack implements CallController {
     private Account mAccount = null;
     private SipCredentials mCredentials = null;
     private TransportConfig mUdpTransportConfig = null;
-    // private TransportConfig mTcpTransportConfig = null;
+    private TransportConfig mTcpTransportConfig = null;
 
     private JobManager mJobManager;
     private LogWriter mLogWriter;
@@ -130,11 +130,13 @@ public final class SipStack implements CallController {
         mUdpTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
         sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_UDP, mUdpTransportConfig);
 
-        /*
-        // TODO: Should be used when UDP invite is too big
-        mTcpTransportConfig = new TransportConfig();
-        mTcpTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
-        sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mTcpTransportConfig);*/
+
+        // FIXME: Should be used when UDP invite is too big, not just for mobile
+        if (NetworkUtils.isMobileData(context)) {
+            mTcpTransportConfig = new TransportConfig();
+            mTcpTransportConfig.setQosType(pj_qos_type.PJ_QOS_TYPE_VOICE);
+            sEndPoint.transportCreate(pjsip_transport_type_e.PJSIP_TRANSPORT_TCP, mTcpTransportConfig);
+        }
 
         sEndPoint.libStart();
 
