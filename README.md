@@ -196,9 +196,9 @@ For more information on:
 
 - `validateCheckout(CheckoutValidateRequest request)`: Validate checkout (card or bank).
 
-- `payConsumers(String productName, List<Consumer> recipients)`: Send money to consumer. 
+- `mobileB2C(String productName, List<Consumer> recipients)`: Send money to consumer. 
 
-- `payBusiness(String productName, Business recipient)`: Send money to business.
+- `mobileB2B(String productName, Business recipient)`: Send money to business.
 
 ### Voice
 
