@@ -3,6 +3,7 @@ package com.africastalking.services;
 
 import com.africastalking.models.payment.B2BResponse;
 import com.africastalking.models.payment.B2CResponse;
+import com.africastalking.models.payment.BankTransferResponse;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
 import com.africastalking.models.payment.checkout.CheckoutValidationResponse;
 
@@ -34,5 +35,8 @@ public interface PaymentServiceInterface {
 
     @POST("bank/checkout/validate")
     Call<CheckoutValidationResponse> bankCheckoutValidate(@Body HashMap<String, Object> body);
+
+    @POST("bank/transfer")
+    Call<BankTransferResponse> bankTransfer(@Body HashMap<String, Object> body);
 
 }

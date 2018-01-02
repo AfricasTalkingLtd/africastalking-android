@@ -1,5 +1,7 @@
 package com.africastalking.services;
 
+import com.africastalking.models.payment.Bank;
+import com.africastalking.models.payment.BankTransferResponse;
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
@@ -237,8 +239,6 @@ public class PaymentService extends Service {
         call.enqueue(makeCallback(callback));
     }
 
-
-
     public B2BResponse mobileB2B(String product, Business recipient) throws IOException {
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
@@ -249,6 +249,35 @@ public class PaymentService extends Service {
     public void mobileB2B(String product, Business recipient, Callback<B2BResponse> callback) {
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
+        call.enqueue(makeCallback(callback));
+    }
+
+    /**
+     * Initiate bank transfer
+     * @param productName
+     * @param recipients
+     * @return
+     * @throws IOException
+     */
+    public BankTransferResponse bankTransfer(String productName, List<Bank> recipients) throws IOException {
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("username", username);
+        body.put("productName", productName);
+        body.put("recipients", recipients);
+        Call<BankTransferResponse> call = payment.bankTransfer(body);
+        Response<BankTransferResponse> resp = call.execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
+        return resp.body();
+    }
+
+    public void bankTransfer(String productName, List<Bank> recipients, Callback<BankTransferResponse> callback) {
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("username", username);
+        body.put("productName", productName);
+        body.put("recipients", recipients);
+        Call<BankTransferResponse> call = payment.bankTransfer(body);
         call.enqueue(makeCallback(callback));
     }
 }

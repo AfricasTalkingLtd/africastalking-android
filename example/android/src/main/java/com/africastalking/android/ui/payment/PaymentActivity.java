@@ -9,7 +9,11 @@ import android.view.MenuItem;
 
 import com.africastalking.AfricasTalking;
 import com.africastalking.android.BuildConfig;
+import com.africastalking.models.payment.Bank;
+import com.africastalking.models.payment.BankTransferResponse;
 import com.africastalking.models.payment.checkout.BankCheckoutRequest;
+import com.africastalking.models.payment.checkout.BankCheckoutRequest.BankAccount;
+import com.africastalking.models.payment.checkout.BankCode;
 import com.africastalking.models.payment.checkout.CardCheckoutRequest;
 import com.africastalking.models.payment.checkout.CheckoutRequest;
 import com.africastalking.models.payment.checkout.MobileCheckoutRequest;
@@ -19,6 +23,10 @@ import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
 import com.africastalking.services.PaymentService;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import timber.log.Timber;
 
@@ -47,6 +55,15 @@ public class PaymentActivity extends BaseActivity {
                     Timber.i(res.transactionId);
                     Timber.i(res.status);
                     Timber.i(res.description);
+
+                    Timber.i("Bank transfer of NGN 5000");
+                    List<Bank> recipients = Arrays.asList(new Bank(new BankAccount("Fake", "23123434", BankCode.GTBank_NG), "NGN 5000", "Desc", new HashMap<String, String>()));
+                    BankTransferResponse response = payment.bankTransfer(BuildConfig.PRODUCT_NAME, recipients);
+                    BankTransferResponse.BankEntry entry = response.entries.get(0);
+                    Timber.i(entry.transactionId);
+                    Timber.i(entry.status);
+                    Timber.i(entry.transactionFee);
+
 
                 } catch (Exception e) {
                     Timber.e(e, "IOException");
