@@ -1,5 +1,6 @@
 package com.africastalking.android.ui.airtime;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -19,7 +20,7 @@ public class AirtimeActivity extends BaseActivity {
         setContentView(R.layout.activity_airtime);
 
 
-        AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
+        @SuppressLint("StaticFieldLeak") AsyncTask<Void, String, Void> task = new AsyncTask<Void, String, Void>() {
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -29,7 +30,7 @@ public class AirtimeActivity extends BaseActivity {
                     AirtimeService airtime = AfricasTalking.getAirtimeService();
 
                     Timber.i("Sending KES 100 to 0718769882");
-                    AirtimeResponse res = airtime.send("0718769882", "KES", 100);
+                    AirtimeResponse res = airtime.send("0718769882", "KES", 100 + ((int) Math.random() * 500));
                     Timber.i("Sent a total of " + res.totalAmount);
 
                 } catch (Exception e) {
