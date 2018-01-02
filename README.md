@@ -200,6 +200,8 @@ For more information on:
 
 - `mobileB2B(String productName, Business recipient)`: Send money to business.
 
+- `bankTransfer(String productName, List<Bank> recipients)`: Move money form payment wallet to bank account.
+
 ### Voice
 
 Unlike other services, voice is initialized as follows:
