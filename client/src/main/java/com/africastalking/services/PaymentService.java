@@ -152,8 +152,11 @@ public class PaymentService extends Service {
             default:
                 throw new IOException("Invalid checkout type");
         }
-        Response<CheckoutResponse> res = call.execute();
-        return res.body();
+        Response<CheckoutResponse> resp = call.execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
+        return resp.body();
     }
 
     /**
@@ -200,8 +203,11 @@ public class PaymentService extends Service {
             default:
                 throw new IOException("Invalid type: Only CARD and BANK are allowed");
         }
-        Response<CheckoutValidationResponse> res = call.execute();
-        return res.body();
+        Response<CheckoutValidationResponse> resp = call.execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
+        return resp.body();
     }
 
     /**
@@ -229,8 +235,11 @@ public class PaymentService extends Service {
     public B2CResponse mobileB2C(String product, List<Consumer> recipients) throws IOException {
         HashMap<String, Object> body = makeB2CRequest(product, recipients);
         Call<B2CResponse> call = payment.requestB2C(body);
-        Response<B2CResponse> res = call.execute();
-        return res.body();
+        Response<B2CResponse> resp = call.execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
+        return resp.body();
     }
 
     public void mobileB2C(String product, List<Consumer> recipients, Callback<B2CResponse> callback) {
@@ -242,8 +251,11 @@ public class PaymentService extends Service {
     public B2BResponse mobileB2B(String product, Business recipient) throws IOException {
         HashMap<String, Object> body = makeB2BRequest(product, recipient);
         Call<B2BResponse> call = payment.requestB2B(body);
-        Response<B2BResponse> res = call.execute();
-        return res.body();
+        Response<B2BResponse> resp = call.execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
+        return resp.body();
     }
 
     public void mobileB2B(String product, Business recipient, Callback<B2BResponse> callback) {

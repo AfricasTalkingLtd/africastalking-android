@@ -79,13 +79,16 @@ public final class SmsService extends Service {
      */
     public List<Recipient> send(String message, String from, String[] recipients) throws IOException {
         Response<SendMessageResponse> resp = sms.send(username, formatRecipients(recipients), from, message).execute();
-        if (resp.isSuccessful()) {
-            try {
-                return resp.body().data.recipients;
-            } catch (NullPointerException npe) {
-            }
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
         }
-        throw new IOException(resp.message());
+
+        try {
+            return resp.body().data.recipients;
+        } catch (NullPointerException npe) {
+            throw new IOException("Invalid API response");
+        }
+
     }
 
     /**
@@ -152,13 +155,16 @@ public final class SmsService extends Service {
                 message,
                 1,
                 enqueue ? "1" : null).execute();
-        if (resp.isSuccessful()) {
-            try {
-                return resp.body().data.recipients;
-            } catch (NullPointerException npe) {
-            }
+
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
         }
-        throw new IOException(resp.message());
+
+        try {
+            return resp.body().data.recipients;
+        } catch (NullPointerException npe) {
+            throw new IOException("Invali API response");
+        }
     }
 
     /**
@@ -267,12 +273,14 @@ public final class SmsService extends Service {
     public List<Recipient> sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients) throws IOException {
         String retryDuration = retryDurationInHours <= 0 ? null : String.valueOf(retryDurationInHours);
         Response<SendMessageResponse> resp = sms.sendPremium(username, formatRecipients(recipients), from, message, keyword, linkId, retryDuration, 0).execute();
-        if (resp.isSuccessful()) {
-            try {
-                return resp.body().data.recipients;
-            } catch (NullPointerException npe) { }
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
         }
-        throw new IOException(resp.message());
+        try {
+            return resp.body().data.recipients;
+        } catch (NullPointerException npe) {
+            throw new IOException("Invalid API response");
+        }
     }
 
     /**
@@ -376,12 +384,16 @@ public final class SmsService extends Service {
      */
     public List<Message> fetchMessage(String lastReceivedId) throws IOException {
         Response<FetchMessageResponse> resp = sms.fetchMessage(username, lastReceivedId).execute();
-        if (resp.isSuccessful()) {
-            try {
-                return resp.body().data.messages;
-            } catch (NullPointerException npe) { }
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
         }
-        throw new IOException(resp.message());
+        try {
+            return resp.body().data.messages;
+        } catch (NullPointerException npe) {
+            throw new IOException("Invalid API response");
+        }
+
+
     }
 
     /**
@@ -440,12 +452,15 @@ public final class SmsService extends Service {
      */
     public List<Subscription> fetchSubscription(String shortCode, String keyword, String lastReceivedId) throws IOException {
         Response<FetchSubscriptionResponse> resp = sms.fetchSubscription(username, shortCode, keyword, lastReceivedId).execute();
-        if (resp.isSuccessful()) {
-            try {
-                return resp.body().subscriptions;
-            } catch (NullPointerException npe) { }
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
         }
-        throw new IOException(resp.message());
+
+        try {
+            return resp.body().subscriptions;
+        } catch (NullPointerException npe) {
+            throw new IOException("Invalid API response");
+        }
     }
 
     /**
@@ -505,6 +520,9 @@ public final class SmsService extends Service {
      */
     public SubscriptionResponse createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken) throws IOException {
         Response<SubscriptionResponse> resp = sms.createSubscription(username, shortCode, keyword, phoneNumber, checkoutToken).execute();
+        if (!resp.isSuccessful()) {
+            throw new IOException(resp.errorBody().string());
+        }
         return resp.body();
     }
 
