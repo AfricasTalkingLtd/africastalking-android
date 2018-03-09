@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "restify": "^6.2.3",
-    "nodemon": "^1.12.1"
+    "africastalking": "^0.3.0",
+    "nodemon": "^1.17.1",
+    "restify": "^6.3.4"
   }
 }
