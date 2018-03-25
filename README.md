@@ -48,29 +48,24 @@ public class SomeActivity extends Activity {
         super.onCreate(args);
         setContentView(R.layout.some_activity);
         
-        try {
-            // Init SDK
-            AfricasTalking.initialize(SERVER_HOSTNAME);
+        // Init SDK
+        AfricasTalking.initialize(SERVER_HOSTNAME);
+       
+        // Get Service
+        AirtimeService airtime = AfricasTalking.getAirtimeService();
 
-            // Get Service
-            AirtimeService airtime = AfricasTalking.getAirtimeService();
+        // Use Service
+        airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
+          @Override
+          void onSuccess(AirtimeResponses responses) {
+            //...
+          }
 
-            // Use Service
-            airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
-              @Override
-              void onSuccess(AirtimeResponses responses) {
-                //...
-              }
-
-              @Override
-              void onError(Throwable throwable) {
-                //...
-              }
-            });
-        
-        } catch (IOException ex) {
-            // grrr
-        }
+          @Override
+          void onError(Throwable throwable) {
+            //...
+          }
+        });
     }
 }
 ```
