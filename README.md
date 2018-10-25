@@ -14,6 +14,13 @@ For instance, to send an SMS, the client will request a token from the server; T
 ### 1. Server
 You can code your server using android studio, eclipse or any other IDE you may deem fit.
 
+**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC. Visit this link to get the Africa's Talking Node.js and PHP SDKs to see a template of how your server should look like in Node.js or PHP.
+
+https://github.com/AfricasTalkingLtd/africastalking-node.js
+
+https://github.com/AfricasTalkingLtd/africastalking-php
+
+
 Whichever IDE you choose to work with, the following need to be done.
 
 #### a. Download dependencies
@@ -92,7 +99,7 @@ public class SomeJavaApplication {
                 server.startInsecure();
                 
                 //Use this if you have provided a port
-                server.startInsecure(port);
+                //server.startInsecure(port);
                 
                 //Please see the Advanced section for a list of other functions you can use to start your server
         } catch (IOException e){
@@ -110,14 +117,6 @@ You may need to add the following code snippet just after **server.startInsecure
             System.out.println("Press ENTER to exit");
             System.in.read();
 ```
-
-**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC.
-
-Visit this link to get the Africa's Talking Node.js and PHP SDKs to see a template of how your server should look like in Node.js or PHP.
-
-https://github.com/AfricasTalkingLtd/africastalking-node.js
-
-https://github.com/AfricasTalkingLtd/africastalking-php
 
 This is enough to run your simple server. Now to the android app.
 
@@ -190,7 +189,7 @@ public class SomeActivity extends Activity {
             AfricasTalking.initialize(SERVER_HOSTNAME);
 
             //Use this if you specified a port for your server
-            AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
+            //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
 
             //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
           
