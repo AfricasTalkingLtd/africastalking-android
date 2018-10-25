@@ -233,7 +233,8 @@ Write the java code. It may look like this.
             AirtimeService airtime = AfricasTalking.getAirtimeService();
 
             // Use Service
-            airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
+            //Will send +254... 100KES airtime
+            airtime.send("+254...", "KES", 100, new Callback<AirtimeResponses>() {
               @Override
               void onSuccess(AirtimeResponses responses) {
                 //...
