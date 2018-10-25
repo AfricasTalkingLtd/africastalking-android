@@ -35,7 +35,7 @@ repositories {
   }
 }
 dependencies{
-  compile 'com.africastalking:server:VERSION'
+  implementation 'com.africastalking:server:VERSION'
 }
 ```
 If you are using Eclipse IDE, or you use Maven dependencies instead, add this code snipppet in your Maven dependencies.
@@ -155,9 +155,9 @@ repositories {
 dependencies{
 
    //ADD THIS
-  compile 'com.africastalking:client:VERSION'
+  implementation 'com.africastalking:client:VERSION'
   // or
-  compile 'com.africastalking:client-ui:VERSION' // with checkout UI for payment
+  implementation 'com.africastalking:client-ui:VERSION' // with checkout UI for payment
 }
 ```
 
