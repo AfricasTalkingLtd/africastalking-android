@@ -20,7 +20,7 @@ https://github.com/AfricasTalkingLtd/africastalking-node.js
 
 https://github.com/AfricasTalkingLtd/africastalking-php
 
-**If you are using Java for your server**
+**If you are using Java for your server...**
 
 Whichever IDE you choose to work with, the following need to be done.
 
