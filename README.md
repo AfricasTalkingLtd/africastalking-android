@@ -14,7 +14,7 @@ For instance, to send an SMS, the client will request a token from the server; T
 ### 1. Server
 You can code your server using android studio, eclipse or any other IDE you may deem fit.
 
-**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC. Visit this link to get the Africa's Talking Node.js and PHP SDKs to see a template of how your server should look like in Node.js or PHP.
+**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC. Visit these links to get the Africa's Talking Node.js and PHP SDKs to see a template of how your server should look like in Node.js or PHP.
 
 https://github.com/AfricasTalkingLtd/africastalking-node.js
 
