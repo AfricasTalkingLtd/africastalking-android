@@ -6,7 +6,7 @@ This SDK simplifies the integration of Africa's Talking APIs into your Android a
 the SDK is split into two components: A **server** module that stores API keys, SIP credentials and other secrets.
 And a **client** module that runs in your app. This client module gets secrets from the server component (via RPC), and uses them to interact with the various APIs.
 
-For instance, to send an SMS, the client will request a token from the server; The server will use it's API key to request a token from Africa's Talking on behalf of the client. It will then forward the token to the client which will use it to request the SMS API to send a text. All in a split second!
+For instance, to send an SMS, the client will request a token from the server; The server will use it's API key to request a token from Africa's Talking on behalf of the client. It will then forward the token to the client which will use it to request, say, the SMS API to send a text. All in a split second!
 
 
 ## Usage
