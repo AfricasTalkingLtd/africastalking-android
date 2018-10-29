@@ -11,7 +11,9 @@ For instance, to send an SMS, the client will request a token from the server; T
 
 ## Usage
 
-**NOTE** The code samples seen here are for running a simple server and doing simple API requests. See the advanced section for the list of all methods you can use within the SDK to access the various services.
+**NOTE:** **a)** The code samples seen here are for running a simple server and doing simple API requests. See the advanced section for the list of all methods you can use within the SDK to access the various services.
+
+   **b)** If you plan on integrating the SDK to your android app, please avoid cloning this whole repo. Instead, just follow as instructed in this ReadMe.
 
 ### 1. Server
 You can code your server using android studio, eclipse or any other IDE you may deem fit.
@@ -371,47 +373,127 @@ The code snippets above will allow you to write
 
 ## Advanced
 
+This section holds the set of all overloaded functions that can be used to perform various tasks in the Android SDK.
 
+### 1. Server
 
-## Initialization
+#### a. Initialization
+The following static method is available on the `AfricasTalking` class to initialize the library, server side.
+
+- `initialize(String username, String apiKey)`: Initialize the library, passing in the username and apiKey.
+
+#### b. Start Server
+The following methods are available to start your server.
+
+- `startInsecure()`: Start the server insecurely.
+
+- `startInsecure(int port)`: Start the server insecurely, providing a port for the server.
+
+- `start(File certChainFile, File privateKeyFile)`: Start the server securely, providing the certificate and private key.
+
+- `start(File certChainFile, File privateKeyFile, int port)`: Same as method shown before, but pass in the port to start the server.
+
+#### c. Add Sip Credentials (Voice Only)
+
+- `addSipCredentials(String username, String password, String host)`: Add sip credentials. The actual values for the arguments will be provided by Africa's Talking on request of a SIP phone.
+
+- `addSipCredentials(String username, String password, String host, int port, String transport)`: Add sip credentials, this
+time passing in a port, and transport value. The value for transport will be provided by Africa's Talking on request of a SIP phone.
+
+#### d. Stop server
+
+- `stop()`: Stop the server.
+
+### 2. Android
+
+#### a. Initialization
 The following static methods are available on the `AfricasTalking` class to initialize the library:
 
-- `initialize(String host, int port, bool disableTLS)`: Initialize the library.
+- `initialize(String host)`: Initialize the library, only passing in the server hostname. 
+
+- `initialize(String host, int port)`: Initialize the library, passing in the server hostname and port only.
+
+- `initialize(String host, int port, bool disableTLS)`: Initialize the library, passing the server hostname, port, and disableTLS boolean option.
+
+#### b. Services
+
+##### b.1 Get a service
+
 - `getXXXService()`: Get an instance to a given `XXX` service. e.g. `AfricasTalking.getSmsService()`, `AfricasTalking.getPaymentService()`, etc.
 
+**NOTE**
+All methods for all services are synchronous (i.e. will block current thread) but provide asynchronous variants that take a `Callback<T>` as the last argument.
 
-## Services
+Synchronous variants return a service reponse, asynchronous variants return void.
 
-All methods are synchronous (i.e. will block current thread) but provide asynchronous variants that take a `Callback<T>` as the last argument.
+If you use the synchronous variants, then make sure you run them in a separate thread from the main UI thread to prevent your app from crashing, and ensuring that you confirm to Android's programming standards (since we are making network calls).
 
-### `Account`
+##### b.2 Account Service
 - `getUser()`: Get user information.
 
-### `Airtime`
+- `getUser(Callback <AccountResponse> callback)`: Get user information with a callback. 
 
-- `send(String phone, String currencyCode, float amount)`: Send airtime to a phone number.
+##### b.3 Airtime Service
+
+- `send(String phone, String currency, float amount)`: Send airtime to a single phone number.
 
 - `send(HashMap<String, String> recipients)`: Send airtime to a bunch of phone numbers. The keys in the `recipients` map are phone numbers while the values are airtime amounts ( e.g. `KES 678`).
 
+- `send(String phone, String currency, float amount, Callback<AirtimeResponse> callback)`: Send airtime to a single phone number, with a callback.
+
+- `send(HashMap<String, String> recipients, Callback<AirtimeResponse> callback)`: Send airtime to a bunch of phone numbers. The keys in the `recipients` map are phone numbers while the values are airtime amounts ( e.g. `KES 678`).
+
 For more information about status notification, please read [http://docs.africastalking.com/airtime/callback](http://docs.africastalking.com/airtime/callback)
 
-### `Token`
+###### b.4 Token Service
 
 - `createCheckoutToken(String phoneNumber)`: Create a checkout token.
 
-### `SMS`
+- `createCheckoutToken(String phoneNumber, Callback<CheckoutTokenResponse> callback)`: Create a checkout token with a callback response.
+
+###### b.5 SMS Service
+
+###### Send an sms to one or more numbers
 
 - `send(String message, String[] recipients)`: Send a message
 
+- `send(String message, String[] recipients, Callback<List<Recipient>> callback)`: Send a message
+
+- `send(String message, String from, String[] recipients)`: Send a message, passing in the number the message is from.
+
+- `send(String message, String from, String[] recipients, Callback<List<Recipient>> callback)`: Send a message, passing in the number the message is from, with a callback.
+
+/* ***delete all sendBulk instances, update in SDK first before final push, with edit***
+
 - `sendBulk(String message, String[] recipients)`: Send a message in bulk
 
+###### Send premium sms
+
 - `sendPremium(String message, String keyword, String linkId, String[] recipients)`: Send a premium SMS
+
+- `sendPremium(String message, String from, String keyword, String linkId, String[] recipients)`: Send a premium SMS, passing in the number the message is from
+
+- `sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients)`: Send a premium SMS, passing in the retry duration
+
+- `sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients)`: Send a premium SMS, passing in the retry duration
+
+- `sendPremium(String message, String keyword, String linkId, String[] recipients, Callback<List<Recipient>> callback)`: Send a premium SMS, with a callback
+
+- `sendPremium(String message, String from, String keyword, String linkId, String[] recipients, Callback<List<Recipient>> callback)`: Send a premium SMS, passing in the number the message is from and a callback
+
+- `sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<List<Recipient>> callback)`: Send a premium SMS, passing in the retry duration and callback.
+
+- `sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients, Callback<List<Recipient>> callback)`: Send a premium SMS,passing in the number the message is from, retry duration, and a callback
+
+###### Create premium sms subscription
+
+- `createSubscription(String )
 
 - `fetchMessage()`: Fetch your messages
 
 - `fetchSubscription(String shortCode, String keyword)`: Fetch your premium subscription data
 
-- `createSubscription(String shortCode, String keyword, String phoneNumber)`: Create a premium subscription
+- `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken)`: Create a premium subscription
 
 For more information on: 
 
