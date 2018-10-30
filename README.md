@@ -443,7 +443,7 @@ If you use the synchronous variants, then make sure you run them in a separate t
 
 - `send(HashMap<String, String> recipients, Callback<AirtimeResponse> callback)`: Send airtime to a bunch of phone numbers. The keys in the `recipients` map are phone numbers while the values are airtime amounts ( e.g. `KES 678`).
 
-For more information about status notification, please read [http://docs.africastalking.com/airtime/callback](http://docs.africastalking.com/airtime/callback)
+For more information about status notification, please read [http://docs.africastalking.com/airtime/callback](http://docs.africastalking.com/airtime/callback) 
 
 ###### b.4 Token Service
 
@@ -487,13 +487,9 @@ For more information about status notification, please read [http://docs.africas
 
 ###### Create premium sms subscription
 
-- `createSubscription(String )
-
-- `fetchMessage()`: Fetch your messages
-
-- `fetchSubscription(String shortCode, String keyword)`: Fetch your premium subscription data
-
 - `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken)`: Create a premium subscription
+
+- `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken, Callback<SubscriptionResponse> callback)`: create a premium sms subscription, with a callback passed in for handling the response.
 
 For more information on: 
 
@@ -503,19 +499,47 @@ For more information on:
 
 - How to listen for subscription notifications: [http://docs.africastalking.com/subscriptions/callback](http://docs.africastalking.com/subscriptions/callback)
 
-### `Payment`
+###### Fetch messages
+
+- `fetchMessage()`: Fetch your messages
+
+- `fetchMessage(Callback<List<Message>> callback)`: Fetch your messages, with a callback.
+
+- `fetchMessage(String lastReceivedId)`: Fetch the last received message
+
+- `fetchMessage(String lastReceivedId, Callback<List<Message>> callback)`: Fetch the last received message
+
+- `fetchSubscription(String shortCode, String keyword)`: Fetch your premium subscription data
+
+- `fetchSubscription(String shortCode, String keyword, String lastReceivedId)`: Fetch your premium subscription data, for last received message
+
+- `fetchSubscription(String shortCode, String keyword, Callback<List<Message>> callback)`: Fetch your premium subscription data
+
+- `fetchSubscription(String shortCode, String keyword, String lastReceivedId)`: Fetch your premium subscription data, for last received message
+
+###### b.6 Payment
 
 - `checkout(CheckoutRequest request)`: Initiate checkout(mobile, card or bank).
 
+- `checkout(CheckoutRequest request, Callback<CheckoutResponse> callback)`: Initiate checkout(mobile, card or bank).
+
 - `validateCheckout(CheckoutValidateRequest request)`: Validate checkout (card or bank).
+
+- `validateCheckout(CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback)`: Validate checkout (card or bank).
 
 - `mobileB2C(String productName, List<Consumer> recipients)`: Send money to consumer. 
 
+- `mobileB2C(String productName, List<Consumer> recipients, Callback<B2CResponse> callback)`: Send money to consumer. 
+
 - `mobileB2B(String productName, Business recipient)`: Send money to business.
+
+- `mobileB2B(String productName, Business recipient, Callback<B2BResponse> callback)`: Send money to business.
 
 - `bankTransfer(String productName, List<Bank> recipients)`: Move money form payment wallet to bank account.
 
-### Voice
+- `bankTransfer(String productName, List<Bank> recipients, Callback<BankTransferReponse> callback)`: Move money form payment wallet to bank account.
+
+###### b.7 Voice
 
 Unlike other services, voice is initialized as follows:
 
