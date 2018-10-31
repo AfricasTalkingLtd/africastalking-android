@@ -541,28 +541,159 @@ For more information on:
 
 ###### b.7 Voice
 
+To use the voice service, you'll need to import the following libraries.
+
+```java
+  
+  import com.africastalking.AfricasTalking;
+  import com.africastalking.AfricasTalkingException; //handling exceptions
+  import com.africastalking.utils.Callback;
+  import com.africastalking.utils.Logger; //Used for logging
+
+  import com.africastalking.services.VoiceService;
+  import com.africastalking.utils.voice.CallInfo;
+  import com.africastalking.utils.voice.CallListener;
+  import com.africastalking.utils.voice.RegistrationListener;
+  
+```
+
 Unlike other services, voice is initialized as follows:
 
 ```java
-AfricasTalking.initializeVoiceService(Context cxt, RegistrationListener listener, new Callback<VoiceService>() {
-    @Override
-    public void onSuccess(VoiceService service) {
-      // keep a reference to the 'service'
-    }
+try{
 
-    @Override
-    public void onFailure(Throwable throwable) {
-      // something blew up
-    }
-});
+  AfricasTalking.initializeVoiceService(Context cxt, RegistrationListener listener, new Callback<VoiceService>() {
+      @Override
+      public void onSuccess(VoiceService service) {
+        // keep a reference to the 'service'
+        mService = service;
+      }
+
+      @Override
+      public void onFailure(Throwable throwable) {
+        // something blew up
+      }
+  });
+  
+  } catch (Exception ex){
+    //failed to initialize
+  }
 ```
 
+The following listeners are needed:
 
-- `registerCallListener(CallListener listener)`:
+**i. Registration listener**
+
+```java
+
+    RegistrationListener listener = new RegistrationListener() {
+        @Override
+        public void onError(Throwable error) {
+            
+            //handle error in registering to the SIP server
+            }
+
+        @Override
+        public void onStarting() {
+
+            //registration starting
+        }
+
+        @Override
+        public void onComplete() {
+
+            //register call listener
+            mService.registerCallListener(mCallListener);
+            
+            //register logger
+            mService.registerLogger(mLogger);
+            
+            //mCallListener is an instance of CallListener. It's instantiated below
+        }
+    };
+
+```
+
+**ii. Call Listener**
+
+```java
+
+    private CallListener mCallListener = new CallListener() {
+        @Override
+        public void onCallBusy(CallInfo call) {
+            Timber.w("Callee Busy: " + call.getDisplayName());
+        }
+
+        @Override
+        public void onError(CallInfo call, final int errorCode, final String errorMessage) {
+
+            Timber.e("Call Error(" + errorCode + "): " + errorMessage);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(VoiceActivity.this, errorMessage + "(" + errorCode + ")", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onRinging(final CallInfo callInfo) {
+            Timber.i("Ringing: " + callInfo.getDisplayName());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(VoiceActivity.this, "Ringing " + callInfo.getDisplayName(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onRingingBack(final CallInfo call) {
+            Timber.i("Ring Back: " + call.getDisplayName());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(VoiceActivity.this, "Ringing Back " + call.getDisplayName(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
+        @Override
+        public void onCallEstablished(CallInfo call) {
+            Timber.i("Starting call: " + call.getDisplayName());
+
+            mService.startAudio();
+            mService.setSpeakerMode(VoiceActivity.this, false);
+
+            // show in-call ui
+            Intent i = new Intent(VoiceActivity.this, InCallActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        }
+
+        @Override
+        public void onCallEnded(CallInfo call) {
+            Timber.w("Call Ended: " + call.getDisplayName());
+        }
+
+        @Override
+        public void onIncomingCall(CallInfo callInfo) {
+            Timber.i("onIncomingCall: " + callInfo.getDisplayName());
+            Intent i = new Intent(VoiceActivity.this, InCallActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+        }
+    };
+
+  
+```
+
+- `registerCallListener(CallListener listener)`: register the call listener
 
 - `makeCall(String phoneNumber)`:
 
-- `picCall()`:
+- `pickCall()`:
 
 - `holdCall()`:
 
