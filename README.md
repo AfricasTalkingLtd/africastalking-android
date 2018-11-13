@@ -621,101 +621,115 @@ The following listeners are needed:
     private CallListener mCallListener = new CallListener() {
         @Override
         public void onCallBusy(CallInfo call) {
-            Timber.w("Callee Busy: " + call.getDisplayName());
+            
+            //Do something
         }
 
         @Override
         public void onError(CallInfo call, final int errorCode, final String errorMessage) {
 
-            Timber.e("Call Error(" + errorCode + "): " + errorMessage);
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(VoiceActivity.this, errorMessage + "(" + errorCode + ")", Toast.LENGTH_LONG).show();
-                }
-            });
+            //Do something based on error
         }
 
         @Override
         public void onRinging(final CallInfo callInfo) {
-            Timber.i("Ringing: " + callInfo.getDisplayName());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(VoiceActivity.this, "Ringing " + callInfo.getDisplayName(), Toast.LENGTH_LONG).show();
-                }
-            });
+            
+            //Do something
         }
 
         @Override
         public void onRingingBack(final CallInfo call) {
-            Timber.i("Ring Back: " + call.getDisplayName());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(VoiceActivity.this, "Ringing Back " + call.getDisplayName(), Toast.LENGTH_LONG).show();
-                }
-            });
+            
+            //Do something
         }
 
         @Override
         public void onCallEstablished(CallInfo call) {
-            Timber.i("Starting call: " + call.getDisplayName());
-
+            
+            //The call has been established. So, start audio
             mService.startAudio();
             mService.setSpeakerMode(VoiceActivity.this, false);
 
             // show in-call ui
-            Intent i = new Intent(VoiceActivity.this, InCallActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
+            //Probably set up an activity or fragment to do this
         }
 
         @Override
         public void onCallEnded(CallInfo call) {
-            Timber.w("Call Ended: " + call.getDisplayName());
+            
+            //Handle the end of the call
         }
 
         @Override
         public void onIncomingCall(CallInfo callInfo) {
-            Timber.i("onIncomingCall: " + callInfo.getDisplayName());
-            Intent i = new Intent(VoiceActivity.this, InCallActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
+            
+            //Do something. 
+            //You can show in-call UI here,
         }
     };
 
   
 ```
 
+You can optionally set up a logger as follows:
+
+```Java
+
+    private Logger logger = new Logger() {
+        @Override
+        public void log(String message, Object... args) {
+            //Log the messages
+            Timber.d(message, args);
+        }
+    };
+
+```
+
+The following methods may be of use in using the Voice Service in the SDK. They belong to the VoiceService class.
+
 - `registerCallListener(CallListener listener)`: register the call listener
 
-- `makeCall(String phoneNumber)`:
+- `unregisterCallListener(CallListener listener)`: unregister the call listener
 
-- `pickCall()`:
+- `registerLogger(Logger logger)`: register the logger
 
-- `holdCall()`:
+- `unregisterLogger(Logger logger)`: unregister the logger
 
-- `resumeCall()`:
+- `makeCall(String phoneNumber)`: make a phone call
 
-- `endCall()`:
+- `pickCall()`: pick a call
+
+- `holdCall()`: hold a call
+
+- `resumeCall()`: resume a held call
+
+- `endCall()`: end a call
 
 - `sendDtmf(char character)`:
 
 - `startAudio()`:
 
-- `toggleMute()`:
+- `toggleMute()`: mute or unmute a call
 
-- `setSpeakerMode(Context context, boolean loudSpeaker)`:
+- `setSpeakerMode(Context context, boolean loudSpeaker)`: toggle between using the loudspeaker and not
 
-- `isCallInProgress()`:
+- `isCallInProgress()`: returns a boolean indicating whether a call is in progress or not
 
-- `getCallInfo()`
+- `getCallInfo()`: get an instance of CallInfo
 
 - `queueStatus(String phoneNumbers)`:
 
+- `queueStatus(String phoneNumbers, Callback<QueuedCallsResponse> callback)`:
+
 - `mediaUpload(String url)`:
+
+- `mediaUpload(String url, Callback<String> callback)`:
+
+- `destroyService()`: destroy the voice service
+
+You can get an instance of the voice service using the following static method of the Africa's Talking class
+
+- `getVoiceService()`: get an instance of the voice service
 
 
 
