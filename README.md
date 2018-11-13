@@ -368,7 +368,7 @@ Please find this code provided in the Advanced section
 **NOTE**
 See the [example](./example) for complete sample apps (Android, Web Java+Node)
 
-The code snippets above will allow you to write 
+The code snippets above will allow for simple use of the Android SDK to use Africa's Talking API services. For a full list and description of the methods, classes and functionalities of the android SDK, see the Advanced section below.
 
 
 ## Advanced
