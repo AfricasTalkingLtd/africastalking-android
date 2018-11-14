@@ -11,7 +11,8 @@ For instance, to send an SMS, the client will request a token from the server; T
 
 ## Usage
 
-**NOTE:** **a)** The code samples seen here are for running a simple server and doing simple API requests. See the advanced section for the list of all methods you can use within the SDK to access the various services.
+**NOTE:** 
+**a)** The code samples seen here are for running a simple server and doing simple API requests. See the advanced section for the list of all methods you can use within the SDK to access the various services.
 
    **b)** If you plan on integrating the SDK to your android app, please avoid cloning this whole repo. Instead, just follow as instructed in this ReadMe.
 
