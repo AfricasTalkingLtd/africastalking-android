@@ -31,7 +31,7 @@ Whichever IDE you choose to work with, the following need to be done.
 
 #### a. Download dependencies
 
-If you are using android studio (with gradle dependencies), add the following code snippet in your build.gradle file (Module: your_server's_module_name)
+If you are using android studio (or gradle dependencies), add the following code snippet in your build.gradle file (Module: your_server's_module_name)
 
 ```groovy
 repositories {
@@ -73,7 +73,7 @@ Now put this Java code in the class you've created to run your server.
 Your server application could be something like this:
 
 ```java
-/* On The Server (Java, Node.js, PHP, C/C++, C# and all languages supported by gRPC.) */
+/* On The Server (Java) */
 
 import com.africastalking.*;
 
@@ -189,12 +189,11 @@ public class SomeActivity extends Activity {
         setContentView(R.layout.some_activity);
         
         // Initialize SDK
-        //Use this method below if you had not specified a port for your server above
         try{
         
             AfricasTalking.initialize(SERVER_HOSTNAME);
 
-            //Use this if you specified a port for your server
+            //Use this instead if you specified a port for your server
             //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
 
             //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
@@ -214,7 +213,7 @@ The code snippet above initializes the SDK. Now, you can use the various Africa'
 
 #### b.1 Airtime Service
 
-Add this code snippet in whatever method or activity you would want to invoke before using the Airtime service.
+Add this code snippet in whatever method or activity you would want to invoke for using the Airtime service.
 
 Import the following library classes
 
@@ -238,7 +237,7 @@ Write the java code. It may look like this.
             AirtimeService airtime = AfricasTalking.getAirtimeService();
 
             // Use Service
-            //Will send +254... 100KES airtime
+            //Will send ksh 100 airtime to +254...
             airtime.send("+254...", "KES", 100, new Callback<AirtimeResponses>() {
               @Override
               void onSuccess(AirtimeResponses responses) {
@@ -260,7 +259,7 @@ Write the java code. It may look like this.
 
 #### b.2 SMS Service
 
-Add this code snippet in whatever method or activity you would want to invoke before using the SMS service.
+Add this code snippet in whatever method or activity you would want to invoke for using the SMS service.
 
 Import the following library classes
 
@@ -284,7 +283,7 @@ Write the Java code. It may look like this.
         
             SmsService sms = AfricasTalking.getSmsService();
             
-            //Will send "Hello" to number "+254...". Note that the String is an array, so you can add more numbers to do a bulk
+            //Will send "Hello" to "+254...". Note that the String is an array, so you can add more numbers to do a bulk
             //sms
             sms.send("Hello", new String[]{"+254...."}, new Callback<List<Recipient>>() {
                         @Override
@@ -310,7 +309,7 @@ Write the Java code. It may look like this.
 
 #### b.3 Payment Service
 
-Add this code snippet in whatever method or activity you would want to invoke before using the Payment service.
+Add this code snippet in whatever method or activity you would want to invoke for using the Payment service.
 
 Import the following library classes
 
@@ -338,10 +337,10 @@ Write the Java code. It may look like this.
             
             //Create the checkout request. You can create a product for testing by visiting
             // https://account.africastalking.com/apps/sandbox/payments/products
-            MobileCheckoutRequest request = new MobileCheckoutRequest("your_product_name", "KES amount",phoneNumber);
+            MobileCheckoutRequest checkoutRequest = new MobileCheckoutRequest("your_product_name", "KES 500",phoneNumber);
             
             //Checkout
-            request.checkout(checkoutRequest, new Callback<CheckoutResponse>() {
+            payment.checkout(checkoutRequest, new Callback<CheckoutResponse>() {
                         @Override
                         public void onSuccess(CheckoutResponse data) {
                             
@@ -375,7 +374,7 @@ The code snippets above will allow for simple use of the Android SDK to use Afri
 
 ## Advanced
 
-This section holds the set of all overloaded functions that can be used to perform various tasks in the Android SDK.
+This section holds the set of all functions that can be used to perform various tasks in the Android SDK.
 
 ### 1. Server
 
@@ -419,7 +418,7 @@ The following static methods are available on the `AfricasTalking` class to init
 
 #### b. Services
 
-##### b.1 Get a service
+##### Get a service
 
 - `getXXXService()`: Get an instance to a given `XXX` service. e.g. `AfricasTalking.getSmsService()`, `AfricasTalking.getPaymentService()`, etc.
 
@@ -428,14 +427,14 @@ All methods for all services are synchronous (i.e. will block current thread) bu
 
 Synchronous variants return a service reponse, asynchronous variants return void.
 
-If you use the synchronous variants, then make sure you run them in a separate thread from the main UI thread to prevent your app from crashing, and ensuring that you confirm to Android's programming standards (since we are making network calls).
+If you use the synchronous variants, then make sure you run them in a separate thread from the main UI thread to prevent your app from crashing, and ensuring that you conform to Android's programming standards (since we are making network calls).
 
-##### b.2 Account Service
+##### b.1 Account Service
 - `getUser()`: Get user information.
 
-- `getUser(Callback <AccountResponse> callback)`: Get user information with a callback. 
+- `getUser(Callback <AccountResponse> callback)`: asynchronous variant of getUser(). 
 
-##### b.3 Airtime Service
+##### b.2 Airtime Service
 
 - `send(String phone, String currency, float amount)`: Send airtime to a single phone number.
 
@@ -443,23 +442,23 @@ If you use the synchronous variants, then make sure you run them in a separate t
 
 - `send(String phone, String currency, float amount, Callback<AirtimeResponse> callback)`: Send airtime to a single phone number, with a callback.
 
-- `send(HashMap<String, String> recipients, Callback<AirtimeResponse> callback)`: Send airtime to a bunch of phone numbers. The keys in the `recipients` map are phone numbers while the values are airtime amounts ( e.g. `KES 678`).
+- `send(HashMap<String, String> recipients, Callback<AirtimeResponse> callback)`: Send airtime to a bunch of phone numbers, with a callback.
 
 For more information about status notification, please read [http://docs.africastalking.com/airtime/callback](http://docs.africastalking.com/airtime/callback) 
 
-###### b.4 Token Service
+###### b.3 Token Service
 
 - `createCheckoutToken(String phoneNumber)`: Create a checkout token.
 
 - `createCheckoutToken(String phoneNumber, Callback<CheckoutTokenResponse> callback)`: Create a checkout token with a callback response.
 
-###### b.5 SMS Service
+###### b.4 SMS Service
 
 ###### Send an sms to one or more numbers
 
 - `send(String message, String[] recipients)`: Send a message
 
-- `send(String message, String[] recipients, Callback<List<Recipient>> callback)`: Send a message
+- `send(String message, String[] recipients, Callback<List<Recipient>> callback)`: Send a message, with a callback
 
 - `send(String message, String from, String[] recipients)`: Send a message, passing in the number the message is from.
 
@@ -477,7 +476,7 @@ For more information about status notification, please read [http://docs.africas
 
 - `sendPremium(String message, String keyword, String linkId, long retryDurationInHours, String[] recipients)`: Send a premium SMS, passing in the retry duration
 
-- `sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients)`: Send a premium SMS, passing in the retry duration
+- `sendPremium(String message, String from, String keyword, String linkId, long retryDurationInHours, String[] recipients)`: Send a premium SMS, passing in the retry duration and the number the message is from
 
 - `sendPremium(String message, String keyword, String linkId, String[] recipients, Callback<List<Recipient>> callback)`: Send a premium SMS, with a callback
 
@@ -491,7 +490,7 @@ For more information about status notification, please read [http://docs.africas
 
 - `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken)`: Create a premium subscription
 
-- `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken, Callback<SubscriptionResponse> callback)`: create a premium sms subscription, with a callback passed in for handling the response.
+- `createSubscription(String shortCode, String keyword, String phoneNumber, String checkoutToken, Callback<SubscriptionResponse> callback)`: create a premium sms subscription, with a callback.
 
 For more information on: 
 
@@ -509,39 +508,39 @@ For more information on:
 
 - `fetchMessage(String lastReceivedId)`: Fetch the last received message
 
-- `fetchMessage(String lastReceivedId, Callback<List<Message>> callback)`: Fetch the last received message
+- `fetchMessage(String lastReceivedId, Callback<List<Message>> callback)`: Fetch the last received message with a callback
 
 - `fetchSubscription(String shortCode, String keyword)`: Fetch your premium subscription data
 
 - `fetchSubscription(String shortCode, String keyword, String lastReceivedId)`: Fetch your premium subscription data, for last received message
 
-- `fetchSubscription(String shortCode, String keyword, Callback<List<Message>> callback)`: Fetch your premium subscription data
+- `fetchSubscription(String shortCode, String keyword, Callback<List<Message>> callback)`: Fetch your premium subscription data, with a callback
 
-- `fetchSubscription(String shortCode, String keyword, String lastReceivedId)`: Fetch your premium subscription data, for last received message
+- `fetchSubscription(String shortCode, String keyword, String lastReceivedId)`: Fetch your premium subscription data, for last received message, with a callback
 
-###### b.6 Payment
+###### b.5 Payment
 
 - `checkout(CheckoutRequest request)`: Initiate checkout(mobile, card or bank).
 
-- `checkout(CheckoutRequest request, Callback<CheckoutResponse> callback)`: Initiate checkout(mobile, card or bank).
+- `checkout(CheckoutRequest request, Callback<CheckoutResponse> callback)`: Initiate checkout(mobile, card or bank), with a callback.
 
 - `validateCheckout(CheckoutValidateRequest request)`: Validate checkout (card or bank).
 
-- `validateCheckout(CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback)`: Validate checkout (card or bank).
+- `validateCheckout(CheckoutValidateRequest request, Callback<CheckoutValidationResponse> callback)`: Validate checkout (card or bank), with a callback.
 
 - `mobileB2C(String productName, List<Consumer> recipients)`: Send money to consumer. 
 
-- `mobileB2C(String productName, List<Consumer> recipients, Callback<B2CResponse> callback)`: Send money to consumer. 
+- `mobileB2C(String productName, List<Consumer> recipients, Callback<B2CResponse> callback)`: Send money to consumer, with a callback. 
 
 - `mobileB2B(String productName, Business recipient)`: Send money to business.
 
-- `mobileB2B(String productName, Business recipient, Callback<B2BResponse> callback)`: Send money to business.
+- `mobileB2B(String productName, Business recipient, Callback<B2BResponse> callback)`: Send money to business, with a callback.
 
-- `bankTransfer(String productName, List<Bank> recipients)`: Move money form payment wallet to bank account.
+- `bankTransfer(String productName, List<Bank> recipients)`: Move money from payment wallet to bank account.
 
-- `bankTransfer(String productName, List<Bank> recipients, Callback<BankTransferReponse> callback)`: Move money form payment wallet to bank account.
+- `bankTransfer(String productName, List<Bank> recipients, Callback<BankTransferReponse> callback)`: Move money from payment wallet to bank account, with a callback.
 
-###### b.7 Voice
+###### b.6 Voice
 
 To use the voice service, you'll need to import the following libraries.
 
@@ -707,9 +706,9 @@ The following methods may be of use in using the Voice Service in the SDK. They 
 
 - `endCall()`: end a call
 
-- `sendDtmf(char character)`:
+- `sendDtmf(char character)`: send the dialpad character the user has pressed
 
-- `startAudio()`:
+- `startAudio()`: initiate the phone speaker to start audio
 
 - `toggleMute()`: mute or unmute a call
 
@@ -718,14 +717,6 @@ The following methods may be of use in using the Voice Service in the SDK. They 
 - `isCallInProgress()`: returns a boolean indicating whether a call is in progress or not
 
 - `getCallInfo()`: get an instance of CallInfo
-
-- `queueStatus(String phoneNumbers)`:
-
-- `queueStatus(String phoneNumbers, Callback<QueuedCallsResponse> callback)`:
-
-- `mediaUpload(String url)`:
-
-- `mediaUpload(String url, Callback<String> callback)`:
 
 - `destroyService()`: destroy the voice service
 
