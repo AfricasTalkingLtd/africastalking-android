@@ -456,7 +456,7 @@ For more information about status notification, please read [http://docs.africas
 
 ###### Send an sms to one or more numbers
 
-**NOTE:** Setting enqueue to false means that the message will be sent and you will receive the response immediately. Setting it to true means that the response will be sent later after the message was sent. 
+**NOTE:** Setting enqueue to false means that the message will be sent and you will receive the response immediately. Setting it to true means that the response will be received later after the message was sent. 
 
 - `send(String message, String[] recipients, boolean enqueue)`: Send a message
 
