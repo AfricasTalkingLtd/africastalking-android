@@ -285,7 +285,7 @@ Write the Java code. It may look like this.
             
             //Will send "Hello" to "+254...". Note that the String is an array, so you can add more numbers to do a bulk
             //sms
-            sms.send("Hello", new String[]{"+254...."}, new Callback<List<Recipient>>() {
+            sms.send("Hello", new String[]{"+254...."}, false, new Callback<List<Recipient>>() {
                         @Override
                         public void onSuccess(List<Recipient> data) {
                             
@@ -429,7 +429,7 @@ Synchronous variants return a service reponse, asynchronous variants return void
 
 If you use the synchronous variants, then make sure you run them in a separate thread from the main UI thread to prevent your app from crashing, and ensuring that you conform to Android's programming standards (since we are making network calls).
 
-##### b.1 Account Service
+##### b.1 Application Service (For getting user account information
 - `getUser()`: Get user information.
 
 - `getUser(Callback <AccountResponse> callback)`: asynchronous variant of getUser(). 
@@ -456,17 +456,15 @@ For more information about status notification, please read [http://docs.africas
 
 ###### Send an sms to one or more numbers
 
-- `send(String message, String[] recipients)`: Send a message
+**NOTE:** Setting enqueue to false means that the message will be sent and you will receive the response immediately. Setting it to true means that the response will be sent later after the message was sent. 
 
-- `send(String message, String[] recipients, Callback<List<Recipient>> callback)`: Send a message, with a callback
+- `send(String message, String[] recipients, boolean enqueue)`: Send a message
 
-- `send(String message, String from, String[] recipients)`: Send a message, passing in the number the message is from.
+- `send(String message, String[] recipients, boolean enqueue, Callback<List<Recipient>> callback)`: Send a message, with a callback
 
-- `send(String message, String from, String[] recipients, Callback<List<Recipient>> callback)`: Send a message, passing in the number the message is from, with a callback.
+- `send(String message, String from, String[] recipients, boolean enqueue)`: Send a message, passing in the number the message is from.
 
-/* ***delete all sendBulk instances, update in SDK first before final push, with edit***
-
-- `sendBulk(String message, String[] recipients)`: Send a message in bulk
+- `send(String message, String from, String[] recipients, boolean enqueue, Callback<List<Recipient>> callback)`: Send a message, passing in the number the message is from, with a callback.
 
 ###### Send premium sms
 
