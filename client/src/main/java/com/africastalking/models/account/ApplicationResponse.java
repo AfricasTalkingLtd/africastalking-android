@@ -2,7 +2,7 @@ package com.africastalking.models.account;
 
 import com.google.gson.annotations.SerializedName;
 
-public final class AccountResponse {
+public final class ApplicationResponse {
 
     @SerializedName("UserData")
     public UserData userData;

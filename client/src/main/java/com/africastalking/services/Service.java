@@ -160,11 +160,11 @@ public abstract class Service {
 
     public static <T extends Service> T newInstance(String service) throws IOException {
 
-        if (service.contentEquals("account")) {
-            if (AccountService.sInstance == null) {
-                AccountService.sInstance = new AccountService();
+        if (service.contentEquals("application")) {
+            if (ApplicationService.sInstance == null) {
+                ApplicationService.sInstance = new ApplicationService();
             }
-            return (T) AccountService.sInstance;
+            return (T) ApplicationService.sInstance;
         }
 
 

@@ -10,7 +10,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0-alpha05'
+        classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
@@ -23,7 +23,7 @@ version properties.getProperty("bintray.version")
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.1"
+    buildToolsVersion '27.0.3'
 
 
     defaultConfig {
@@ -48,13 +48,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:design:27.0.1'
-    compile 'com.android.support:appcompat-v7:27.0.1'
-    compile 'com.android.support:support-compat:27.0.1'
-    compile ('io.card:android-sdk:5.5.1'){
+    implementation 'com.android.support:design:27.0.1'
+    implementation 'com.android.support:appcompat-v7:27.0.1'
+    implementation 'com.android.support:support-compat:27.0.1'
+    implementation ('io.card:android-sdk:5.5.1'){
         exclude group: "com.android.support"
     }
-    compile ('uk.co.chrisjenx:calligraphy:2.3.0'){
+    implementation ('uk.co.chrisjenx:calligraphy:2.3.0'){
         exclude group: "com.android.support"
     }
 }

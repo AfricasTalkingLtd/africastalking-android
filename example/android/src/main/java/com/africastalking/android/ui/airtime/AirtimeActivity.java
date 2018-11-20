@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.africastalking.AfricasTalking;
 import com.africastalking.android.R;
 import com.africastalking.android.ui.BaseActivity;
+import com.africastalking.models.account.ApplicationResponse;
 import com.africastalking.models.airtime.AirtimeResponse;
 import com.africastalking.services.AirtimeService;
 
