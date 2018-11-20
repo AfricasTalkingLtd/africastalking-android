@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+properties.load(project.rootProject.file('local.properties').newDataInputStream()) //Initializing properties???
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.1"
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "com.africastalking.android"
@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.7.0'
     implementation 'com.jraska:console:0.4.3'
     implementation 'com.jraska:console-timber-tree:0.4.3'
+    implementation project(':client')
     implementation project(':client-ui')
     testImplementation 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'

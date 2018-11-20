@@ -9,7 +9,7 @@ import retrofit2.http.Query;
 /**
  * Account Endpoints
  */
-public interface AccountServiceInterface {
+public interface ApplicationServiceInterface {
     @GET("user")
     Call<ApplicationResponse> getUser(@Query("username") String username);
 }

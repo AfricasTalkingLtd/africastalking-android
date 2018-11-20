@@ -17,11 +17,6 @@ public interface SmsServiceInterface {
     @FormUrlEncoded
     @POST("messaging")
     Call<SendMessageResponse> send(@Field("username") String username, @Field("to") String to,
-                                   @Field("from") String from, @Field("message") String message);
-
-    @FormUrlEncoded
-    @POST("messaging")
-    Call<SendMessageResponse> sendBulk(@Field("username") String username, @Field("to") String to,
                                    @Field("from") String from, @Field("message") String message,
                                    @Field("bulkSMSMode") int bulkMode, @Field("enqueue") String enqueue);
     @FormUrlEncoded

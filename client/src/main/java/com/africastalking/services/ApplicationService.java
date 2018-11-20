@@ -2,7 +2,7 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.models.account.AccountResponse;
+import com.africastalking.models.account.ApplicationResponse;
 
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -12,20 +12,20 @@ import java.io.IOException;
 /**
  * Account service. Retrieve user account info
  */
-public class AccountService extends Service {
+public class ApplicationService extends Service {
 
-    static AccountService sInstance;
-    private AccountServiceInterface service;
+    static ApplicationService sInstance;
+    private ApplicationServiceInterface service;
 
-    AccountService() throws IOException {
+    ApplicationService() throws IOException {
         super();
     }
 
     @Override
-    protected AccountService getInstance() throws IOException {
+    protected ApplicationService getInstance() throws IOException {
 
         if (sInstance == null) {
-            sInstance = new AccountService();
+            sInstance = new ApplicationService();
         }
 
         return sInstance;
@@ -39,7 +39,7 @@ public class AccountService extends Service {
                 .baseUrl(url)
                 .build();
 
-        service = retrofit.create(AccountServiceInterface.class);
+        service = retrofit.create(ApplicationServiceInterface.class);
     }
 
     @Override
@@ -65,8 +65,8 @@ public class AccountService extends Service {
      * @return String in specified format, xml or json
      * @throws IOException
      */
-    public AccountResponse getUser() throws IOException {
-        Response<AccountResponse> resp = service.getUser(username).execute();
+    public ApplicationResponse getUser() throws IOException {
+        Response<ApplicationResponse> resp = service.getUser(username).execute();
         if (!resp.isSuccessful()) {
             throw new IOException(resp.errorBody().string());
         }
@@ -81,7 +81,7 @@ public class AccountService extends Service {
      * </p>
      * @param callback
      */
-    public void getUser(final Callback<AccountResponse> callback) {
+    public void getUser(final Callback<ApplicationResponse> callback) {
         service.getUser(username).enqueue(makeCallback(callback));
     }
 }

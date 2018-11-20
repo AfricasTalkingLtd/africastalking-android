@@ -77,8 +77,8 @@ public final class SmsService extends Service {
      * Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> send(String message, String from, String[] recipients) throws IOException {
-        Response<SendMessageResponse> resp = sms.send(username, formatRecipients(recipients), from, message).execute();
+    public List<Recipient> send(String message, String from, String[] recipients, boolean enqueue) throws IOException {
+        Response<SendMessageResponse> resp = sms.send(username, formatRecipients(recipients), from, message, 1, enqueue ? "1" : null).execute();
         if (!resp.isSuccessful()) {
             throw new IOException(resp.errorBody().string());
         }
@@ -98,8 +98,8 @@ public final class SmsService extends Service {
      * occurred
      * </p>
      */
-    public void send(String message, String from, String[] recipients, final Callback<List<Recipient>> callback) {
-        sms.send(username, formatRecipients(recipients), from, message).enqueue(makeCallback(new Callback<SendMessageResponse>() {
+    public void send(String message, String from, String[] recipients, boolean enqueue, final Callback<List<Recipient>> callback) {
+        sms.send(username, formatRecipients(recipients), from, message, 1, enqueue ? "1" : null).enqueue(makeCallback(new Callback<SendMessageResponse>() {
             @Override
             public void onSuccess(SendMessageResponse data) {
                 if (data != null) {
@@ -122,8 +122,8 @@ public final class SmsService extends Service {
      * Synchronously send the request and return its response.
      * </p>
      */
-    public List<Recipient> send(String message, String[] recipients) throws IOException {
-        return send(message, null, recipients);
+    public List<Recipient> send(String message, String[] recipients, boolean enqueue) throws IOException {
+        return send(message, null, recipients,enqueue);
     }
 
 
@@ -134,132 +134,17 @@ public final class SmsService extends Service {
      * occurred
      * </p>
      */
-    public void send(String message, String[] recipients, Callback<List<Recipient>> callback) {
-        send(message, null, recipients, callback);
+    public void send(String message, String[] recipients, boolean enqueue, Callback<List<Recipient>> callback) {
+        send(message, null, recipients, enqueue, callback);
     }
 
 
     // -> Bulk
 
     /**
-     * Send a message in bulk
-     * <p>
-     * Synchronously send the request and return its response.
-     * </p>
+     * sendBulk()
+     * Deprecated
      */
-    public List<Recipient> sendBulk(String message, String from, boolean enqueue, String[] recipients) throws IOException {
-        Response<SendMessageResponse> resp = sms.sendBulk(
-                username,
-                formatRecipients(recipients),
-                from,
-                message,
-                1,
-                enqueue ? "1" : null).execute();
-
-        if (!resp.isSuccessful()) {
-            throw new IOException(resp.errorBody().string());
-        }
-
-        try {
-            return resp.body().data.recipients;
-        } catch (NullPointerException npe) {
-            throw new IOException("Invali API response");
-        }
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Asynchronously send the request and notify {@code callback} of its response or if an error
-     * occurred
-     * </p>
-     */
-    public void sendBulk(String message, String from, boolean enqueue, String[] recipients, final Callback<List<Recipient>> callback) {
-        sms.sendBulk(username,
-                formatRecipients(recipients),
-                from,
-                message,
-                1,
-                enqueue ? "1" : null).enqueue(makeCallback(new Callback<SendMessageResponse>() {
-
-                @Override
-                public void onSuccess(SendMessageResponse data) {
-                    if (data != null) {
-                        callback.onSuccess(data.data.recipients);
-                    } else {
-                        callback.onFailure(new Exception("Invalid API response"));
-                    }
-                }
-
-                @Override
-                public void onFailure(Throwable throwable) {
-                    callback.onFailure(throwable);
-                }
-        }));
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Synchronously send the request and return its response.
-     * </p>
-     */
-    public List<Recipient> sendBulk(String message, String from, String[] recipients) throws IOException {
-        return sendBulk(message, from, false, recipients);
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Asynchronously send the request and notify {@code callback} of its response or if an error
-     * occurred
-     * </p>
-     */
-    public void sendBulk(String message, String from, String[] recipients, Callback<List<Recipient>> callback) {
-        sendBulk(message, from, false, recipients, callback);
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Synchronously send the request and return its response.
-     * </p>
-     */
-    public List<Recipient> sendBulk(String message, boolean enqueue, String[] recipients) throws IOException {
-        return sendBulk(message, null, enqueue, recipients);
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Asynchronously send the request and notify {@code callback} of its response or if an error
-     * occurred
-     * </p>
-     */
-    public void sendBulk(String message, boolean enqueue, String[] recipients, Callback<List<Recipient>> callback) {
-        sendBulk(message, null, enqueue, recipients, callback);
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Synchronously send the request and return its response.
-     * </p>
-     */
-    public List<Recipient> sendBulk(String message, String[] recipients) throws IOException {
-        return sendBulk(message, null, false, recipients);
-    }
-
-    /**
-     * Send a message in bulk
-     * <p>
-     * Asynchronously send the request and notify {@code callback} of its response or if an error
-     * occurred
-     * </p>
-     */
-    public void sendBulk(String message, String[] recipients, Callback<List<Recipient>> callback) {
-        sendBulk(message, null, false, recipients, callback);
-    }
 
 
     // -> Premium
