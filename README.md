@@ -466,6 +466,8 @@ For more information about status notification, please read [http://docs.africas
 
 - `send(String message, String from, String[] recipients, boolean enqueue, Callback<List<Recipient>> callback)`: Send a message, passing in the number the message is from, with a callback.
 
+**Note** "from" is your sms shortcode or alphanumeric name created from your Africa's Talking account. You can create one for testing from: https://account.africastalking.com/apps/sandbox/sms/shortcodes/create
+
 ###### Send premium sms
 
 - `sendPremium(String message, String keyword, String linkId, String[] recipients)`: Send a premium SMS
