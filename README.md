@@ -189,22 +189,13 @@ public class SomeActivity extends Activity {
         setContentView(R.layout.some_activity);
         
         // Initialize SDK
-        try{
-        
-            AfricasTalking.initialize(SERVER_HOSTNAME);
 
-            //Use this instead if you specified a port for your server
-            //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
+        AfricasTalking.initialize(SERVER_HOSTNAME);
 
-            //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
-          
-        }catch (IOException e){
-        
-            //Do something
-            
-        }
-        
-        //
+        //Use this instead if you specified a port for your server
+        //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
+
+        //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
     }
 }
 ```
