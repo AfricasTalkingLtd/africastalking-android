@@ -51,20 +51,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        try {
-            Timber.i("Initializing SDK...");
-            AfricasTalking.initialize(
-                    BuildConfig.RPC_HOST,
-                    BuildConfig.RPC_PORT, true);
-            AfricasTalking.setLogger(new Logger() {
-                @Override
-                public void log(String message, Object... args) {
-                    Timber.d(message, args);
-                }
-            });
-        } catch (IOException ex) {
-            Timber.e(ex.getMessage());
-        }
+        //Initialize the SDK
+        Timber.i("Initializing SDK...");
+        AfricasTalking.initialize(
+                BuildConfig.RPC_HOST,
+                BuildConfig.RPC_PORT, true);
+        AfricasTalking.setLogger(new Logger() {
+            @Override
+            public void log(String message, Object... args) {
+                Timber.d(message, args);
+            }
+        });
     }
 
     @OnClick(R.id.airtime_layout)

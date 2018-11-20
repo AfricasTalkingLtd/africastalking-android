@@ -4,7 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.text.TextUtils;
 
-import com.africastalking.services.AccountService;
+import com.africastalking.services.ApplicationService;
 import com.africastalking.services.AirtimeService;
 import com.africastalking.services.PaymentService;
 import com.africastalking.services.Service;
@@ -44,17 +44,17 @@ public final class AfricasTalking {
     );
 
 
-    public static void initialize(String host, int port, boolean disableTLS) throws IOException {
+    public static void initialize(String host, int port, boolean disableTLS) {
         Service.HOST = host;
         Service.PORT = port;
         Service.DISABLE_TLS = disableTLS;
     }
 
-    public static void initialize(String host, int port) throws IOException {
+    public static void initialize(String host, int port) {
         initialize(host, port, false);
     }
 
-    public static void initialize(String host) throws IOException {
+    public static void initialize(String host) {
         initialize(host, Service.PORT, false);
     }
 
@@ -89,8 +89,13 @@ public final class AfricasTalking {
         return Service.newInstance("payment");
     }
 
+    /*
     public static AccountService getAccountService() throws IOException {
         return Service.newInstance("account");
+    } */
+
+    public static ApplicationService getApplicationService() throws IOException {
+        return Service.newInstance("application");
     }
 
     public static TokenService getTokenService() throws IOException {

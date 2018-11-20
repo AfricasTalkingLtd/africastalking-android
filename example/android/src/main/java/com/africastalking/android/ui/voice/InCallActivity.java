@@ -179,5 +179,6 @@ public class InCallActivity extends AppCompatActivity {
             mService.unregisterCallListener(mCallListener);
         }
         super.onDestroy();
+
     }
 }

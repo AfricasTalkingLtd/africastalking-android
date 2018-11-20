@@ -6,7 +6,7 @@ This SDK simplifies the integration of Africa's Talking APIs into your Android a
 the SDK is split into two components: A **server** module that stores API keys, SIP credentials and other secrets.
 And a **client** module that runs in your app. This client module gets secrets from the server component (via RPC), and uses them to interact with the various APIs.
 
-For instance, to send an SMS, the client with request a token from the server; The server will use it's API key to request a token from Africa's Talking on behalf of the client. It will then forward the token to the client which will use it to request the SMS API to send a text. All in a split second!
+For instance, to send an SMS, the client with (**will**) request a token from the server; The server will use it's API key to request a token from Africa's Talking on behalf of the client. It will then forward the token to the client which will use it to request the SMS API to send a text. All in a split second!
 
 
 ### Usage
@@ -48,29 +48,24 @@ public class SomeActivity extends Activity {
         super.onCreate(args);
         setContentView(R.layout.some_activity);
         
-        try {
-            // Init SDK
-            AfricasTalking.initialize(SERVER_HOSTNAME);
+        // Init SDK
+        AfricasTalking.initialize(SERVER_HOSTNAME);
+       
+        // Get Service
+        AirtimeService airtime = AfricasTalking.getAirtimeService();
 
-            // Get Service
-            AirtimeService airtime = AfricasTalking.getAirtimeService();
+        // Use Service
+        airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
+          @Override
+          void onSuccess(AirtimeResponses responses) {
+            //...
+          }
 
-            // Use Service
-            airtime.send("+25467675655", "KES", 100, new Callback<AirtimeResponses>() {
-              @Override
-              void onSuccess(AirtimeResponses responses) {
-                //...
-              }
-
-              @Override
-              void onError(Throwable throwable) {
-                //...
-              }
-            });
-        
-        } catch (IOException ex) {
-            // grrr
-        }
+          @Override
+          void onError(Throwable throwable) {
+            //...
+          }
+        });
     }
 }
 ```

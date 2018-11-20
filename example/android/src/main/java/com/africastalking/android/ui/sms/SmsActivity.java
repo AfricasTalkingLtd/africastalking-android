@@ -10,7 +10,9 @@ import com.africastalking.android.ui.BaseActivity;
 import com.africastalking.models.sms.Recipient;
 import com.africastalking.models.sms.SendMessageResponse;
 import com.africastalking.services.SmsService;
+import com.africastalking.utils.Callback;
 
+import java.io.IOException;
 import java.util.List;
 
 import timber.log.Timber;
@@ -33,7 +35,7 @@ public class SmsActivity extends BaseActivity {
                     SmsService sms = AfricasTalking.getSmsService();
 
                     Timber.i("Sending hello to 0718769882");
-                    List<Recipient> res = sms.send("hello", new String[]{"0718769882"});
+                    List<Recipient> res = sms.send("hello", new String[]{"0718769882"},false);
 
                     Timber.i(res.get(0).messageId);
                     Timber.i(res.get(0).status);
