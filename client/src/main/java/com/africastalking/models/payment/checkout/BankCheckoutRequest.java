@@ -18,9 +18,9 @@ public final class BankCheckoutRequest extends CheckoutRequest {
         public String dateOfBirth;
 
         /**
-         * A bank account
-         * @param accountName Bank account name e.g. Odeyola LeGrand
-         * @param accountNumber Bank account number e.g. 0982627488993
+         * A bank application
+         * @param accountName Bank application name e.g. Odeyola LeGrand
+         * @param accountNumber Bank application number e.g. 0982627488993
          * @param bankCode Bank code. See supported banks {@link com.africastalking.models.payment.checkout.BankCode BankCode}
          */
         public BankAccount(String accountName, String accountNumber, BankCode bankCode) {

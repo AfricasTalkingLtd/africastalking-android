@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize the SDK
         Timber.i("Initializing SDK...");
+
+        //Find these values at the local.properties file in the Gradle Scripts dropdown in the right panel
         AfricasTalking.initialize(
                 BuildConfig.RPC_HOST,
                 BuildConfig.RPC_PORT, true);

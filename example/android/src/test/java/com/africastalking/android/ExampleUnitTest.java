@@ -384,7 +384,7 @@ class MyApp {
         for (int i = 0; i < accCfgs.size(); i++) {
             MyAccountConfig my_cfg = accCfgs.get(i);
 
-	    /* Customize account config */
+	    /* Customize application config */
             my_cfg.accCfg.getNatConfig().setIceEnabled(true);
             my_cfg.accCfg.getVideoConfig().setAutoTransmitOutgoing(true);
             my_cfg.accCfg.getVideoConfig().setAutoShowIncoming(true);
@@ -440,7 +440,7 @@ class MyApp {
             ContainerNode tp_node = root.readContainer("SipTransport");
             sipTpConfig.readObject(tp_node);
 
-	    /* Read account configs */
+	    /* Read application configs */
             accCfgs.clear();
             ContainerNode accs_node = root.readArray("accounts");
             while (accs_node.hasUnread()) {
@@ -487,7 +487,7 @@ class MyApp {
             ContainerNode tp_node = json.writeNewContainer("SipTransport");
             sipTpConfig.writeObject(tp_node);
 
-	    /* Write account configs */
+	    /* Write application configs */
             buildAccConfigs();
             ContainerNode accs_node = json.writeNewArray("accounts");
             for (int i = 0; i < accCfgs.size(); i++) {

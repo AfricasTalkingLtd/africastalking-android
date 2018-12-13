@@ -140,7 +140,7 @@ public final class SipStack implements CallController {
 
         sEndPoint.libStart();
 
-        Log.d(TAG,  "Loading account...");
+        Log.d(TAG,  "Loading application...");
         loadAccount(registrationListener, credentials);
 
         sInstance = this;

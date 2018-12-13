@@ -3,7 +3,6 @@ package com.africastalking.android.ui.payment;
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +22,7 @@ import com.africastalking.utils.Callback;
 import com.africastalking.android.R;
 import com.africastalking.models.payment.checkout.CheckoutResponse;
 import com.africastalking.services.PaymentService;
+import com.africastalking.android.ui.BaseActivity;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-public class PaymentActivity extends AppCompatActivity {
+public class PaymentActivity extends BaseActivity {
 
     PaymentService payment;
 

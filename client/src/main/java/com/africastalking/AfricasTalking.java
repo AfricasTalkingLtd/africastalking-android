@@ -91,7 +91,7 @@ public final class AfricasTalking {
 
     /*
     public static AccountService getAccountService() throws IOException {
-        return Service.newInstance("account");
+        return Service.newInstance("application");
     } */
 
     public static ApplicationService getApplicationService() throws IOException {

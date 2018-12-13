@@ -2,7 +2,7 @@ package com.africastalking.services;
 
 
 import com.africastalking.utils.Callback;
-import com.africastalking.models.account.ApplicationResponse;
+import com.africastalking.models.application.ApplicationResponse;
 
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -10,7 +10,7 @@ import retrofit2.Retrofit;
 import java.io.IOException;
 
 /**
- * Account service. Retrieve user account info
+ * Account service. Retrieve user application info
  */
 public class ApplicationService extends Service {
 

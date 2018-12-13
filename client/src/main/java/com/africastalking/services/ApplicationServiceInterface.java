@@ -1,6 +1,6 @@
 package com.africastalking.services;
 
-import com.africastalking.models.account.ApplicationResponse;
+import com.africastalking.models.application.ApplicationResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

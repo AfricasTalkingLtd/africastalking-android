@@ -1,4 +1,4 @@
-package com.africastalking.models.account;
+package com.africastalking.models.application;
 
 import com.google.gson.annotations.SerializedName;
 

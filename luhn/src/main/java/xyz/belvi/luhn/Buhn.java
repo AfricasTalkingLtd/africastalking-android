@@ -87,7 +87,7 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
 
 
         BankTextWatcher accountNameWatcher = new BankTextWatcher(
-                accountName, 2, "Enter a valid account name",
+                accountName, 2, "Enter a valid application name",
                 new Runnable() {
                     @Override
                     public void run() {
@@ -95,7 +95,7 @@ public final class Buhn extends BaseActivity implements LuhnVerifier {
                     }
                 });
         BankTextWatcher accountNumberWatcher = new BankTextWatcher(
-                accountNumber, 5, "Enter a valid account number",
+                accountNumber, 5, "Enter a valid application number",
                 new Runnable() {
                     @Override
                     public void run() {
