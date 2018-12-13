@@ -8,30 +8,17 @@ And a **client** module that runs in your app. This client module gets secrets f
 
 For instance, to send an SMS, the client will request a token from the server; The server will use it's API key to request a token from Africa's Talking on behalf of the client. It will then forward the token to the client which will use it to request, say, the SMS API to send a text. All in a split second!
 
+If you plan on integrating the SDK to your android app, please avoid cloning this whole repo. Instead, just follow as instructed in this ReadMe.
 
-## Usage
 
-**NOTE:** 
 
-  **a)** The code samples seen here are for running a simple server and doing simple API requests. See the advanced section for the list of all methods you can use within the SDK to access the various services.
-
-   **b)** If you plan on integrating the SDK to your android app, please avoid cloning this whole repo. Instead, just follow as instructed in this ReadMe.
+## Install 
 
 ### 1. Server
-You can code your server using android studio, eclipse or any other IDE you may deem fit.
 
-**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC. Visit these links to get the Africa's Talking Node.js SDK to see a template of how your server should look like in Node.js.
+**Download dependencies**
 
-https://github.com/AfricasTalkingLtd/africastalking-node.js
-
-
-**If you are using Java for your server...**
-
-Whichever IDE you choose to work with, the following need to be done.
-
-#### a. Download dependencies
-
-If you are using android studio (or gradle dependencies), add the following code snippet in your build.gradle file (Module: your_server's_module_name)
+If you are using android studio (or gradle dependencies), add the following code snippet in your build.gradle file
 
 ```groovy
 repositories {
@@ -55,84 +42,11 @@ Maven (from `http://dl.bintray.com/africastalking/java`)
 </dependency>
 ```
 
-#### b. Add server side code
+### 2. Android app
 
-First, import the following library classes in the class you've created to run the server.
+**download dependencies**
 
-```Java
-
-    import com.africastalking.AfricasTalking;
-    import com.africastalking.Server;
-    
-    import java.io.IOException;
-    
-```
-
-Now put this Java code in the class you've created to run your server.
-
-Your server application could be something like this:
-
-```java
-/* On The Server (Java) */
-
-import com.africastalking.*;
-
-public class SomeJavaApplication {
-
-    //Save your credentials in static final variables
-    private static final String USERNAME = "your_username"; //Use "sandbox" if you are testing
-    
-    application
-    //go to https://account.africastalking.com/apps/sandbox/settings/key
-    private static final String API_KEY = "your_API_KEY"; 
-                                                  
-    //Optional
-    private static final int port = "your_server's_port_number";
-                                                  
-    public static void main(String[] args) {
-    
-        // Initialize the SDK
-        AfricasTalking.initialize(USERNAME, API_KEY);
-        
-        // Initialize the server
-        Server server = new Server();
-        
-        // Add SIP credentials (Voice Only)
-        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
-        
-        // Start the server
-        try{
-                server.startInsecure();
-                
-                //Use this if you have provided a port
-                //server.startInsecure(port);
-                
-                //Please see the Advanced section for a list of other functions you can use to start your server
-        } catch (IOException e){
-        
-                //Do something if server doesn't start
-        }
-    }
-}
-```
-
-You may need to add the following code snippet just after **server.startInsecure()**, to ensure your server stays alive until you terminate it (Only add this if you run the above code and the server stops prematurely). For a server set to serve a production application, this may not be necessary.
-
-```
-//A loop to help us keep our server online until we terminate it
-            System.out.println("Press ENTER to exit");
-            System.in.read();
-```
-
-This is enough to run your simple server. Now to the android app.
-
-### 2. Android App
-
-In your android app, you need to add the following dependencies, and structure your code as shown below.
-
-#### a. Add dependencies
-
-Go to the build.gradle file (Module: app [or the name of the module your app's code is in]) and add the following code snippet.
+Go to the build.gradle file for your app module and add the following code snippet.
 
 ```groovy
 
@@ -166,9 +80,77 @@ dependencies{
 }
 ```
 
-#### b. Add Africa's Talking SDK Code
+## Initialization
 
-First, import the following library classes.
+### 1. Server
+
+Import the following library classes.
+
+```Java
+
+    import com.africastalking.AfricasTalking;
+    import com.africastalking.Server;
+    
+    import java.io.IOException;
+    
+```
+
+Now put this Java code.
+
+Your server application could be something like this:
+
+```java
+/* On The Server (Java) */
+
+import com.africastalking.*;
+
+public class SomeJavaApplication {
+
+    //Save your credentials. Use "sandbox" if you are testing
+    private static final String USERNAME = "your_username";
+    
+    //You can generate this for testing in your Africa's Talking account.
+    //go to https://account.africastalking.com/apps/sandbox/settings/key
+    private static final String API_KEY = "your_API_KEY"; 
+                                                  
+    //Optional
+    private static final int port = "your_server's_port_number";
+                                                  
+    public static void main(String[] args) {
+    
+        // Initialize the SDK
+        AfricasTalking.initialize(USERNAME, API_KEY);
+        
+        // Initialize the server
+        Server server = new Server();
+        
+        // Add SIP credentials (Voice Only)
+        server.addSipCredentials(SIP_USERNAME, SIP_PASSWORD, SIP_HOST);
+        
+        // Start the server
+        try{
+                server.startInsecure();
+                
+                //Use this if you have provided a port
+                //server.startInsecure(port);
+                
+        } catch (IOException e){
+        
+                //Do something if server doesn't start
+        }
+    }
+}
+```
+
+You can code your server using android studio, eclipse or any other IDE you may deem fit.
+
+**NOTE** You are not restricted to use Java to code your server. You can instead use Node.js, PHP, C/C++, C#, and all languages supported by gRPC. Visit these links to get the Africa's Talking Node.js SDK to see a template of how your server should look like in Node.js.
+
+https://github.com/AfricasTalkingLtd/africastalking-node.js
+
+### 2. Android App
+
+Import the following library classes.
 
 ```Java 
 
@@ -177,7 +159,7 @@ First, import the following library classes.
     import java.io.IOException;
 ```
 
-Adding the following code snippet in, preferrably, MainActivity (or whatever activity your app launches to).
+Add the following code snippet in, preferrably, MainActivity (or whatever activity your app launches to).
 
 ```java
 /* On The Client (Android) */
@@ -185,24 +167,43 @@ public class SomeActivity extends Activity {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(Bundle savedInstanceState);
-        setContentView(R.layout.some_activity);
+         
+         //....
         
         // Initialize SDK
+        try{
+        
+            AfricasTalking.initialize(SERVER_HOSTNAME);
 
-        AfricasTalking.initialize(SERVER_HOSTNAME);
+            //Use this instead if you specified a port for your server
+            //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
 
-        //Use this instead if you specified a port for your server
-        //AfricasTalking.initialize(SERVER_HOSTNAME, port, true);
-
-        //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
+            //The SERVER_HOSTNAME can be the ip address of your server on the network or a domain name that can be resolved
+          
+        }catch (IOException e){
+        
+            //Do something
+            
+        }
+        
     }
 }
 ```
 
-The code snippet above initializes the SDK. Now, you can use the various Africa's Talking API services as follows:
+You may need to add the following code snippet just after **server.startInsecure()**, to ensure your server stays alive until you terminate it (Only add this if you run the above code and the server stops prematurely). For a server set to serve a production application, this may not be necessary.
 
-#### b.1 Airtime Service
+```
+//A loop to help us keep our server online until we terminate it
+            System.out.println("Press ENTER to exit");
+            System.in.read();
+```
+
+
+## Usage
+
+### Android App
+
+#### 1. Airtime Service
 
 Add this code snippet in whatever method or activity you would want to invoke for using the Airtime service.
 
@@ -248,7 +249,7 @@ Write the java code. It may look like this.
         }
 ```
 
-#### b.2 SMS Service
+#### 2. SMS Service
 
 Add this code snippet in whatever method or activity you would want to invoke for using the SMS service.
 
@@ -298,7 +299,7 @@ Write the Java code. It may look like this.
         
 ```
 
-#### b.3 Payment Service
+#### 3. Payment Service
 
 Add this code snippet in whatever method or activity you would want to invoke for using the Payment service.
 
@@ -353,7 +354,7 @@ Write the Java code. It may look like this.
             
 ```
 
-#### b.4 Voice Service
+#### 4. Voice Service
 
 Please find this code provided in the Advanced section
 
