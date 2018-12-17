@@ -31,6 +31,8 @@ dependencies{
 }
 ```
 
+For Maven dependencies (if you are using Eclipse IDE)
+
 Maven (from `http://dl.bintray.com/africastalking/java`)
 
 ```xml
