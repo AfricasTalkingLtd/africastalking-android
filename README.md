@@ -30,7 +30,6 @@ dependencies{
   implementation 'com.africastalking:server:VERSION'
 }
 ```
-If you are using Eclipse IDE, or you use Maven dependencies instead, add this code snipppet in your Maven dependencies.
 
 Maven (from `http://dl.bintray.com/africastalking/java`)
 
